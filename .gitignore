@@ -1,0 +1,116 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code related
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Gradle
+.gradle/
+build/
+local.properties
+*.keystore
+*.jks
+*.apk
+*.aab
+
+# iOS
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Linux
+**/linux/**/flutter/
+**/linux/**/build/
+**/linux/**/.flutter-plugins
+**/linux/**/.flutter-plugins-dependencies
+**/linux/**/.packages
+
+# Windows
+**/windows/**/flutter/
+**/windows/**/build/
+**/windows/**/.flutter-plugins
+**/windows/**/.flutter-plugins-dependencies
+**/windows/**/.packages
+
+# macOS
+**/macos/**/flutter/
+**/macos/**/build/
+**/macos/**/.flutter-plugins
+**/macos/**/.flutter-plugins-dependencies
+**/macos/**/.packages
+
+# Web
+**/web/**/flutter/
+**/web/**/build/
+
+# Backend
+hitutor-backend/.idea/
+hitutor-backend/target/
+hitutor-backend/*.iml
+hitutor-backend/.DS_Store
+hitutor-backend/logs/
+hitutor-backend/*.log
+hitutor-backend/application-local.yml
+hitutor-backend/application-dev.yml
+hitutor-backend/application-prod.yml
