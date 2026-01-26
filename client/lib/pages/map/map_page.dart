@@ -148,8 +148,8 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       }
 
       position ??= Position(
-        latitude: 39.9042,
-        longitude: 116.4074,
+        latitude: 28.66999503,
+        longitude: 115.82297033,
         timestamp: DateTime.now(),
         accuracy: 0,
         altitude: 0,
@@ -248,13 +248,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   Future<void> _loadMarkers() async {
     if (_mapController == null) return;
 
-    if (_currentLocation == null) {
-      return;
-    }
-
-    final latitude = _currentLocation!.latitude;
-    final longitude = _currentLocation!.longitude;
-
     try {
       setState(() {
         _markers.clear();
@@ -264,21 +257,13 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
       
       if (widget.role == 'tutor') {
-        await tutorProvider.getNearbyStudentsByLocation(
-          latitude: latitude,
-          longitude: longitude,
-          radius: 20,
-        );
+        await tutorProvider.getNearbyStudents(page: 1, limit: 100);
       } else {
-        await tutorProvider.getNearbyTutorsByLocation(
-          latitude: latitude,
-          longitude: longitude,
-          radius: 20,
-        );
+        await tutorProvider.getNearbyTutors(page: 1, limit: 100);
       }
 
       final tutorsData = tutorProvider.tutors;
-
+      
       for (var tutor in tutorsData) {
         final latitude = tutor.latitude;
         final longitude = tutor.longitude;
@@ -298,6 +283,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             double.tryParse(longitude.toString()) ?? 0,
           );
           
+          _tutors.add(tutor);
           _markers.add(Marker(
             position: markerPosition,
             icon: icon,
@@ -430,7 +416,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                       children: [
                         Row(
                           children: [
-                            Expanded(
+                            Flexible(
                               child: Text(
                                 tutor.user.name,
                                 style: const TextStyle(
@@ -442,7 +428,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const SizedBox(width: 4),
                             if (tutor.user.isVerified)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

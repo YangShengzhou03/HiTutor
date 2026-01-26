@@ -34,7 +34,7 @@
   "message": "获取用户信息成功",
   "data": {
     "id": "123",
-    "name": "张三",
+    "username": "张三",
     "phone": "13800138000",
     "email": "zhangsan@example.com",
     "role": "student",
@@ -97,7 +97,7 @@
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "user": {
       "id": "123",
-      "name": "张三",
+      "username": "张三",
       "phone": "13800138000",
       "email": "zhangsan@example.com",
       "role": "student"
@@ -208,8 +208,7 @@
   "message": "获取用户信息成功",
   "data": {
     "id": "123",
-    "name": "张三",
-    "username": "zhangsan",
+    "username": "张三",
     "avatar": "https://example.com/avatar.jpg",
     "phone": "13800138000",
     "email": "zhangsan@example.com",
@@ -236,7 +235,7 @@
     "content": [
       {
         "id": "123",
-        "name": "张三",
+        "username": "张三",
         "phone": "13800138000",
         "email": "zhangsan@example.com",
         "role": "student",
@@ -259,7 +258,7 @@
     "content": [
       {
         "id": "123",
-        "name": "张三",
+        "username": "张三",
         "phone": "13800138000",
         "email": "zhangsan@example.com",
         "role": "tutor",
@@ -324,21 +323,22 @@
       {
         "id": 1,
         "userId": "123",
+        "userName": "张三",
+        "userAvatar": "https://example.com/avatar.jpg",
+        "userVerified": true,
         "subjectId": 1,
         "subjectName": "数学",
-        "educationBackground": "北京大学",
-        "teachingExperience": 5,
         "hourlyRate": "100-150",
-        "teachingStyle": "耐心细致",
-        "introduction": "本人有5年教学经验...",
+        "address": "北京市朝阳区",
+        "latitude": "39.9042",
+        "longitude": "116.4074",
+        "description": "本人有5年教学经验...",
+        "availableTime": "周末",
+        "targetGradeLevels": "小学,初中",
         "status": "available",
-        "user": {
-          "id": "123",
-          "name": "张三",
-          "avatar": "https://example.com/avatar.jpg",
-          "phone": "13800138000",
-          "isVerified": true
-        }
+        "rating": 4.8,
+        "reviewCount": 20,
+        "createdAt": "2024-01-01 10:00:00"
       }
     ],
     "page": 0,
@@ -357,17 +357,22 @@
     {
       "id": 1,
       "userId": "123",
+      "userName": "张三",
+      "userAvatar": "https://example.com/avatar.jpg",
+      "userVerified": true,
+      "subjectId": 1,
       "subjectName": "数学",
       "hourlyRate": "100-150",
-      "latitude": 39.9042,
-      "longitude": 116.4074,
-      "distance": 2.5,
-      "user": {
-        "id": "123",
-        "name": "张三",
-        "avatar": "https://example.com/avatar.jpg",
-        "isVerified": true
-      }
+      "address": "北京市朝阳区",
+      "latitude": "39.9042",
+      "longitude": "116.4074",
+      "description": "本人有5年教学经验...",
+      "availableTime": "周末",
+      "targetGradeLevels": "小学,初中",
+      "status": "available",
+      "rating": 4.8,
+      "reviewCount": 20,
+      "createdAt": "2024-01-01 10:00:00"
     }
   ]
 }
@@ -385,23 +390,21 @@
       {
         "id": 1,
         "userId": "456",
+        "userName": "李四",
+        "userAvatar": "https://example.com/avatar.jpg",
         "childName": "小明",
         "childGrade": "小学三年级",
         "subjectId": 1,
         "subjectName": "数学",
         "address": "北京市朝阳区",
-        "latitude": 39.9042,
-        "longitude": 116.4074,
-        "hourlyRateMin": 80,
-        "hourlyRateMax": 120,
+        "latitude": "39.9042",
+        "longitude": "116.4074",
+        "hourlyRateMin": "80",
+        "hourlyRateMax": "120",
         "requirements": "每周两次，周末",
+        "availableTime": "周末",
         "status": "pending",
-        "user": {
-          "id": "456",
-          "name": "李四",
-          "phone": "13900139000",
-          "avatar": "https://example.com/avatar.jpg"
-        }
+        "createdAt": "2024-01-01 10:00:00"
       }
     ],
     "page": 0,
@@ -420,23 +423,21 @@
     {
       "id": 1,
       "userId": "456",
+      "userName": "李四",
+      "userAvatar": "https://example.com/avatar.jpg",
       "childName": "小明",
       "childGrade": "小学三年级",
       "subjectId": 1,
       "subjectName": "数学",
       "address": "北京市朝阳区",
-      "latitude": 39.9042,
-      "longitude": 116.4074,
-      "hourlyRateMin": 80,
-      "hourlyRateMax": 120,
+      "latitude": "39.9042",
+      "longitude": "116.4074",
+      "hourlyRateMin": "80",
+      "hourlyRateMax": "120",
       "requirements": "每周两次，周末",
+      "availableTime": "周末",
       "status": "pending",
-      "user": {
-        "id": "456",
-        "name": "李四",
-        "phone": "13900139000",
-        "avatar": "https://example.com/avatar.jpg"
-      }
+      "createdAt": "2024-01-01 10:00:00"
     }
   ]
 }
@@ -487,10 +488,10 @@
     {
       "id": 1,
       "appointmentId": 1,
-      "tutorId": "123",
       "reviewerId": "456",
       "reviewerName": "李四",
       "reviewerAvatar": "https://example.com/avatar.jpg",
+      "reviewedId": "123",
       "rating": 5,
       "comment": "老师非常耐心，孩子很喜欢",
       "createdAt": "2024-01-16 10:00:00"
@@ -506,10 +507,10 @@
   "data": {
     "id": 1,
     "appointmentId": 1,
-    "tutorId": "123",
     "reviewerId": "456",
     "reviewerName": "李四",
     "reviewerAvatar": "https://example.com/avatar.jpg",
+    "reviewedId": "123",
     "rating": 5,
     "comment": "老师非常耐心，孩子很喜欢",
     "createdAt": "2024-01-16 10:00:00"
@@ -592,16 +593,12 @@
     {
       "id": 1,
       "name": "数学",
-      "icon": "calculate",
-      "status": "active",
-      "sortOrder": 1
+      "status": "active"
     },
     {
       "id": 2,
       "name": "英语",
-      "icon": "translate",
-      "status": "active",
-      "sortOrder": 2
+      "status": "active"
     }
   ]
 }
@@ -615,16 +612,12 @@
     {
       "id": 1,
       "name": "数学",
-      "icon": "calculate",
-      "status": "active",
-      "sortOrder": 1
+      "status": "active"
     },
     {
       "id": 2,
       "name": "英语",
-      "icon": "translate",
-      "status": "active",
-      "sortOrder": 2
+      "status": "active"
     }
   ]
 }
@@ -638,9 +631,7 @@
   "data": {
     "id": 1,
     "name": "数学",
-    "icon": "calculate",
-    "status": "active",
-    "sortOrder": 1
+    "status": "active"
   }
 }
 ```
@@ -653,9 +644,7 @@
   "data": {
     "id": 1,
     "name": "数学",
-    "icon": "calculate",
-    "status": "active",
-    "sortOrder": 1
+    "status": "active"
   }
 }
 ```

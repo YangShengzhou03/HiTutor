@@ -62,6 +62,8 @@ class TutorProvider with ChangeNotifier {
           createdAt: DateTime.now(),
           type: 'student_request',
           targetGradeLevels: [],
+          latitude: item['latitude']?.toString(),
+          longitude: item['longitude']?.toString(),
         );
       }).toList();
       
@@ -130,6 +132,8 @@ class TutorProvider with ChangeNotifier {
           createdAt: DateTime.now(),
           type: 'student_request',
           targetGradeLevels: [],
+          latitude: item['latitude']?.toString(),
+          longitude: item['longitude']?.toString(),
         );
       }).toList();
       
@@ -213,7 +217,7 @@ class TutorProvider with ChangeNotifier {
             education: item['education'] ?? '',
             major: item['major'] ?? '',
             teachingExperience: item['teachingExperience'] ?? 0,
-            isVerified: item['userVerified'] == true || item['userVerified'] == 1,
+            isVerified: item['userVerified'] == true || item['userVerified'] ==1,
             createdAt: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
@@ -231,6 +235,8 @@ class TutorProvider with ChangeNotifier {
           createdAt: DateTime.now(),
           type: 'tutor_service',
           targetGradeLevels: gradeLevels,
+          latitude: item['latitude']?.toString(),
+          longitude: item['longitude']?.toString(),
         );
       }).toList();
       

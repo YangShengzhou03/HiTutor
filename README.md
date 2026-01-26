@@ -4,9 +4,12 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/stargazers)&nbsp;[![GitHub forks](https://img.shields.io/github/forks/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/network/members)&nbsp;[![GitHub issues](https://img.shields.io/github/issues/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/issues)&nbsp;[![GitHub license](https://img.shields.io/github/license/YangShengzhou03/HiTutor?style=for-the-badge)](https://github.com/YangShengzhou03/HiTutor/blob/main/LICENSE)&nbsp;[![Flutter](https://img.shields.io/badge/Flutter-3.2.6-02569B?style=for-the-badge&logo=flutter)](https://flutter.dev/)&nbsp;[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.0-6DB33F?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 
-**一个现代化的家教信息对接共享平台，采用前后端分离架构**
+<div align="center">
+  <img src="https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/logo.svg" alt="HiTutor Logo" width="120" height="120">
+  <h3>一个现代化的家教信息对接共享平台，采用前后端分离架构</h3>
+</div>
 
-[快速开始](#-快速开始) • [功能特性](#-功能特性) • [技术架构](#-技术架构) • [API文档](API_RESPONSE_FORMAT.md)
+[快速开始](#快速开始) • [功能特性](#功能特性) • [技术架构](#技术架构) • [API文档](API_RESPONSE_FORMAT.md)
 
 </div>
 
@@ -17,20 +20,66 @@ HiTutor好会帮是一个纯公益的家教信息对接共享平台，连接学�
 ## 功能特性
 
 ### 移动客户端功能
-- **用户认证** - 手机号注册登录、密码登录、短信验证码登录、实名认证、家教教师资质认证
-- **家教信息** - 发布家教信息、设置授课科目、时薪价格、授课地点、可授课时间段
-- **学生需求** - 发布家教需求、选择辅导科目、设置学生年级、时薪预算、上课地点
-- **智能搜索** - 按科目筛选、按年级筛选、基于地理位置的附近搜索、按时薪范围筛选、关键词搜索
-- **在线沟通** - 用户间即时聊天、聊天会话管理、消息实时推送、支持文字和图片消息
-- **预约报名** - 对家教信息/学生需求发起报名、报名状态跟踪、预约时间确认
-- **预约管理** - 预约信息查看、预约状态管理、预约历史记录、预约取消和完成确认
-- **评价系统** - 完成对接后评价、1-5星评分、文字评价、评价历史记录
-- **收藏功能** - 收藏家教信息/学生需求、收藏列表管理、收藏状态实时同步
-- **黑名单** - 添加用户到黑名单、黑名单列表管理、黑名单用户隔离
-- **积分系统** - 积分获取和消耗、积分余额查看、积分明细记录
-- **投诉举报** - 用户投诉功能、投诉分类、投诉进度查看
-- **消息通知** - 系统消息推送、报名申请通知、预约状态变更通知、消息已读/未读管理
-- **用户主页** - 个人信息展示、已发布信息/需求列表、评价记录、积分信息
+
+**用户认证** - 手机号注册登录、密码登录、短信验证码登录、实名认证、家教教师资质认证
+
+**家教信息** - 发布家教信息、设置授课科目、时薪价格、授课地点、可授课时间段
+![发布家教信息](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/publish_tutor_service_page.jpg)
+
+**学生需求** - 发布家教需求、选择辅导科目、设置学生年级、时薪预算、上课地点
+![发布学生需求](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/publish_student_request_page.jpg)
+
+**智能搜索** - 按科目筛选、按年级筛选、基于地理位置的附近搜索、按时薪范围筛选、关键词搜索
+![地图页面](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/map_page.jpg)
+
+**在线沟通** - 用户间即时聊天、聊天会话管理、消息实时推送、支持文字和图片消息
+
+**预约报名** - 对家教信息/学生需求发起报名、报名状态跟踪、预约时间确认
+
+**预约管理** - 预约信息查看、预约状态管理、预约历史记录、预约取消和完成确认
+
+**评价系统** - 完成对接后评价、1-5星评分、文字评价、评价历史记录
+
+**收藏功能** - 收藏家教信息/学生需求、收藏列表管理、收藏状态实时同步
+
+**黑名单** - 添加用户到黑名单、黑名单列表管理、黑名单用户隔离
+
+**积分系统** - 积分获取和消耗、积分余额查看、积分明细记录
+![积分页面](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/points_page.jpg)
+
+**投诉举报** - 用户投诉功能、投诉分类、投诉进度查看
+
+**消息通知** - 系统消息推送、报名申请通知、预约状态变更通知、消息已读/未读管理
+
+**用户主页** - 个人信息展示、已发布信息/需求列表、评价记录、积分信息
+![我的页面](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/profile_page.jpg)
+
+## 页面展示
+
+### 首页
+**首页** - 展示平台主要功能入口，包括家教信息、学生需求、搜索功能等
+![首页](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/home_page.jpg)
+
+### 启动页面
+**启动页面** - 应用启动时展示的欢迎页面
+![启动页面](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/splash_page.jpg)
+
+### 学生需求详情
+**学生需求详情** - 查看学生发布的家教需求详细信息
+![学生需求详情](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/student_request_detail_page.jpg)
+
+### 家教认证
+**家教认证** - 家教教师资质认证流程，包括填写认证信息、提交材料、审核等步骤
+![家教认证表单](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/tutor_certification_form_page.jpg)
+
+**认证状态** - 家教认证通过后显示已认证状态
+![家教已认证](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/tutor_certified_page.jpg)
+
+**认证证书** - 家教认证通过后获得的电子版认证证书
+![家教认证证书](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/tutor_certification_certificate.jpg)
+
+**认证提交成功** - 提交认证信息后显示的成功提示页面
+![认证提交成功](https://gitee.com/Yangshengzhou/hi-tutor/blob/master/assest/certification_submitted_successfully.jpg)
 
 ## 快速开始
 
@@ -278,16 +327,93 @@ HiTutor/
 ├── hitutor-backend/                      # 后端项目
 │   ├── src/main/java/com/hitutor/        # Java源代码
 │   │   ├── config/                      # 配置类
+│   │   │   ├── CustomAccessDeniedHandler.java
+│   │   │   ├── GlobalExceptionHandler.java
 │   │   │   ├── JacksonConfig.java
+│   │   │   ├── JwtAuthenticationFilter.java
+│   │   │   ├── MyMetaObjectHandler.java
 │   │   │   ├── SecurityConfig.java
-│   │   │   └── WebConfig.java
+│   │   │   ├── WebConfig.java
+│   │   │   └── WebSocketConfig.java
+│   │   ├── controller/                  # 控制器
+│   │   │   ├── AdminController.java
+│   │   │   ├── AppointmentController.java
+│   │   │   ├── AuthController.java
+│   │   │   ├── BlacklistController.java
+│   │   │   ├── ComplaintController.java
+│   │   │   ├── FavoriteController.java
+│   │   │   ├── MessageController.java
+│   │   │   ├── NotificationController.java
+│   │   │   ├── PointController.java
+│   │   │   ├── RequestApplicationController.java
+│   │   │   ├── ReviewController.java
+│   │   │   ├── StudentRequestController.java
+│   │   │   ├── SubjectController.java
+│   │   │   ├── TutorCertificationController.java
+│   │   │   ├── TutorProfileController.java
+│   │   │   ├── TutorResumeController.java
+│   │   │   ├── UserController.java
+│   │   │   └── VerificationController.java
+│   │   ├── document/                    # 文档
+│   │   │   └── ChatMessage.java
+│   │   ├── dto/                         # 数据传输对象
+│   │   │   ├── AppointmentDTO.java
+│   │   │   ├── ComplaintDTO.java
+│   │   │   ├── RequestApplicationDTO.java
+│   │   │   ├── ReviewDTO.java
+│   │   │   ├── StudentRequestDTO.java
+│   │   │   ├── TutorProfileDTO.java
+│   │   │   └── UserDTO.java
+│   │   ├── entity/                      # 实体类
+│   │   │   ├── Appointment.java
+│   │   │   ├── Blacklist.java
+│   │   │   ├── Complaint.java
+│   │   │   ├── Conversation.java
+│   │   │   ├── Favorite.java
+│   │   │   ├── Notification.java
+│   │   │   ├── PointRecord.java
+│   │   │   ├── RequestApplication.java
+│   │   │   ├── Review.java
+│   │   │   ├── StudentRequest.java
+│   │   │   ├── TutorCertification.java
+│   │   │   ├── TutorProfile.java
+│   │   │   ├── TutorResume.java
+│   │   │   ├── TutorSubject.java
+│   │   │   └── User.java
+│   │   ├── mapper/                      # 数据访问
+│   │   │   ├── AppointmentMapper.java
+│   │   │   ├── ComplaintMapper.java
+│   │   │   ├── ConversationMapper.java
+│   │   │   ├── FavoriteMapper.java
+│   │   │   ├── NotificationMapper.java
+│   │   │   ├── PointRecordMapper.java
+│   │   │   ├── RequestApplicationMapper.java
+│   │   │   ├── ReviewMapper.java
+│   │   │   ├── StudentRequestMapper.java
+│   │   │   ├── TutorCertificationMapper.java
+│   │   │   ├── TutorProfileMapper.java
+│   │   │   ├── TutorResumeMapper.java
+│   │   │   ├── UserMapper.java
+│   │   │   └── SubjectMapper.java
 │   │   └── HiTutorApplication.java      # 应用入口
 │   ├── src/main/resources/               # 资源文件
 │   │   ├── application.yml               # 应用配置
 │   │   └── application.properties        # 应用配置
 │   └── pom.xml                         # Maven配置
 ├── assest/                             # 项目资源
-│   └── logo.svg                        # 项目Logo
+│   ├── certification_submitted_successfully.jpg
+│   ├── home_page.jpg
+│   ├── logo.svg
+│   ├── map_page.jpg
+│   ├── points_page.jpg
+│   ├── profile_page.jpg
+│   ├── publish_student_request_page.jpg
+│   ├── publish_tutor_service_page.jpg
+│   ├── splash_page.jpg
+│   ├── student_request_detail_page.jpg
+│   ├── tutor_certification_certificate.jpg
+│   ├── tutor_certification_form_page.jpg
+│   └── tutor_certified_page.jpg
 ├── data.sql                            # 数据库初始化脚本
 ├── API_RESPONSE_FORMAT.md                # API响应格式文档
 └── README.md                           # 项目说明文档
@@ -308,6 +434,7 @@ HiTutor/
 - **通知表 (notifications)** - 存储通知信息
 - **消息表 (messages)** - 存储聊天消息
 - **会话表 (conversations)** - 存储聊天会话
+- **科目表 (subjects)** - 存储科目信息
 
 ## 开发指南
 
@@ -394,7 +521,7 @@ HiTutor/
 
 ---
 
-**感谢使用 HiTutor好会帮家教信息对接共享平台！**
+感谢使用 HiTutor好会帮家教信息对接共享平台！
 
 <div align="center">
 
