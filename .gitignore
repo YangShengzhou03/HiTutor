@@ -114,3 +114,27 @@ hitutor-backend/*.log
 hitutor-backend/application-local.yml
 hitutor-backend/application-dev.yml
 hitutor-backend/application-prod.yml
+hitutor-backend/src/main/resources/application.yml
+hitutor-backend/src/main/resources/application-*.yml
+
+# Frontend
+hitutor-boss-frontend/node_modules/
+hitutor-boss-frontend/dist/
+hitutor-boss-frontend/.env
+hitutor-boss-frontend/.env.local
+hitutor-boss-frontend/.env.development
+hitutor-boss-frontend/.env.production
+hitutor-boss-frontend/.DS_Store
+
+# Sensitive files - NEVER commit these!
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.env
+.env.local
+.env.*.local
+config/secrets.yml
+credentials.json
+service-account.json
