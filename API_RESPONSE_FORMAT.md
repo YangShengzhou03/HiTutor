@@ -22,6 +22,12 @@
 | message | String | 操作结果的描述信息（部分接口可能不包含此字段） |
 | data | Any | 返回的数据，成功时包含具体数据，失败时可能为null |
 
+### 响应格式说明
+
+本系统采用统一的响应格式，所有API接口都遵循这个格式，确保前端可以统一处理响应数据。success字段表示操作是否成功，true表示操作成功，false表示操作失败。message字段提供操作结果的描述信息，帮助用户了解操作的结果，部分接口可能不包含此字段。data字段包含返回的具体数据，成功时包含业务数据，失败时可能为null或包含错误信息。
+
+统一的响应格式具有以下优点：第一，前端可以统一处理响应数据，减少重复代码；第二，响应格式清晰明了，易于理解和使用；第三，便于接口调试和错误排查；第四，提高代码可维护性，降低开发成本。
+
 ---
 
 ## 成功响应示例
@@ -194,6 +200,24 @@
 | 403 | Forbidden | 权限不足 |
 | 404 | Not Found | 资源不存在 |
 | 500 | Internal Server Error | 服务器内部错误 |
+
+### HTTP状态码说明
+
+HTTP状态码是HTTP协议中用于表示HTTP请求处理结果的三位数字代码，本系统使用标准的HTTP状态码来表示API请求的处理结果。
+
+200 OK表示请求成功，服务器成功处理了请求并返回了响应数据。这是最常见的状态码，表示操作成功完成。
+
+201 Created表示资源创建成功，服务器成功创建了新资源并返回了响应数据。这个状态码通常用于POST请求，表示资源创建成功。
+
+400 Bad Request表示请求参数错误，服务器无法理解客户端发送的请求。这个状态码通常表示客户端发送的请求参数有误，例如缺少必填参数、参数格式错误等。
+
+401 Unauthorized表示未授权或Token无效，客户端没有提供有效的身份认证信息。这个状态码通常表示用户未登录或登录令牌已过期，需要重新登录获取新的令牌。
+
+403 Forbidden表示权限不足，客户端虽然提供了有效的身份认证信息，但没有权限访问请求的资源。这个状态码通常表示用户没有权限执行某个操作，例如普通用户尝试访问管理员功能。
+
+404 Not Found表示资源不存在，服务器找不到请求的资源。这个状态码通常表示请求的资源ID不存在或已被删除。
+
+500 Internal Server Error表示服务器内部错误，服务器在处理请求时发生了错误。这个状态码通常表示服务器端出现了异常，需要开发人员排查问题。
 
 ---
 
@@ -802,6 +826,231 @@
 {
   "success": true,
   "message": "消息已标记为已读"
+}
+```
+
+#### 删除会话
+```json
+{
+  "success": true,
+  "message": "会话删除成功"
+}
+```
+
+#### 删除消息
+```json
+{
+  "success": true,
+  "message": "消息删除成功"
+}
+```
+
+### 报名模块 (RequestApplication)
+
+#### 获取报名列表（分页）
+```json
+{
+  "success": true,
+  "message": "获取报名列表成功",
+  "data": {
+    "content": [
+      {
+        "id": 1,
+        "tutorId": "123",
+        "tutorName": "张三",
+        "tutorAvatar": "https://example.com/avatar.jpg",
+        "studentRequestId": 1,
+        "studentRequestSubjectName": "数学",
+        "studentRequestGrade": "小学三年级",
+        "status": "pending",
+        "message": "我有5年教学经验，擅长小学数学教学",
+        "createTime": "2024-01-10 10:00:00"
+      }
+    ],
+    "page": 0,
+    "size": 10,
+    "totalElements": 30
+  }
+}
+```
+
+#### 创建报名申请
+```json
+{
+  "success": true,
+  "message": "报名申请提交成功",
+  "data": {
+    "id": 1,
+    "tutorId": "123",
+    "tutorName": "张三",
+    "studentRequestId": 1,
+    "status": "pending",
+    "message": "我有5年教学经验，擅长小学数学教学",
+    "createTime": "2024-01-10 10:00:00"
+  }
+}
+```
+
+#### 接受报名申请
+```json
+{
+  "success": true,
+  "message": "已接受报名申请",
+  "data": {
+    "id": 1,
+    "status": "accepted"
+  }
+}
+```
+
+#### 拒绝报名申请
+```json
+{
+  "success": true,
+  "message": "已拒绝报名申请",
+  "data": {
+    "id": 1,
+    "status": "rejected"
+  }
+}
+```
+
+### 黑名单模块 (Blacklist)
+
+#### 获取黑名单列表
+```json
+{
+  "success": true,
+  "message": "获取黑名单列表成功",
+  "data": [
+    {
+      "id": 1,
+      "userId": "123",
+      "blockedUserId": "456",
+      "blockedUserName": "李四",
+      "blockedUserAvatar": "https://example.com/avatar.jpg",
+      "createTime": "2024-01-10 10:00:00"
+    }
+  ]
+}
+```
+
+#### 添加到黑名单
+```json
+{
+  "success": true,
+  "message": "已添加到黑名单",
+  "data": {
+    "id": 1,
+    "userId": "123",
+    "blockedUserId": "456",
+    "createTime": "2024-01-10 10:00:00"
+  }
+}
+```
+
+#### 从黑名单移除
+```json
+{
+  "success": true,
+  "message": "已从黑名单移除"
+}
+```
+
+#### 检查是否在黑名单
+```json
+{
+  "success": true,
+  "message": "查询成功",
+  "data": true
+}
+```
+
+### 投诉模块 (Complaint)
+
+#### 获取投诉列表
+```json
+{
+  "success": true,
+  "message": "获取投诉列表成功",
+  "data": [
+    {
+      "id": 1,
+      "userId": "123",
+      "userName": "张三",
+      "complainedUserId": "456",
+      "complainedUserName": "李四",
+      "type": "虚假信息",
+      "content": "该用户发布的信息与实际情况不符",
+      "status": "pending",
+      "createTime": "2024-01-10 10:00:00"
+    }
+  ]
+}
+```
+
+#### 创建投诉
+```json
+{
+  "success": true,
+  "message": "投诉提交成功",
+  "data": {
+    "id": 1,
+    "userId": "123",
+    "complainedUserId": "456",
+    "type": "虚假信息",
+    "content": "该用户发布的信息与实际情况不符",
+    "status": "pending",
+    "createTime": "2024-01-10 10:00:00"
+  }
+}
+```
+
+### 家教认证模块 (TutorCertification)
+
+#### 获取家教认证信息
+```json
+{
+  "success": true,
+  "message": "获取家教认证信息成功",
+  "data": {
+    "id": 1,
+    "userId": "123",
+    "userName": "张三",
+    "education": "本科",
+    "school": "北京大学",
+    "major": "计算机科学",
+    "teachingExperience": 5,
+    "certificateUrl": "https://example.com/certificate.jpg",
+    "status": "approved",
+    "createTime": "2024-01-10 10:00:00"
+  }
+}
+```
+
+#### 提交家教认证
+```json
+{
+  "success": true,
+  "message": "家教认证提交成功，请等待审核",
+  "data": {
+    "id": 1,
+    "userId": "123",
+    "status": "pending",
+    "createTime": "2024-01-10 10:00:00"
+  }
+}
+```
+
+#### 审核家教认证
+```json
+{
+  "success": true,
+  "message": "家教认证审核成功",
+  "data": {
+    "id": 1,
+    "status": "approved"
+  }
 }
 ```
 
