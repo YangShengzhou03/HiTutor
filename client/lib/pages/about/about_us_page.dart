@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../theme/app_theme.dart';
 
 class AboutUsPage extends StatelessWidget {
@@ -75,6 +76,65 @@ class AboutUsPage extends StatelessWidget {
                 _buildInfoSection(
                   '我们的使命',
                   '让每一个孩子都能享受到优质的教育资源，让每一位家教老师都能实现自己的价值。',
+                ),
+                const SizedBox(height: 40),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/user-agreement');
+                          },
+                          child: const Text(
+                            '许可协议',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                        const Text('|', style: TextStyle(color: Colors.grey)),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/privacy-policy');
+                          },
+                          child: const Text(
+                            '隐私政策',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Copyright © 2026 Yangshengzhou. All Rights Reserved',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () async {
+                        final url = Uri.parse('https://beian.miit.gov.cn/#/Integrated/recordQuery');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        }
+                      },
+                      child: const Text(
+                        'ICP备案号：赣ICP备2025075576号-2A',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

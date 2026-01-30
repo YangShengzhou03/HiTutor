@@ -18,17 +18,21 @@ class SplashAdPage extends StatefulWidget {
 class _SplashAdPageState extends State<SplashAdPage> {
   int _countdown = 3;
   late Timer _timer;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _initializeAuth();
-    _startCountdown();
   }
 
   Future<void> _initializeAuth() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.initialize();
+    setState(() {
+      _isInitialized = true;
+    });
+    _startCountdown();
   }
 
   void _startCountdown() {
@@ -45,9 +49,9 @@ class _SplashAdPageState extends State<SplashAdPage> {
   }
 
   void _jumpToNextPage() {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (!_isInitialized) return;
     
-
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
     if (authProvider.isLoggedIn) {
       if (authProvider.isFirstLogin) {

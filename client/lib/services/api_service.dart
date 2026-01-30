@@ -10,7 +10,6 @@ class ApiService {
 
   static void setToken(String token) {
     _token = token;
-    StorageService.saveToken(token);
   }
 
   static Future<void> initTokens() async {
@@ -19,7 +18,6 @@ class ApiService {
 
   static void clearToken() {
     _token = null;
-    StorageService.removeToken();
   }
 
   static Map<String, String> _getHeaders({bool needAuth = true}) {
@@ -177,9 +175,9 @@ class ApiService {
   static Future<dynamic> checkLogin() async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/check-login'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<void> sendVerificationCode(String phone) async {
@@ -223,10 +221,10 @@ class ApiService {
   static Future<dynamic> updateUserRole(String userId, Map<String, dynamic> data) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/users/$userId/role'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> updateProfile(

@@ -199,6 +199,9 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
                               hintText: '请输入手机号',
                               prefixIcon: Icon(Icons.phone_rounded),
                             ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return '请输入手机号';
@@ -221,6 +224,9 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
                                     hintText: '请输入验证码',
                                     prefixIcon: Icon(Icons.verified_user_rounded),
                                   ),
+                                  onChanged: (value) {
+                                    setState(() {});
+                                  },
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return '请输入验证码';

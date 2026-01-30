@@ -82,10 +82,23 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> updateUserRole(@PathVariable String id, @RequestBody Map<String, Object> userData) {
         Map<String, Object> response = new java.util.HashMap<>();
         
-        User user = userService.getUserById(id);
+        // 从 SecurityContextHolder 中获取用户 ID，确保使用 token 中的真实用户 ID
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String targetUserId = null;
+        
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName())) {
+            targetUserId = authentication.getName();
+        } else {
+            // 当 SecurityContext 中没有有效的用户 ID 时，使用路径参数中的用户 ID
+            targetUserId = id;
+        }
+        
+        // 使用用户 ID 查询用户
+        User user = userService.getUserById(targetUserId);
         if (user == null) {
             response.put("success", false);
             response.put("message", "用户不存在");
+            response.put("data", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         
@@ -96,12 +109,14 @@ public class UserController {
             if ("admin".equals(user.getRole())) {
                 response.put("success", false);
                 response.put("message", "禁止修改管理员角色");
+                response.put("data", null);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             }
             
             if (!"student".equals(newRole) && !"tutor".equals(newRole)) {
                 response.put("success", false);
                 response.put("message", "角色类型错误");
+                response.put("data", null);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             
@@ -109,6 +124,7 @@ public class UserController {
         } else {
             response.put("success", false);
             response.put("message", "缺少角色参数");
+            response.put("data", null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         
@@ -117,12 +133,16 @@ public class UserController {
         if (!updated) {
             response.put("success", false);
             response.put("message", "更新失败");
+            response.put("data", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         
+        // 重新查询用户，确保返回最新信息
+        User updatedUser = userService.getUserById(targetUserId);
+        
         response.put("success", true);
         response.put("message", "角色更新成功");
-        response.put("data", DtoConverter.toUserDTO(user));
+        response.put("data", DtoConverter.toUserDTO(updatedUser != null ? updatedUser : user));
         return ResponseEntity.ok(response);
     }
 

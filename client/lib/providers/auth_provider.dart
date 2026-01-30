@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
@@ -22,58 +21,43 @@ class AuthProvider with ChangeNotifier {
 
   
   Future<void> initialize() async {
-    _isLoading = true;
-    notifyListeners();
+    Future.microtask(() {
+      _isLoading = true;
+      notifyListeners();
+    });
 
     try {
       final savedToken = await StorageService.getToken();
-      final savedUserData = await StorageService.getUserData();
-      final savedIsLoggedIn = await StorageService.isLoggedIn();
-      final savedIsFirstLogin = await StorageService.isFirstLogin();
 
-      if (savedToken != null && savedIsLoggedIn) {
+      if (savedToken != null) {
         _token = savedToken;
         _isLoggedIn = true;
-        _isFirstLogin = savedIsFirstLogin;
-
         ApiService.setToken(savedToken);
 
-        if (savedUserData != null) {
-          _user = User.fromJson(jsonDecode(savedUserData));
-        } else {
+        try {
           _user = await AuthService.getCurrentUser();
-          if (_user != null) {
-            await StorageService.saveUserData(jsonEncode(_user!.toJson()));
-          }
+          _isFirstLogin = false;
+        } catch (e) {
+          _isLoggedIn = false;
+          _token = null;
+          await StorageService.removeToken();
         }
-
-        await _checkDailyLogin();
+      } else {
+        _isLoggedIn = false;
       }
     } catch (e) {
-      await StorageService.clearUserData();
       _token = null;
       _user = null;
       _isLoggedIn = false;
       _isFirstLogin = false;
     } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-  
-  Future<void> _checkDailyLogin() async {
-    try {
-      if (_token != null) {
-        await ApiService.checkLogin();
-      }
-    } catch (e) {
-      // 静默处理错误，因为这不是关键操作
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
     }
   }
 
-
-
-  
   Future<void> loginWithRequest(Map<String, dynamic> request) async {
     _isLoading = true;
     notifyListeners();
@@ -86,18 +70,9 @@ class AuthProvider with ChangeNotifier {
 
       ApiService.setToken(_token!);
 
-      try {
-        _user = await AuthService.getCurrentUser();
-      } catch (e) {
-        _user = response.user;
-      }
+      _user = await AuthService.getCurrentUser();
 
       await StorageService.saveToken(_token!);
-      await StorageService.saveUserId(_user!.id);
-      await StorageService.saveUserData(jsonEncode(_user!.toJson()));
-
-      await StorageService.setLoggedIn(true);
-      await StorageService.setFirstLogin(_isFirstLogin);
 
       notifyListeners();
     } catch (e) {
@@ -121,12 +96,6 @@ class AuthProvider with ChangeNotifier {
       _isFirstLogin = response.isFirstLogin;
 
       await StorageService.saveToken(_token!);
-      await StorageService.saveUserId(_user!.id);
-      await StorageService.saveUserData(jsonEncode(_user!.toJson()));
-
-      await StorageService.setLoggedIn(true);
-      await StorageService.setFirstLogin(_isFirstLogin);
-
       ApiService.setToken(_token!);
 
       notifyListeners();
@@ -146,13 +115,14 @@ class AuthProvider with ChangeNotifier {
     try {
       final userToUse = _user ?? (userId != null ? User(id: userId, username: '', avatar: '', phone: '', email: '', createTime: DateTime.now()) : null);
       if (userToUse == null) throw Exception('用户未登录');
+      if (_token == null) throw Exception('Token 未设置');
+
+      ApiService.setToken(_token!);
 
       final request = {'roleId': roleId};
       await AuthService.updateUserRole(userToUse.id, request);
 
       _user = await AuthService.getCurrentUser();
-
-      await StorageService.setFirstLogin(false);
       _isFirstLogin = false;
 
       notifyListeners();
@@ -171,7 +141,7 @@ class AuthProvider with ChangeNotifier {
 
     await AuthService.logout();
 
-    await StorageService.clearUserData();
+    await StorageService.removeToken();
     _token = null;
     _user = null;
     _isLoggedIn = false;
@@ -204,11 +174,15 @@ class AuthProvider with ChangeNotifier {
       }
     }
 
+    if (_user == null) {
+      _isLoggedIn = false;
+      _token = null;
+      _isFirstLogin = false;
+      notifyListeners();
+      return;
+    }
+
     await StorageService.saveToken(token);
-    await StorageService.saveUserId(_user!.id);
-    await StorageService.saveUserData(jsonEncode(_user!.toJson()));
-    await StorageService.setLoggedIn(true);
-    await StorageService.setFirstLogin(isFirstLogin);
 
     notifyListeners();
   }

@@ -192,6 +192,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     hintText: '请输入手机号',
                     prefixIcon: Icon(Icons.phone_rounded, color: AppTheme.textTertiary),
                   ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return '请输入手机号';
@@ -226,6 +229,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           prefixIcon: const Icon(Icons.key_rounded, color: AppTheme.textTertiary),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         ),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return '请输入验证码';
@@ -284,6 +290,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       },
                     ),
                   ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return '请输入新密码';
@@ -326,6 +335,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       },
                     ),
                   ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return '请确认密码';

@@ -68,7 +68,7 @@ class AuthService {
   }
 
   static Future<User> getCurrentUser() async {
-    final response = await ApiService.getUser('me', needAuth: false);
+    final response = await ApiService.getUser('me', needAuth: true);
     final user = User.fromJson(response['data']);
     return user;
   }
