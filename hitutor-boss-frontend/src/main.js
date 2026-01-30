@@ -24,4 +24,7 @@ app.config.globalProperties.$store = store;
 
 store.init().then(() => {
   app.mount('#app');
+}).catch((error) => {
+  console.log('初始化失败，继续启动应用:', error);
+  app.mount('#app');
 });

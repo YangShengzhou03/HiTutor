@@ -59,7 +59,7 @@ class MessageProvider with ChangeNotifier {
           otherUser: _conversations[index].otherUser,
           lastMessage: _conversations[index].lastMessage,
           unreadCount: 0,
-          updatedAt: _conversations[index].updatedAt,
+          updateTime: DateTime.now(),
         );
         _conversations[index] = updatedSession;
         notifyListeners();
@@ -94,7 +94,7 @@ class MessageProvider with ChangeNotifier {
           content: newMessage.content,
           type: newMessage.type,
           isRead: newMessage.isRead,
-          createdAt: newMessage.createdAt,
+          createTime: newMessage.createTime,
         );
         
         
@@ -103,7 +103,7 @@ class MessageProvider with ChangeNotifier {
           otherUser: _conversations[index].otherUser,
           lastMessage: newLastMessage,
           unreadCount: _conversations[index].unreadCount, 
-          updatedAt: DateTime.now(),
+          updateTime: DateTime.now(),
         );
         _conversations[index] = updatedSession;
         notifyListeners();

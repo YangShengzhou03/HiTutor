@@ -25,38 +25,38 @@
       </el-form>
 
       <el-table :data="reviewList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="评价ID" width="120">
+        <el-table-column prop="id" label="评价ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="orderId" label="预约ID" width="120">
+        <el-table-column prop="orderId" label="预约ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.orderId" />
+            {{ row.orderId ? (row.orderId.length > 4 ? row.orderId.substring(0, 4) + '...' : row.orderId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="reviewerId" label="评价人ID" width="120">
+        <el-table-column prop="reviewerId" label="评价人ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.reviewerId" />
+            {{ row.reviewerId ? (row.reviewerId.length > 4 ? row.reviewerId.substring(0, 4) + '...' : row.reviewerId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="reviewedId" label="被评价人ID" width="120">
+        <el-table-column prop="reviewedId" label="被评价人ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.reviewedId" />
+            {{ row.reviewedId ? (row.reviewedId.length > 4 ? row.reviewedId.substring(0, 4) + '...' : row.reviewedId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="rating" label="评分" width="120">
+        <el-table-column prop="rating" label="评分" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <el-rate v-model="row.rating" disabled show-score text-color="#ff9900" />
           </template>
         </el-table-column>
-        <el-table-column prop="comment" label="评价内容" width="300" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="comment" label="评价内容" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="100">
+        <el-table-column label="操作" fixed="right" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
           </template>
@@ -95,7 +95,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

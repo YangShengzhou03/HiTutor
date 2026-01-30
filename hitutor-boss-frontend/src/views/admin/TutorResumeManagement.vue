@@ -8,35 +8,35 @@
       </template>
 
       <el-table :data="resumeList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="简历ID" width="120">
+        <el-table-column prop="id" label="简历ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="120">
+        <el-table-column prop="userId" label="用户ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
+            {{ row.userId ? (row.userId.length > 4 ? row.userId.substring(0, 4) + '...' : row.userId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="teachingExperience" label="教学年限" width="120">
+        <el-table-column prop="teachingExperience" label="教学年限" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.teachingExperience }}年
           </template>
         </el-table-column>
-        <el-table-column prop="teachingStyle" label="教学风格" width="200" show-overflow-tooltip />
-        <el-table-column prop="specialties" label="擅长科目" width="200" show-overflow-tooltip />
-        <el-table-column prop="achievements" label="教学成就" width="200" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="teachingStyle" label="教学风格" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="specialties" label="擅长科目" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="achievements" label="教学成就" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="更新时间" width="180">
+        <el-table-column prop="updateTime" label="更新时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.updateTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right" width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleEdit(row)">编辑</el-button>
@@ -102,7 +102,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

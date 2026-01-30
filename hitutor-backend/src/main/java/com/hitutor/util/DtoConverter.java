@@ -31,7 +31,6 @@ public class DtoConverter {
         
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
-        dto.setName(user.getUsername());
         dto.setUsername(user.getUsername());
         dto.setAvatar(user.getAvatar());
         dto.setPhone(user.getPhone());
@@ -42,8 +41,8 @@ public class DtoConverter {
         dto.setRole(user.getRole());
         dto.setStatus(user.getStatus());
         dto.setPoints(user.getPoints());
-        dto.setCreatedAt(user.getCreateTime() != null ? user.getCreateTime().format(DATETIME_FORMATTER) : null);
-        dto.setUpdatedAt(user.getUpdateTime() != null ? user.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(user.getCreateTime() != null ? user.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(user.getUpdateTime() != null ? user.getUpdateTime().format(DATETIME_FORMATTER) : null);
         dto.setLastLoginTime(user.getLastLoginTime() != null ? user.getLastLoginTime().format(DATETIME_FORMATTER) : null);
         dto.setLastLoginIp(user.getLastLoginIp());
         
@@ -83,8 +82,8 @@ public class DtoConverter {
         dto.setDescription(complaint.getDescription());
         dto.setContactPhone(complaint.getContactPhone());
         dto.setStatus(complaint.getStatus());
-        dto.setCreatedAt(complaint.getCreatedAt() != null ? complaint.getCreatedAt().format(DATETIME_FORMATTER) : null);
-        dto.setUpdatedAt(complaint.getUpdatedAt() != null ? complaint.getUpdatedAt().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(complaint.getCreateTime() != null ? complaint.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(complaint.getUpdateTime() != null ? complaint.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -146,7 +145,8 @@ public class DtoConverter {
             dto.setReviewCount(0);
         }
         
-        dto.setCreatedAt(profile.getCreateTime() != null ? profile.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(profile.getCreateTime() != null ? profile.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(profile.getUpdateTime() != null ? profile.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -185,8 +185,8 @@ public class DtoConverter {
         dto.setRequirements(request.getRequirements());
         dto.setAvailableTime(request.getAvailableTime());
         dto.setStatus(request.getStatus());
-        dto.setCreatedAt(request.getCreateTime() != null ? request.getCreateTime().format(DATETIME_FORMATTER) : null);
-        dto.setUpdatedAt(request.getUpdateTime() != null ? request.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(request.getCreateTime() != null ? request.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(request.getUpdateTime() != null ? request.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -283,8 +283,8 @@ public class DtoConverter {
         }
         dto.setMessage(application.getMessage());
         dto.setStatus(application.getStatus());
-        dto.setCreatedAt(application.getCreateTime() != null ? application.getCreateTime().format(DATETIME_FORMATTER) : null);
-        dto.setUpdatedAt(application.getUpdateTime() != null ? application.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(application.getCreateTime() != null ? application.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(application.getUpdateTime() != null ? application.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -304,8 +304,8 @@ public class DtoConverter {
         dto.setMajor(certification.getMajor());
         dto.setCertificateNumber(certification.getCertificateNumber());
         dto.setStatus(certification.getStatus());
-        dto.setCreatedAt(certification.getCreateTime() != null ? certification.getCreateTime().format(DATETIME_FORMATTER) : null);
-        dto.setUpdatedAt(certification.getUpdateTime() != null ? certification.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(certification.getCreateTime() != null ? certification.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(certification.getUpdateTime() != null ? certification.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 }

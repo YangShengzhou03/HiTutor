@@ -341,7 +341,7 @@ const handleLogin = async () => {
       ElMessage.error(response.message || '登录失败');
     }
   } catch (error) {
-    ElMessage.error('登录失败，请检查网络连接');
+    ElMessage.error(error.message || '登录失败，请检查网络连接');
   }
 };
 
@@ -371,7 +371,7 @@ const handleRegister = async () => {
       ElMessage.error(response.message || '注册失败')
     }
   } catch (error) {
-    ElMessage.error('注册失败，请检查网络连接')
+    ElMessage.error(error.message || '注册失败，请检查网络连接')
   }
 };
 
@@ -385,7 +385,7 @@ const handleForgotPassword = async () => {
       ElMessage.error(response.message || '密码重置失败');
     }
   } catch (error) {
-    ElMessage.error('密码重置失败，请检查网络连接');
+    ElMessage.error(error.message || '密码重置失败，请检查网络连接');
   }
 };
 

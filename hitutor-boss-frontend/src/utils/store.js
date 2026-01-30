@@ -27,12 +27,9 @@ const store = {
     }
   },
 
-  setTokens(accessToken, refreshToken) {
+  setTokens(accessToken) {
     if (accessToken) {
       utils.saveToken(accessToken)
-    }
-    if (refreshToken) {
-      utils.saveRefreshToken(refreshToken)
     }
   },
 
@@ -61,10 +58,10 @@ const store = {
       const isSuccess = (response && (response.code === 200 || response.success === true))
 
       if (isSuccess && response.data) {
-          const { accessToken, refreshToken, user } = response.data
+          const { accessToken, user } = response.data
 
           if (accessToken) {
-            this.setTokens(accessToken, refreshToken)
+            this.setTokens(accessToken)
           }
 
           if (user) {
@@ -78,7 +75,7 @@ const store = {
 
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
-      return { success: false, message: '登录失败，请检查网络连接' }
+      return { success: false, message: error.message || '登录失败，请检查网络连接' }
     } finally {
       state.loading = false
     }
@@ -95,7 +92,7 @@ const store = {
         return { success: false, message: response?.message || '注册失败' };
       }
     } catch (error) {
-      return { success: false, message: '注册失败，请检查网络连接' };
+      return { success: false, message: error.message || '注册失败，请检查网络连接' };
     } finally {
       state.loading = false
     }
@@ -109,10 +106,10 @@ const store = {
       const isSuccess = (response && (response.code === 200 || response.success === true))
 
       if (isSuccess && response.data) {
-          const { accessToken, refreshToken, user } = response.data
+          const { accessToken, user } = response.data
 
           if (accessToken) {
-            this.setTokens(accessToken, refreshToken)
+            this.setTokens(accessToken)
           }
 
           if (user) {
@@ -126,7 +123,7 @@ const store = {
 
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
-      return { success: false, message: '登录失败，请检查网络连接' }
+      return { success: false, message: error.message || '登录失败，请检查网络连接' }
     } finally {
       state.loading = false
     }
@@ -149,7 +146,7 @@ const store = {
 
       return { success: false, message: response?.message || '更新失败' }
     } catch (error) {
-      return { success: false, message: '更新失败，请重试' }
+      return { success: false, message: error.message || '更新失败，请重试' }
     }
   },
 
@@ -165,7 +162,7 @@ const store = {
 
       return { success: false, message: response?.message || '密码修改失败' }
     } catch (error) {
-      return { success: false, message: '密码修改失败，请重试' }
+      return { success: false, message: error.message || '密码修改失败，请重试' }
     }
   },
 
@@ -270,11 +267,11 @@ const store = {
 
             return { success: true, message: response.message || '注册成功，请手动登录' }
           }
-        }
+      }
 
       return { success: false, message: response?.message || '注册失败' }
     } catch (error) {
-      return { success: false, message: '注册失败，请检查网络连接' }
+      return { success: false, message: error.message || '注册失败，请检查网络连接' }
     } finally {
       state.loading = false
     }
@@ -282,6 +279,13 @@ const store = {
 
   async fetchCurrentUser() {
     if (!utils.isLoggedIn()) {
+      return
+    }
+
+    const token = utils.getToken()
+    const decoded = utils.parseJWT(token)
+    
+    if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
       this.clearUser()
       return
     }
@@ -299,12 +303,8 @@ const store = {
         }
       }
     } catch (error) {
-      const token = utils.getToken()
-      const decoded = utils.parseJWT(token)
-      
-      if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
-        this.clearUser()
-      }
+      console.log('获取用户信息失败:', error)
+      // 不要立即清除用户信息，让路由守卫来处理
     }
   },
 
@@ -345,7 +345,7 @@ const store = {
 
       return { success: false, message: response?.message || '更新失败' }
     } catch (error) {
-      return { success: false, message: '更新失败，请重试' }
+      return { success: false, message: error.message || '更新失败，请重试' }
     } finally {
       state.loading = false
     }
@@ -364,7 +364,7 @@ const store = {
 
       return { success: false, message: response?.message || '密码更新失败' }
     } catch (error) {
-      return { success: false, message: '密码更新失败，请重试' }
+      return { success: false, message: error.message || '密码更新失败，请重试' }
     } finally {
       state.loading = false
     }
@@ -379,49 +379,25 @@ const store = {
     }
   },
 
-  async refreshToken() {
-    const refreshToken = utils.getRefreshToken()
-    if (!refreshToken) {
+  async init() {
+    const token = utils.getToken()
+    if (!token) {
+      return false
+    }
+
+    const decoded = utils.parseJWT(token)
+    
+    if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
+      this.clearUser()
       return false
     }
 
     try {
-      const response = await api.auth.refreshToken({ refreshToken })
-      const isSuccess = (response && (response.code === 200 || response.success === true))
-
-      if (isSuccess && response.data) {
-        const { accessToken, refreshToken: newRefreshToken } = response.data
-        this.setTokens(accessToken, newRefreshToken)
-        return true
-      }
-
-      return false
-    } catch (error) {
-      this.clearUser()
-      return false
-    }
-  },
-
-  async init() {
-    if (utils.isLoggedIn()) {
-      const token = utils.getToken()
-      const decoded = utils.parseJWT(token)
-      
-      if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
-        this.clearUser()
-        return false
-      }
-
-      try {
-        await this.fetchCurrentUser()
-        await this.fetchStorageInfo()
-      } catch (error) {
-        console.log('初始化时获取用户信息失败，但 token 仍然有效:', error)
-      }
-      
+      await this.fetchCurrentUser()
+      await this.fetchStorageInfo()
       return true
-    } else {
-      this.clearUser()
+    } catch (error) {
+      console.log('初始化时获取用户信息失败:', error)
       return false
     }
   }

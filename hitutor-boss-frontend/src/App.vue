@@ -42,17 +42,8 @@ const retryLoading = async () => {
   }
 }
 
-onMounted(async () => {
-  try {
-    if (typeof store.init === 'function') {
-      await store.init()
-    }
-    isLoading.value = false
-  } catch (error) {
-    hasError.value = true
-    errorMessage.value = error.message || '初始化失败'
-    isLoading.value = false
-  }
+onMounted(() => {
+  isLoading.value = false
 })
 </script>
 

@@ -313,7 +313,7 @@ class _ComplaintListPageState extends State<ComplaintListPage> with SingleTicker
           _buildInfoRow(
             Icons.access_time,
             '提交时间',
-            _formatDateTime(complaint['createdAt']),
+            _formatDateTime(complaint['createTime']),
           ),
         ],
       ),

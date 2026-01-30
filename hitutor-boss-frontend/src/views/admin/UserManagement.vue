@@ -31,67 +31,67 @@
       </el-form>
 
       <el-table :data="userList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="用户ID" width="120">
+        <el-table-column prop="id" label="用户ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" width="120">
+        <el-table-column prop="username" label="用户名" min-width="100" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.username || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" label="手机号" width="120">
+        <el-table-column prop="phone" label="手机号" min-width="110" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="邮箱" width="180">
+        <el-table-column prop="email" label="邮箱" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="role" label="角色" width="100">
+        <el-table-column prop="role" label="角色" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getRoleType(row.role)">{{ getRoleText(row.role) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
               {{ row.status === 'active' ? '正常' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="badge" label="头衔" width="120">
+        <el-table-column prop="badge" label="头衔" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag v-if="row.badge" type="warning">{{ row.badge }}</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="gender" label="性别" width="80">
+        <el-table-column prop="gender" label="性别" width="80" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag v-if="row.gender === 'male'" type="primary">男</el-tag>
             <el-tag v-else-if="row.gender === 'female'" type="danger">女</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="lastLoginTime" label="最后登录时间" width="180">
+        <el-table-column prop="lastLoginTime" label="最后登录时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.lastLoginTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="lastLoginIp" label="最后登录IP" width="140">
+        <el-table-column prop="lastLoginIp" label="最后登录IP" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.lastLoginIp || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="注册时间" width="180">
+        <el-table-column prop="createTime" label="注册时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="400">
+        <el-table-column label="操作" fixed="right" width="400" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleAdjustPoints(row)">调整积分</el-button>
@@ -127,7 +127,7 @@
     <el-dialog v-model="dialogVisible" title="用户详情" width="600px">
       <el-descriptions v-if="currentUser" :column="2" border>
         <el-descriptions-item label="用户ID">
-          <IdDisplay :id="currentUser.id" />
+          {{ currentUser.id ? (currentUser.id.length > 4 ? currentUser.id.substring(0, 4) + '...' : currentUser.id) : '-' }}
         </el-descriptions-item>
         <el-descriptions-item label="用户名">{{ currentUser.username || '-' }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ currentUser.phone || '-' }}</el-descriptions-item>
@@ -157,7 +157,7 @@
     <el-dialog v-model="pointsDialogVisible" title="调整积分" width="500px">
       <el-form v-if="pointsForm" :model="pointsForm" label-width="100px">
         <el-form-item label="用户ID">
-          <IdDisplay :id="pointsForm.userId" />
+          {{ pointsForm.userId ? (pointsForm.userId.length > 4 ? pointsForm.userId.substring(0, 4) + '...' : pointsForm.userId) : '-' }}
         </el-form-item>
         <el-form-item label="用户名">
           <span>{{ pointsForm.username }}</span>
@@ -196,7 +196,7 @@
     <el-dialog v-model="badgeDialogVisible" title="赐予头衔" width="500px">
       <el-form v-if="badgeForm" :model="badgeForm" label-width="100px">
         <el-form-item label="用户ID">
-          <IdDisplay :id="badgeForm.userId" />
+          {{ badgeForm.userId ? (badgeForm.userId.length > 4 ? badgeForm.userId.substring(0, 4) + '...' : badgeForm.userId) : '-' }}
         </el-form-item>
         <el-form-item label="用户名">
           <span>{{ badgeForm.username }}</span>
@@ -261,7 +261,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)
@@ -519,7 +519,7 @@ const handleConfirmAddUser = async () => {
       ElMessage.error(response.message || '添加用户失败')
     }
   } catch (error) {
-    ElMessage.error('添加用户失败')
+    ElMessage.error(error.message || '添加用户失败')
   }
 }
 

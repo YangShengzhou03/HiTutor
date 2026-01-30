@@ -58,8 +58,7 @@ class TutorProvider with ChangeNotifier {
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['userName'] ?? item['childName'] ?? '学生需求',
-            username: 'student_request',
+            username: item['userName'] ?? item['childName'] ?? '学生需求',
             avatar: item['userAvatar'] ?? '',
             phone: '',
             email: '',
@@ -67,7 +66,7 @@ class TutorProvider with ChangeNotifier {
             badge: item['badge']?.toString(),
             isVerified: userVerified,
             teachingExperience: 0,
-            createdAt: DateTime.now(),
+            createTime: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
               ? [Subject(id: item['subjectId'].toString(), name: item['subjectName'], icon: '')]
@@ -81,7 +80,7 @@ class TutorProvider with ChangeNotifier {
           description: item['requirements'] ?? '',
           certifications: [],
           isAvailable: true,
-          createdAt: DateTime.now(),
+          createTime: DateTime.now(),
           type: 'student_request',
           targetGradeLevels: [],
           latitude: item['latitude']?.toString(),
@@ -128,8 +127,7 @@ class TutorProvider with ChangeNotifier {
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['userName'] ?? item['childName'] ?? '学生需求',
-            username: 'student_request',
+            username: item['userName'] ?? item['childName'] ?? '学生需求',
             avatar: item['userAvatar'] ?? '',
             phone: '',
             email: '',
@@ -137,7 +135,7 @@ class TutorProvider with ChangeNotifier {
             badge: item['badge']?.toString(),
             isVerified: _parseBool(item['userVerified']),
             teachingExperience: 0,
-            createdAt: DateTime.now(),
+            createTime: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
               ? [Subject(id: item['subjectId'].toString(), name: item['subjectName'], icon: '')]
@@ -151,7 +149,7 @@ class TutorProvider with ChangeNotifier {
           description: item['requirements'] ?? '',
           certifications: [],
           isAvailable: true,
-          createdAt: DateTime.now(),
+          createTime: DateTime.now(),
           type: 'student_request',
           targetGradeLevels: [],
           latitude: item['latitude']?.toString(),
@@ -235,8 +233,7 @@ class TutorProvider with ChangeNotifier {
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['userName'] ?? '家教',
-            username: item['username'] ?? 'tutor',
+            username: item['userName'] ?? item['username'] ?? '家教',
             avatar: item['userAvatar'] ?? '',
             phone: item['phone'] ?? '',
             email: item['email'] ?? '',
@@ -244,7 +241,7 @@ class TutorProvider with ChangeNotifier {
             badge: item['badge']?.toString(),
             teachingExperience: item['teachingExperience'] ?? 0,
             isVerified: userVerified,
-            createdAt: DateTime.now(),
+            createTime: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
               ? [Subject(id: item['subjectId']?.toString() ?? '', name: item['subjectName'], icon: '')]
@@ -258,7 +255,7 @@ class TutorProvider with ChangeNotifier {
           description: item['description'] ?? '',
           certifications: [],
           isAvailable: item['status'] == 'available',
-          createdAt: DateTime.now(),
+          createTime: DateTime.now(),
           type: 'tutor_service',
           targetGradeLevels: gradeLevels,
           latitude: item['latitude']?.toString(),
@@ -351,8 +348,7 @@ class TutorProvider with ChangeNotifier {
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['userName'] ?? '家教',
-            username: item['username'] ?? 'tutor',
+            username: item['userName'] ?? item['username'] ?? '家教',
             avatar: item['userAvatar'] ?? '',
             phone: item['phone'] ?? '',
             email: item['email'] ?? '',
@@ -360,7 +356,7 @@ class TutorProvider with ChangeNotifier {
             badge: item['badge']?.toString(),
             teachingExperience: item['teachingExperience'] ?? 0,
             isVerified: _parseBool(item['userVerified']),
-            createdAt: DateTime.now(),
+            createTime: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
               ? [Subject(id: item['subjectId']?.toString() ?? '', name: item['subjectName'], icon: '')]
@@ -374,7 +370,7 @@ class TutorProvider with ChangeNotifier {
           description: item['description'] ?? '',
           certifications: [],
           isAvailable: item['status'] == 'available',
-          createdAt: DateTime.now(),
+          createTime: DateTime.now(),
           type: 'tutor_service',
           targetGradeLevels: gradeLevels,
         );

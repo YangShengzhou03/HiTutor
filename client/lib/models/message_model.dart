@@ -7,7 +7,7 @@ class Message {
   final String content;
   final MessageType type;
   final bool isRead;
-  final DateTime createdAt;
+  final DateTime createTime;
 
   Message({
     required this.id,
@@ -16,7 +16,7 @@ class Message {
     required this.content,
     required this.type,
     required this.isRead,
-    required this.createdAt,
+    required this.createTime,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -30,8 +30,8 @@ class Message {
         orElse: () => MessageType.text,
       ),
       isRead: json['isRead'] == true || json['isRead'] == 1,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
+      createTime: json['createTime'] != null 
+          ? DateTime.tryParse(json['createTime'].toString()) ?? DateTime.now()
           : DateTime.now(),
     );
   }
@@ -49,7 +49,7 @@ class ChatSession {
   final User otherUser;
   final Message lastMessage;
   final int unreadCount;
-  final DateTime updatedAt;
+  final DateTime updateTime;
   final String type;
   final String name;
 
@@ -58,10 +58,10 @@ class ChatSession {
     required this.otherUser,
     required this.lastMessage,
     required this.unreadCount,
-    required this.updatedAt,
+    required this.updateTime,
     this.type = 'user',
     String? name,
-  }) : name = name ?? otherUser.name;
+  }) : name = name ?? otherUser.username;
 
   factory ChatSession.fromJson(Map<String, dynamic> json) {
     return ChatSession(
@@ -69,8 +69,8 @@ class ChatSession {
       otherUser: User.fromJson(json['otherUser'] ?? {}),
       lastMessage: Message.fromJson(json['lastMessage'] ?? {}),
       unreadCount: json['unreadCount'] is int ? json['unreadCount'] : int.tryParse(json['unreadCount']?.toString() ?? '0') ?? 0,
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.tryParse(json['updatedAt'].toString()) ?? DateTime.now()
+      updateTime: json['updateTime'] != null 
+          ? DateTime.tryParse(json['updateTime'].toString()) ?? DateTime.now()
           : DateTime.now(),
       type: json['type']?.toString() ?? 'user',
       name: json['name']?.toString(),

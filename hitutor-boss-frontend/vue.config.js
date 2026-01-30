@@ -32,12 +32,9 @@ module.exports = defineConfig({
     compress: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        pathRewrite: {
-          '^/api': ''
-        },
         logLevel: 'debug'
       }
     },

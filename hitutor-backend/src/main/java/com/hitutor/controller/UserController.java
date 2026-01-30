@@ -30,19 +30,28 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getCurrentUser(@RequestParam(required = false) String userId) {
         Map<String, Object> response = new java.util.HashMap<>();
         
-        if (userId == null || userId.isEmpty()) {
-            response.put("success", false);
-            response.put("message", "未授权");
-            response.put("data", new java.util.HashMap<>());
-            return ResponseEntity.status(401).body(response);
+        String targetUserId = userId;
+        
+        if (targetUserId == null || targetUserId.isEmpty()) {
+            org.springframework.security.core.Authentication authentication = 
+                SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null || !authentication.isAuthenticated()) {
+                response.put("success", false);
+                response.put("message", "未登录");
+                response.put("data", new java.util.HashMap<>());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            
+            targetUserId = authentication.getName();
         }
         
-        User user = userService.getUserById(userId);
+        User user = userService.getUserById(targetUserId);
         if (user == null) {
             response.put("success", false);
             response.put("message", "用户不存在");
             response.put("data", new java.util.HashMap<>());
-            return ResponseEntity.status(404).body(response);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         
         response.put("success", true);
@@ -285,9 +294,58 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseEntity<Map<String, Object>> changePassword(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new java.util.HashMap<>();
-        response.put("success", false);
-        response.put("message", "未授权");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        
+        org.springframework.security.core.Authentication authentication = 
+            SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            response.put("success", false);
+            response.put("message", "未授权");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        
+        String userId = authentication.getName();
+        User user = userService.getUserById(userId);
+        
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "用户不存在");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        
+        String oldPassword = request.get("oldPassword");
+        String newPassword = request.get("newPassword");
+        
+        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "原密码不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "新密码不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        if (!passwordUtil.validatePassword(oldPassword, user.getPassword())) {
+            response.put("success", false);
+            response.put("message", "原密码错误");
+            return ResponseEntity.badRequest().body(response);
+        }
+        
+        user.setPassword(passwordUtil.encodePassword(newPassword));
+        boolean updated = userService.updateUser(user);
+        
+        if (updated) {
+            response.put("success", true);
+            response.put("message", "密码修改成功");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("success", false);
+            response.put("message", "密码修改失败");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @GetMapping("/{id}/statistics")

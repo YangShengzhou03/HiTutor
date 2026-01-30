@@ -583,7 +583,7 @@ class _SubjectExplorePageState extends State<SubjectExplorePage> {
     final address = item['address']?.toString() ?? '';
     final tutor = Tutor.fromJson(item);
     final rating = tutor.rating.toStringAsFixed(1);
-    final name = tutor.user.name;
+    final name = tutor.user.username;
     final avatar = tutor.user.avatar;
 
     return GestureDetector(

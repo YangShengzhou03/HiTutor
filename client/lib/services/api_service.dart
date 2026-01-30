@@ -7,36 +7,19 @@ class ApiService {
   // static const String baseUrl = 'http://10.0.2.2:8080/api';
   static const String baseUrl = 'http://120.55.50.51/api';
   static String? _token;
-  static String? _refreshToken;
-  static bool _isRefreshing = false;
-  static Completer<Map<String, dynamic>?>? _refreshCompleter;
-  static int _refreshFailureCount = 0;
-  static DateTime? _lastRefreshFailureTime;
 
   static void setToken(String token) {
     _token = token;
     StorageService.saveToken(token);
   }
 
-  static void setRefreshToken(String refreshToken) {
-    _refreshToken = refreshToken;
-    StorageService.saveRefreshToken(refreshToken);
-  }
-
   static Future<void> initTokens() async {
     _token = await StorageService.getToken();
-    _refreshToken = await StorageService.getRefreshToken();
-    
-    if (_refreshToken != null) {
-      await _checkAndRefreshTokenIfNeeded();
-    }
   }
 
   static void clearToken() {
     _token = null;
-    _refreshToken = null;
     StorageService.removeToken();
-    StorageService.removeRefreshToken();
   }
 
   static Map<String, String> _getHeaders({bool needAuth = true}) {
@@ -49,7 +32,7 @@ class ApiService {
     return headers;
   }
 
-  static Future<dynamic> _handleResponse(http.Response response, {bool needAuth = false, String? originalMethod, String? originalUrl, String? originalBody}) async {
+  static Future<dynamic> _handleResponse(http.Response response, {bool needAuth = false}) async {
     try {
       if (response.statusCode == 204) {
         return {'success': true, 'data': null};
@@ -74,56 +57,25 @@ class ApiService {
         }
         return body;
       } else {
-        if (response.statusCode == 401) {
-          if (needAuth && _refreshToken != null) {
-            final now = DateTime.now();
-            if (_lastRefreshFailureTime != null && 
-                now.difference(_lastRefreshFailureTime!).inMinutes < 1 &&
-                _refreshFailureCount >= 3) {
-              clearToken();
-              throw Exception('登录已过期，请重新登录');
-            }
-            
-            if (_isRefreshing) {
-              if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
-                await _refreshCompleter!.future;
-                if (_token != null) {
-                  return await _retryRequest(originalMethod ?? 'GET', originalUrl ?? '', originalBody);
-                }
-              }
-            } else {
-              _isRefreshing = true;
-              _refreshCompleter = Completer<Map<String, dynamic>?>();
-              try {
-                final refreshResponse = await _refreshAccessToken();
-                if (!_refreshCompleter!.isCompleted) {
-                  _refreshCompleter!.complete(refreshResponse);
-                }
-                _isRefreshing = false;
-                _refreshFailureCount = 0;
-                _lastRefreshFailureTime = null;
-                if (refreshResponse != null) {
-                  return await _retryRequest(originalMethod ?? 'GET', originalUrl ?? '', originalBody);
-                } else {
-                  clearToken();
-                }
-              } catch (e) {
-                _isRefreshing = false;
-                _refreshFailureCount++;
-                _lastRefreshFailureTime = DateTime.now();
-                if (!_refreshCompleter!.isCompleted) _refreshCompleter!.complete(null);
-                clearToken();
-              }
-            }
-          }
-        }
-
         String errorMessage;
         if (body is Map) {
           errorMessage = body['message'] ?? '请求失败';
         } else {
           errorMessage = '请求失败';
         }
+        
+        if (response.statusCode == 401) {
+          // 只有当不是登录请求时才清除token
+          // 登录请求失败（如密码错误）不应该清除token
+          if (!['/api/auth/login', '/api/auth/login-password', '/api/auth/login-sms'].contains(response.request?.url.path)) {
+            clearToken();
+            // 如果没有具体错误信息，才使用默认的过期提示
+            if (errorMessage == '请求失败') {
+              errorMessage = '登录已过期，请重新登录';
+            }
+          }
+        }
+        
         throw Exception(errorMessage);
       }
     } catch (e) {
@@ -133,76 +85,6 @@ class ApiService {
         rethrow;
       }
     }
-  }
-
-  static Future<Map<String, dynamic>?> _refreshAccessToken() async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/refresh-token'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'refreshToken': _refreshToken}),
-      );
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        if (body['success'] == true && body['data'] != null) {
-          final data = body['data'];
-          setToken(data['accessToken']);
-          setRefreshToken(data['refreshToken']);
-          return data;
-        }
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static Future<void> _checkAndRefreshTokenIfNeeded() async {
-    if (_refreshToken == null) return;
-    
-    final claims = _parseTokenClaims(_refreshToken!);
-    if (claims == null) return;
-    
-    final expiration = claims['exp'] as int?;
-    if (expiration == null) return;
-    
-    final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiration * 1000);
-    final now = DateTime.now();
-    final daysUntilExpiration = expirationDate.difference(now).inDays;
-    
-    if (daysUntilExpiration <= 7) {
-      await _refreshAccessToken();
-    }
-  }
-
-  static Map<String, dynamic>? _parseTokenClaims(String token) {
-    try {
-      final parts = token.split('.');
-      if (parts.length != 3) return null;
-      
-      var payload = parts[1];
-      
-      while (payload.length % 4 != 0) {
-        payload += '=';
-      }
-      
-      final decoded = utf8.decode(base64.decode(payload));
-      
-      return jsonDecode(decoded) as Map<String, dynamic>;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static Future<dynamic> _retryRequest(String method, String url, String? body) async {
-    final request = http.Request(method, Uri.parse(url))
-      ..headers.addAll(_getHeaders())
-      ..body = body ?? '';
-
-    final streamedResponse = await http.Client().send(request);
-    final httpResponse = await http.Response.fromStream(streamedResponse);
-    return await _handleResponse(httpResponse, needAuth: true, originalMethod: method, originalUrl: url, originalBody: body);
   }
 
   
@@ -239,15 +121,6 @@ class ApiService {
         'verificationCode': verificationCode,
         'role': role,
       }),
-    );
-    return await _handleResponse(response);
-  }
-
-  static Future<dynamic> refreshToken(String refreshToken) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/refresh-token'),
-      headers: _getHeaders(needAuth: false),
-      body: jsonEncode({'refreshToken': refreshToken}),
     );
     return await _handleResponse(response);
   }
@@ -343,7 +216,7 @@ class ApiService {
       Uri.parse(url),
       headers: _getHeaders(needAuth: needAuth),
     );
-    final result = await _handleResponse(response, needAuth: needAuth, originalMethod: 'GET', originalUrl: url);
+    final result = await _handleResponse(response, needAuth: needAuth);
     return result;
   }
 
@@ -353,7 +226,7 @@ class ApiService {
       headers: _getHeaders(needAuth: false),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'PATCH', originalUrl: '$baseUrl/users/$userId/role', originalBody: jsonEncode(data));
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> updateProfile(
@@ -365,7 +238,7 @@ class ApiService {
       headers: _getHeaders(needAuth: false),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'PUT', originalUrl: '$baseUrl/users/$userId/profile', originalBody: jsonEncode(data));
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getTutors({
@@ -376,7 +249,6 @@ class ApiService {
     double? longitude,
     double? radius,
   }) async {
-    String url;
     if (latitude != null && longitude != null) {
       var uri = Uri.parse('$baseUrl/tutor-profiles/nearby').replace(queryParameters: {
         'latitude': latitude.toString(),
@@ -384,9 +256,8 @@ class ApiService {
         'radius': (radius ?? 20).toString(),
         if (subject != null) 'subject': subject,
       });
-      url = uri.toString();
       final response = await http.get(uri, headers: _getHeaders(needAuth: false));
-      return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: url);
+      return await _handleResponse(response, needAuth: false);
     }
     
     var uri = Uri.parse('$baseUrl/tutor-profiles?page=$page&size=$size');
@@ -396,10 +267,9 @@ class ApiService {
         'subject': subject,
       });
     }
-    url = uri.toString();
 
     final response = await http.get(uri, headers: _getHeaders(needAuth: false));
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: url);
+    return await _handleResponse(response, needAuth: false);
   }
 
   
@@ -428,7 +298,6 @@ class ApiService {
     double? longitude,
     double? radius,
   }) async {
-    String url;
     if (latitude != null && longitude != null) {
       var uri = Uri.parse('$baseUrl/student-requests/nearby').replace(queryParameters: {
         'latitude': latitude.toString(),
@@ -436,9 +305,8 @@ class ApiService {
         'radius': (radius ?? 20).toString(),
         if (subject != null) 'subject': subject,
       });
-      url = uri.toString();
       final response = await http.get(uri, headers: _getHeaders(needAuth: false));
-      return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: url);
+      return await _handleResponse(response, needAuth: false);
     }
     
     var uri = Uri.parse('$baseUrl/student-requests?page=$page&size=$size');
@@ -448,10 +316,9 @@ class ApiService {
         'subject': subject,
       });
     }
-    url = uri.toString();
 
     final response = await http.get(uri, headers: _getHeaders(needAuth: false));
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: url);
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getStudentRequestById(String id) async {
@@ -459,7 +326,7 @@ class ApiService {
       Uri.parse('$baseUrl/student-requests/$id'),
       headers: _getHeaders(needAuth: false),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: '$baseUrl/student-requests/$id');
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> searchStudentRequests(
@@ -528,7 +395,7 @@ class ApiService {
       headers: _getHeaders(needAuth: false),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'POST', originalUrl: '$baseUrl/tutor-profiles', originalBody: jsonEncode(data));
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> updateService(
@@ -540,7 +407,7 @@ class ApiService {
       headers: _getHeaders(needAuth: false),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'PUT', originalUrl: '$baseUrl/tutor-profiles/$serviceId', originalBody: jsonEncode(data));
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<void> deleteService(String serviceId) async {
@@ -548,7 +415,7 @@ class ApiService {
       Uri.parse('$baseUrl/tutor-profiles/$serviceId'),
       headers: _getHeaders(needAuth: false),
     );
-    await _handleResponse(response, needAuth: false, originalMethod: 'DELETE', originalUrl: '$baseUrl/tutor-profiles/$serviceId');
+    await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> createRequest(
@@ -559,7 +426,7 @@ class ApiService {
       headers: _getHeaders(needAuth: false),
       body: jsonEncode(data),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'POST', originalUrl: '$baseUrl/student-requests', originalBody: jsonEncode(data));
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<void> deleteRequest(String requestId) async {
@@ -567,7 +434,7 @@ class ApiService {
       Uri.parse('$baseUrl/student-requests/$requestId'),
       headers: _getHeaders(needAuth: false),
     );
-    await _handleResponse(response, needAuth: false, originalMethod: 'DELETE', originalUrl: '$baseUrl/student-requests/$requestId');
+    await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getUserRequests() async {
@@ -575,7 +442,7 @@ class ApiService {
       Uri.parse('$baseUrl/student-requests/user'),
       headers: _getHeaders(needAuth: false),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: '$baseUrl/student-requests/user');
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getUserRequestsWithUserId(String userId) async {
@@ -583,7 +450,7 @@ class ApiService {
       Uri.parse('$baseUrl/student-requests/user?userId=$userId'),
       headers: _getHeaders(needAuth: false),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: '$baseUrl/student-requests/user?userId=$userId');
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getUserRequestsByUserId(String userId, {bool needAuth = false}) async {
@@ -591,7 +458,7 @@ class ApiService {
       Uri.parse('$baseUrl/student-requests/user/$userId'),
       headers: _getHeaders(needAuth: needAuth),
     );
-    return await _handleResponse(response, needAuth: needAuth, originalMethod: 'GET', originalUrl: '$baseUrl/student-requests/user/$userId');
+    return await _handleResponse(response, needAuth: needAuth);
   }
 
   static Future<dynamic> getUserServices() async {
@@ -599,7 +466,7 @@ class ApiService {
       Uri.parse('$baseUrl/tutor-profiles/user'),
       headers: _getHeaders(needAuth: false),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: '$baseUrl/tutor-profiles/user');
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getUserServicesWithUserId(String userId) async {
@@ -607,7 +474,7 @@ class ApiService {
       Uri.parse('$baseUrl/tutor-profiles/user?userId=$userId'),
       headers: _getHeaders(needAuth: false),
     );
-    return await _handleResponse(response, needAuth: false, originalMethod: 'GET', originalUrl: '$baseUrl/tutor-profiles/user?userId=$userId');
+    return await _handleResponse(response, needAuth: false);
   }
 
   static Future<dynamic> getUserServicesByUserId(String userId, {bool needAuth = false}) async {
@@ -615,7 +482,7 @@ class ApiService {
       Uri.parse('$baseUrl/tutor-profiles/user/$userId'),
       headers: _getHeaders(needAuth: needAuth),
     );
-    return await _handleResponse(response, needAuth: needAuth, originalMethod: 'GET', originalUrl: '$baseUrl/tutor-profiles/user/$userId');
+    return await _handleResponse(response, needAuth: needAuth);
   }
 
   
@@ -685,49 +552,49 @@ class ApiService {
   }) async {
     final response = await http.get(
       Uri.parse('$baseUrl/notifications?page=$page&size=$size'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> getUnreadNotificationCount() async {
     final response = await http.get(
       Uri.parse('$baseUrl/notifications/unread-count'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> markNotificationAsRead(String id) async {
     final response = await http.put(
       Uri.parse('$baseUrl/notifications/$id/read'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> markAllNotificationsAsRead() async {
     final response = await http.put(
       Uri.parse('$baseUrl/notifications/read-all'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> deleteNotification(String id) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/notifications/$id'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
   
   static Future<dynamic> getConversations(String userId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/messages/conversations?userId=$userId'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> getMessages(
@@ -737,9 +604,9 @@ class ApiService {
   }) async {
     final response = await http.get(
       Uri.parse('$baseUrl/messages/conversations/$sessionId/messages?page=$page&size=$size'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> createConversation(
@@ -748,13 +615,13 @@ class ApiService {
   ) async {
     final response = await http.post(
       Uri.parse('$baseUrl/messages/conversations'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
       body: jsonEncode({
         'user1Id': user1Id,
         'user2Id': user2Id,
       }),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<dynamic> sendMessage(
@@ -766,7 +633,7 @@ class ApiService {
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/messages/conversations/$sessionId/messages'),
-      headers: _getHeaders(needAuth: false),
+      headers: _getHeaders(needAuth: true),
       body: jsonEncode({
         'senderId': senderId,
         'receiverId': receiverId,
@@ -774,7 +641,7 @@ class ApiService {
         'messageType': messageType,
       }),
     );
-    return await _handleResponse(response);
+    return await _handleResponse(response, needAuth: true);
   }
 
   static Future<void> markAsRead(String sessionId, String userId) async {

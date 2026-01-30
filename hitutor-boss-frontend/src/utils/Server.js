@@ -1,29 +1,35 @@
 import axios from 'axios'
-import { getToken, removeToken, parseJWT } from './utils.js'
-import { ElMessage } from 'element-plus'
-import router from '@/route'
-import store from './store.js'
+import { getToken, parseJWT } from './utils.js'
 
 const Server = axios.create({
   baseURL: process.env.VUE_APP_API_BASE_URL || '',
   timeout: 10000
 })
 
+const pendingRequests = new Map()
+
+function generateRequestKey(config) {
+  const { method, url, params, data } = config
+  return [method, url, JSON.stringify(params), JSON.stringify(data)].join('&')
+}
+
 Server.interceptors.request.use(async config => {
+  const requestKey = generateRequestKey(config)
+  
+  if (pendingRequests.has(requestKey)) {
+    return Promise.reject(new Error('请求重复'))
+  }
+  
+  pendingRequests.set(requestKey, true)
+  config.requestKey = requestKey
+
   const token = getToken()
   if (token) {
     const decoded = parseJWT(token)
-    const isTokenExpiring = decoded && decoded.exp && decoded.exp * 1000 - Date.now() < 5 * 60 * 1000
+    const isTokenExpired = decoded && decoded.exp && decoded.exp * 1000 < Date.now()
 
-    if (isTokenExpiring) {
-      try {
-        const refreshSuccess = await store.refreshToken()
-        if (refreshSuccess) {
-          config.headers.Authorization = `Bearer ${getToken()}`
-        }
-      } catch (error) {
-        console.error('Token refresh failed:', error)
-      }
+    if (isTokenExpired) {
+      return Promise.reject(new Error('登录已过期，请重新登录'))
     } else {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -33,6 +39,10 @@ Server.interceptors.request.use(async config => {
 
 Server.interceptors.response.use(
   response => {
+    if (response.config.requestKey) {
+      pendingRequests.delete(response.config.requestKey)
+    }
+
     if (response.data === null || response.data === undefined) {
       return { data: null, code: 500, message: '响应数据为空' }
     }
@@ -50,11 +60,9 @@ Server.interceptors.response.use(
         if (data.message && (data.message.includes('Token无效') ||
           data.message.includes('Token过期') ||
           data.message.includes('未授权访问'))) {
-          handleTokenExpiration()
           return Promise.reject(new Error('登录已过期，请重新登录'))
         }
 
-        ElMessage.error(data.message || '请求失败')
         return Promise.reject(new Error(data.message || '请求失败'))
       }
     }
@@ -66,11 +74,9 @@ Server.interceptors.response.use(
         if (data.message && (data.message.includes('Token无效') ||
           data.message.includes('Token过期') ||
           data.message.includes('未授权访问'))) {
-          handleTokenExpiration()
           return Promise.reject(new Error('登录已过期，请重新登录'))
         }
 
-        ElMessage.error(data.message || '请求失败')
         return Promise.reject(new Error(data.message || '请求失败'))
       }
     }
@@ -78,56 +84,64 @@ Server.interceptors.response.use(
     return data
   },
   error => {
+    if (error.config && error.config.requestKey) {
+      pendingRequests.delete(error.config.requestKey)
+    }
+
+    if (error.message === '请求重复') {
+      return Promise.reject(error)
+    }
+
     if (!error.response) {
-      ElMessage.error('网络连接失败，请检查网络连接')
       return Promise.reject(error)
     }
 
     const status = error.response.status
     const url = error.config?.url || ''
+    const responseData = error.response?.data
 
     switch (status) {
       case 401:
-        handleTokenExpiration()
-        break
+        if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('登录已过期，请重新登录'))
+        }
       case 403:
-        ElMessage.error('权限不足，无法访问该资源')
-        break
+        if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('权限不足，无法访问该资源'))
+        }
       case 404:
         if (url.includes('/api/card-keys/')) {
-          ElMessage.error('卡密不存在或参数错误')
+          return Promise.reject(new Error('卡密不存在或参数错误'))
+        } else if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('请求的资源不存在'))
         }
-        break
+      case 409:
+        if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('资源冲突，请检查数据'))
+        }
       case 500:
-        ElMessage.error('服务器内部错误，请联系管理员')
-        break
+        if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('服务器内部错误，请联系管理员'))
+        }
       default:
-        ElMessage.error('请求失败，请稍后重试')
+        if (responseData && responseData.message) {
+          return Promise.reject(new Error(responseData.message))
+        } else {
+          return Promise.reject(new Error('请求失败，请稍后重试'))
+        }
     }
-
-    return Promise.reject(error)
   }
 )
-
-function handleTokenExpiration() {
-  const token = getToken()
-  const decoded = parseJWT(token)
-  
-  if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
-    removeToken()
-
-    if (store && store.clearUser) {
-      store.clearUser()
-    }
-
-    ElMessage.error('登录已过期，请重新登录')
-
-    const currentPath = router.currentRoute.value.path
-    if (currentPath !== '/login' && !currentPath.includes('/login')) {
-      router.replace('/login')
-    }
-  }
-}
 
 const http = {
   get: (url, params = {}) => Server.get(url, { params }),

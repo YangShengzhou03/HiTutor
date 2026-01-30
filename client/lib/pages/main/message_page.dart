@@ -35,7 +35,7 @@ class _MessagePageState extends State<MessagePage> {
     
     
     final otherUserId = conversation.otherUser.id;
-    final otherUserName = conversation.otherUser.name;
+    final otherUserName = conversation.otherUser.username;
     
     Navigator.pushNamed(
       context,
@@ -244,7 +244,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget _buildMessageItem(ChatSession conversation) {
     final hasUnread = conversation.unreadCount > 0;
     final accentColor = _getConversationColor(conversation);
-    final formattedTime = _formatTime(conversation.updatedAt);
+    final formattedTime = _formatTime(conversation.updateTime);
 
     return GestureDetector(
       onTap: () => _handleMessageTap(conversation),

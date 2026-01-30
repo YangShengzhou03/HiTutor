@@ -16,7 +16,7 @@ class Tutor {
   final String? address;
   final List<String> certifications;
   final bool isAvailable;
-  final DateTime createdAt;
+  final DateTime createTime;
   final String type;
   final List<GradeLevel> targetGradeLevels;
   final String? latitude;
@@ -38,7 +38,7 @@ class Tutor {
     this.address,
     required this.certifications,
     required this.isAvailable,
-    required this.createdAt,
+    required this.createTime,
     required this.type,
     required this.targetGradeLevels,
     this.latitude,
@@ -49,15 +49,14 @@ class Tutor {
     final user = json.containsKey('user') ? User.fromJson(json['user']) : 
                  User(
                   id: json['userId']?.toString() ?? '',
-                  name: json['userName']?.toString() ?? '',
-                  username: json['userName']?.toString(),
+                  username: json['userName']?.toString() ?? json['userName']?.toString() ?? '',
                   avatar: json['userAvatar']?.toString() ?? '',
                   phone: '',
                   email: '',
                   gender: json['userGender']?.toString(),
                   badge: json['badge']?.toString(),
                   isVerified: _parseBool(json['userVerified']),
-                  createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) ?? DateTime.now() : DateTime.now(),
+                  createTime: json['createTime'] != null ? DateTime.tryParse(json['createTime']) ?? DateTime.now() : DateTime.now(),
                 );
     
     List<GradeLevel> gradeLevels = [];
@@ -102,8 +101,8 @@ class Tutor {
       address: json['address']?.toString() ?? '',
       certifications: [],
       isAvailable: json['status'] == 'available' || json['status'] == 'active' || json['isAvailable'] == true,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+      createTime: json['createTime'] != null 
+          ? DateTime.tryParse(json['createTime']) ?? DateTime.now()
           : DateTime.now(),
       type: json['type'] ?? 'tutor_service',
       targetGradeLevels: gradeLevels,
@@ -240,14 +239,14 @@ class Review {
   final User reviewer;
   final String content;
   final double rating;
-  final DateTime createdAt;
+  final DateTime createTime;
 
   Review({
     required this.id,
     required this.reviewer,
     required this.content,
     required this.rating,
-    required this.createdAt,
+    required this.createTime,
   });
 
   factory Review.fromJson(Map<String, dynamic> json) {
@@ -256,16 +255,16 @@ class Review {
         id: json['id']?.toString() ?? '',
         reviewer: User(
           id: json['reviewerId']?.toString() ?? '',
-          name: json['reviewerName'] ?? '匿名用户',
+          username: json['reviewerName'] ?? '匿名用户',
           avatar: json['reviewerAvatar'] ?? '',
           phone: '',
           email: '',
-          createdAt: DateTime.now(),
+          createTime: DateTime.now(),
         ),
         content: json['comment'] ?? '',
         rating: (json['rating'] ?? 0).toDouble(),
-        createdAt: json['createdAt'] != null 
-            ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+        createTime: json['createTime'] != null 
+            ? DateTime.tryParse(json['createTime']) ?? DateTime.now()
             : DateTime.now(),
       );
     }
@@ -275,8 +274,8 @@ class Review {
       reviewer: User.fromJson(json['reviewer'] ?? {}),
       content: json['content'] ?? '',
       rating: (json['rating'] ?? 0).toDouble(),
-      createdAt: json['createdAt'] != null 
-          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+      createTime: json['createTime'] != null 
+          ? DateTime.tryParse(json['createTime']) ?? DateTime.now()
           : DateTime.now(),
     );
   }

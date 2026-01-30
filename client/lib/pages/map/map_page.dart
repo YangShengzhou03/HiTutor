@@ -408,7 +408,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     ),
                     child: Center(
                       child: Text(
-                        tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
+                        tutor.user.username.isNotEmpty ? tutor.user.username[0] : 'U',
                         style: TextStyle(
                           fontSize: 28,
                           color: accentColor,
@@ -426,7 +426,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                           children: [
                             Flexible(
                               child: Text(
-                                tutor.user.name,
+                                tutor.user.username,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,

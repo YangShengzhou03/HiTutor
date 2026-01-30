@@ -787,7 +787,7 @@ class ApprovedCertificationPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Divider(color: AppTheme.dividerColor),
                   const SizedBox(height: 16),
-                  _buildInfoRow('认证时间', _formatDate(certificationData['createdAt'])),
+                  _buildInfoRow('认证时间', _formatDate(certificationData['createTime'])),
                   const SizedBox(height: 32),
                   Container(
                     padding: const EdgeInsets.all(16),

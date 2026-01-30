@@ -232,7 +232,7 @@ class _BlacklistPageState extends State<BlacklistPage> {
 
   Widget _buildBlacklistCard(Map<String, dynamic> item, Map<String, dynamic> blockedUser) {
     final userName = blockedUser['username'] ?? '未知用户';
-    final createdAt = DateTime.tryParse(item['createdAt'] ?? '');
+    final createTime = DateTime.tryParse(item['createTime'] ?? '');
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -265,10 +265,10 @@ class _BlacklistPageState extends State<BlacklistPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (createdAt != null) ...[
+                  if (createTime != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      _formatTime(createdAt),
+                      _formatTime(createTime),
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppTheme.textTertiary,

@@ -92,6 +92,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Camera, Edit } from '@element-plus/icons-vue'
 import api from '../../services/api'
+import * as utils from '../../utils/utils.js'
 
 const profileFormRef = ref()
 const avatarInput = ref()
@@ -257,7 +258,9 @@ const handleAvatarChange = (event) => {
 }
 
 onMounted(() => {
-  loadUserInfo()
+  if (utils.isLoggedIn()) {
+    loadUserInfo()
+  }
 })
 </script>
 

@@ -235,7 +235,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              _formatTime(message.createdAt),
+              _formatTime(message.createTime),
               style: TextStyle(
                 fontSize: 11,
                 color: isMyMessage ? Colors.white70 : AppTheme.textTertiary,

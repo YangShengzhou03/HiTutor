@@ -11,9 +11,7 @@ const AdminService = {
     return Promise.resolve({ success: true, message: '退出登录成功' })
   },
 
-  refreshToken(data) {
-    return Server.post('/api/auth/refresh-token', data)
-  },
+
 
   // 管理员专用注册接口 - 仅需邮箱和密码，不需要验证码
   register(data) {

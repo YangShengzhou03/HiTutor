@@ -260,7 +260,7 @@ class _MyApplicationsPageState extends State<MyApplicationsPage> {
           _buildInfoRow(
             Icons.access_time,
             '报名时间',
-            _formatDateTime(app['createTime'] ?? app['createdAt']),
+            _formatDateTime(app['createTime'] ?? ''),
           ),
         ],
       ),

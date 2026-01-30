@@ -67,12 +67,10 @@ public class AuthController {
             user.setLastLoginTime(LocalDateTime.now());
             userService.updateUser(user);
             
-            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
-            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
             data.put("accessToken", accessToken);
-            data.put("refreshToken", refreshToken);
             data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
@@ -112,12 +110,10 @@ public class AuthController {
             user.setLastLoginIp(IpUtil.getClientIp(httpRequest));
             userService.updateUser(user);
             
-            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
-            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
             data.put("accessToken", accessToken);
-            data.put("refreshToken", refreshToken);
             data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
@@ -166,12 +162,10 @@ public class AuthController {
             user.setLastLoginIp(IpUtil.getClientIp(httpRequest));
             userService.updateUser(user);
             
-            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
-            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
             data.put("accessToken", accessToken);
-            data.put("refreshToken", refreshToken);
             data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
@@ -202,12 +196,10 @@ public class AuthController {
             if (saved) {
                 pointService.addPoints(newUser.getId(), 5, "login", "每日登录奖励");
                 
-                String accessToken = jwtUtil.generateAccessToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
-                String refreshToken = jwtUtil.generateRefreshToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
+                String accessToken = jwtUtil.generateToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
                 Map<String, Object> response = new HashMap<>();
                 Map<String, Object> data = new HashMap<>();
                 data.put("accessToken", accessToken);
-                data.put("refreshToken", refreshToken);
                 data.put("user", DtoConverter.toUserDTO(newUser));
                 data.put("isFirstLogin", true); 
                 response.put("data", data);
@@ -220,51 +212,6 @@ public class AuthController {
                 response.put("message", "用户创建失败");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-        }
-    }
-
-    @PostMapping("/refresh-token")
-    public ResponseEntity<Map<String, Object>> refreshToken(@RequestBody Map<String, String> request) {
-        
-        String refreshToken = request.get("refreshToken");
-        try {
-            if (!jwtUtil.validateRefreshToken(refreshToken)) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "无效的刷新令牌");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-            }
-            
-            String userId = jwtUtil.getUserIdFromToken(refreshToken);
-            String username = jwtUtil.getUsernameFromToken(refreshToken);
-            String role = jwtUtil.getRoleFromToken(refreshToken);
-            
-            User user = userService.getUserById(userId);
-            if (user == null || !"active".equals(user.getStatus())) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "账号已被禁用，请联系管理员");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-            }
-            
-            String newAccessToken = jwtUtil.generateAccessToken(userId, username, role);
-            String newRefreshToken = jwtUtil.generateRefreshToken(userId, username, role);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "令牌刷新成功");
-            Map<String, Object> data = new HashMap<>();
-            data.put("accessToken", newAccessToken);
-            data.put("refreshToken", newRefreshToken);
-            response.put("data", data);
-            response.put("accessToken", newAccessToken);
-            response.put("refreshToken", newRefreshToken);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "无效的刷新令牌");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 
@@ -309,12 +256,10 @@ public class AuthController {
 
         boolean saved = userService.saveUser(user);
         if (saved) {
-            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
-            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
             data.put("accessToken", accessToken);
-            data.put("refreshToken", refreshToken);
             data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", true); 
             response.put("data", data);

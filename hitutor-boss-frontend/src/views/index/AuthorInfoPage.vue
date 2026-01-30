@@ -25,22 +25,48 @@
                 </div>
                 <div class="profile-info">
                   <div class="name-title">
-                    <h3>Yangshengzhou</h3>
+                    <h3>杨圣洲</h3>
                     <span class="developer-badge">好会帮 开发者</span>
                   </div>
-                                    <div class="expertise-tags">
+                  <div class="profile-title">江西科技师范大学 · 信息管理与信息系统</div>
+                  <div class="profile-subtitle">籍贯：吉安县 | 2022年江西省职教高考（三校生）全省第一名（559分）</div>
+                  <div class="expertise-tags">
                     <span class="tag">Vue.js</span>
                     <span class="tag">Spring Boot</span>
                     <span class="tag">MySQL</span>
                     <span class="tag">Docker</span>
-                    <span class="tag">Microservices</span>
+                    <span class="tag">Kubernetes</span>
+                    <span class="tag">Linux</span>
+                    <span class="tag">DevOps</span>
                   </div>
                   <p class="profile-bio">
-                    全栈独立开发者，专注于从零到一构建实用产品。热衷于技术探索与创新实践，
-                    深入研究用户需求，独立完成从产品设计、前后端开发到部署上线的全流程。
-                    已成功打造 好会帮、LeafSort、Lucky_SMS 等多个项目，
-                    致力于将创意转化为高效、实用的工具产品，为用户创造真实价值。
+                    全栈独立开发者，专注于从零到一构建实用产品。2022年参加江西省职教高考（三校生），以559分获得全省第一名，考入江西科技师范大学信息管理与信息系统专业。大学期间，系统学习 Linux、Docker、K8S 等 DevOps 与运维相关技术，专注于 Windows 桌面工具、自动化解决方案及企业级系统的研发与落地。
                   </p>
+                  <div class="projects-section">
+                    <h4>代表项目</h4>
+                    <div class="project-list">
+                      <div class="project-item">
+                        <span class="project-name">Jobs_helper（海投助手）</span>
+                        <span class="project-desc">浏览器脚本插件，聚焦 Boss 直聘平台，具备自动化简历投递、AI 智能回复 HR 消息等功能</span>
+                      </div>
+                      <div class="project-item">
+                        <span class="project-name">LeafSort（轻羽媒体整理）</span>
+                        <span class="project-desc">融合深度学习算法与多线程处理能力，可对海量照片与视频进行整理、归类及去重，通过微软应用商店、联想应用商店分发，适配 Windows 系统</span>
+                      </div>
+                      <div class="project-item">
+                        <span class="project-name">LeafPan</span>
+                        <span class="project-desc">基于 Vue 3 + Spring Boot 3 技术栈构建，为企业级文件管理平台</span>
+                      </div>
+                      <div class="project-item">
+                        <span class="project-name">LeafBoss</span>
+                        <span class="project-desc">基于 Spring Boot 3 + Vue3 + Element Plus + MySQL + JavaScript 技术栈构建，专注于卡密全生命周期管理与安全验证服务</span>
+                      </div>
+                      <div class="project-item">
+                        <span class="project-name">Lucky_SMS</span>
+                        <span class="project-desc">教育类开源系统，基于 Vue 3 和 Spring Boot 开发，具备多角色权限控制，适用于毕业设计、商业应用及教育管理场景，后续更新了用户信息脱敏功能</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -91,7 +117,6 @@
               </div>
             </div>
           </section>
-
 
         </div>
       </div>
@@ -242,6 +267,51 @@ export default {
   padding: 20px;
   text-align: justify;
   text-justify: inter-ideograph;
+}
+
+.profile-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.projects-section {
+  margin-top: 32px;
+}
+
+.projects-section h4 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.project-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 4px;
+}
+
+.project-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.project-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a5568;
 }
 
 .expertise-tags {

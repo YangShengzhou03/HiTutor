@@ -30,13 +30,13 @@ public class Complaint {
     @TableField("status")
     private String status;
     
-    @TableField("created_at")
+    @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
     
-    @TableField("updated_at")
+    @TableField("update_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateTime;
 
     
     public Long getId() {
@@ -103,19 +103,19 @@ public class Complaint {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 }

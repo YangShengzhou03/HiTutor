@@ -18,39 +18,39 @@
       </el-form>
 
       <el-table :data="userList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="用户ID" width="120">
+        <el-table-column prop="id" label="用户ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" width="120">
+        <el-table-column prop="username" label="用户名" min-width="100" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.username || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" label="手机号" width="120">
+        <el-table-column prop="phone" label="手机号" min-width="110" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="邮箱" width="180">
+        <el-table-column prop="email" label="邮箱" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="role" label="角色" width="100">
+        <el-table-column prop="role" label="角色" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getRoleType(row.role)">{{ getRoleText(row.role) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="points" label="当前积分" width="120">
+        <el-table-column prop="points" label="当前积分" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <span :style="{ color: row.points >= 0 ? '#67C23A' : '#F56C6C', fontWeight: 'bold' }">
               {{ row.points || 0 }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="300">
+        <el-table-column label="操作" fixed="right" width="250" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleAddPoints(row)">发放积分</el-button>
             <el-button type="warning" size="small" @click="handleDeductPoints(row)">扣除积分</el-button>
@@ -137,7 +137,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

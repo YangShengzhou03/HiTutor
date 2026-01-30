@@ -21,7 +21,7 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         if (status != null && !status.isEmpty()) {
             queryWrapper.eq("status", status);
         }
-        queryWrapper.orderByDesc("created_at");
+        queryWrapper.orderByDesc("create_time");
         
         Page<Complaint> pageObj = new Page<>(page, size);
         Page<Complaint> result = baseMapper.selectPage(pageObj, queryWrapper);
@@ -60,8 +60,8 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
         }
         
         complaint.setStatus("pending");
-        complaint.setCreatedAt(LocalDateTime.now());
-        complaint.setUpdatedAt(LocalDateTime.now());
+        complaint.setCreateTime(LocalDateTime.now());
+        complaint.setUpdateTime(LocalDateTime.now());
         
         baseMapper.insert(complaint);
         return complaint;
@@ -78,7 +78,7 @@ public class ComplaintServiceImpl extends ServiceImpl<ComplaintMapper, Complaint
     public List<Complaint> getComplaintsByUserId(String userId) {
         QueryWrapper<Complaint> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
-        queryWrapper.orderByDesc("created_at");
+        queryWrapper.orderByDesc("create_time");
         return baseMapper.selectList(queryWrapper);
     }
 }

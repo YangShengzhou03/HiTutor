@@ -72,7 +72,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                   address: tutor.address,
                   certifications: tutor.certifications,
                   isAvailable: tutor.isAvailable,
-                  createdAt: tutor.createdAt,
+                  createTime: tutor.createTime,
                   type: tutor.type,
                   targetGradeLevels: tutor.targetGradeLevels,
                   latitude: tutor.latitude,
@@ -330,7 +330,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
           Routes.userProfile,
           arguments: {
             'userId': _currentTutor.user.id.toString(),
-            'userName': _currentTutor.user.name,
+            'userName': _currentTutor.user.username,
           },
         );
       },
@@ -350,7 +350,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                   ),
                   child: Center(
                     child: Text(
-                      _currentTutor.user.name.isNotEmpty ? _currentTutor.user.name[0] : 'U',
+                      _currentTutor.user.username.isNotEmpty ? _currentTutor.user.username[0] : 'U',
                       style: TextStyle(
                         fontSize: 36,
                         color: accentColor,
@@ -368,7 +368,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                         children: [
                           Flexible(
                             child: Text(
-                              _currentTutor.user.name,
+                              _currentTutor.user.username,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -832,10 +832,10 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _buildReviewItem(
-                  review.reviewer.name,
+                  review.reviewer.username,
                   review.content,
                   review.rating,
-                  review.createdAt.toString().split(' ')[0],
+                  review.createTime.toString().split(' ')[0],
                   review.reviewer.gender,
                 ),
               );

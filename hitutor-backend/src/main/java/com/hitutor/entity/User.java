@@ -66,11 +66,11 @@ public class User {
     @TableField("is_verified")
     private Boolean isVerified;
 
-    @TableField("create_time")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    @TableField("update_time")
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 

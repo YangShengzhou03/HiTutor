@@ -14,8 +14,8 @@ public class RequestApplicationDTO {
     private Boolean applicantVerified;
     private String message;
     private String status;
-    private String createdAt;
-    private String updatedAt;
+    private String createTime;
+    private String updateTime;
 
     public RequestApplicationDTO() {
     }
@@ -100,19 +100,19 @@ public class RequestApplicationDTO {
         this.status = status;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }

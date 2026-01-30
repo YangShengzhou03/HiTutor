@@ -23,35 +23,35 @@
       </el-form>
 
       <el-table :data="certificationList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="认证ID" width="120">
+        <el-table-column prop="id" label="认证ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="120">
+        <el-table-column prop="userId" label="用户ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
+            {{ row.userId ? (row.userId.length > 4 ? row.userId.substring(0, 4) + '...' : row.userId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="realName" label="真实姓名" width="120" />
-        <el-table-column prop="idCard" label="身份证号" width="180" />
-        <el-table-column prop="education" label="学历" width="100" />
-        <el-table-column prop="school" label="毕业院校" width="150" />
-        <el-table-column prop="major" label="专业" width="180" />
-        <el-table-column prop="certificateNumber" label="教师资格证号" width="160" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="realName" label="真实姓名" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="idCard" label="身份证号" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="education" label="学历" width="100" show-overflow-tooltip />
+        <el-table-column prop="school" label="毕业院校" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="major" label="专业" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="certificateNumber" label="教师资格证号" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="申请时间" width="180">
+        <el-table-column prop="createTime" label="申请时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="250">
+        <el-table-column label="操作" fixed="right" width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button
@@ -125,7 +125,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
     private String id;
-    private String name;
     private String username;
     private String avatar;
     private String phone;
@@ -19,13 +18,11 @@ public class UserDTO {
     private String role;
     private String status;
     private String badge;
-    private String createdAt;
-    private String updatedAt;
+    private String createTime;
+    private String updateTime;
     private String lastLoginTime;
     private String lastLoginIp;
     private Integer points;
-    private String latitude;
-    private String longitude;
 
     public UserDTO() {
     }
@@ -36,14 +33,6 @@ public class UserDTO {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUsername() {
@@ -134,20 +123,20 @@ public class UserDTO {
         this.badge = badge;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getLastLoginTime() {
@@ -172,21 +161,5 @@ public class UserDTO {
 
     public void setPoints(Integer points) {
         this.points = points;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 }

@@ -7,6 +7,7 @@
 <div align="center">
   <img src="https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/logo.svg" alt="HiTutor Logo" width="120" height="120">
   <h3>一个现代化的家教信息对接共享平台，采用前后端分离架构</h3>
+  <p>免费、公平、透明的家教信息对接服务，连接学生与专业家教老师</p>
 </div>
 
 [快速开始](#快速开始) • [功能特性](#功能特性) • [技术架构](#技术架构) • [API文档](API_RESPONSE_FORMAT.md)
@@ -562,6 +563,25 @@ HiTutor/
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/YangShengzhou03/HiTutor?style=flat-square)
 ![GitHub Contributors](https://img.shields.io/github/contributors/YangShengzhou03/HiTutor?style=flat-square)
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/YangShengzhou03/HiTutor?style=flat-square)
+
+## 关于作者
+
+### 开发者简介
+
+**杨圣洲**，籍贯吉安县，2022年参加江西省职教高考（三校生），以559分获得全省第一名，考入江西科技师范大学信息管理与信息系统专业。
+
+### 技术背景
+
+大学期间，系统学习 Linux、Docker、K8S 等 DevOps 与运维相关技术，专注于 Windows 桌面工具、自动化解决方案及企业级系统的研发与落地，开发了多款不同场景的项目。
+
+### 代表项目
+
+- **Jobs_helper（海投助手）**：浏览器脚本插件，聚焦 Boss 直聘平台，具备自动化简历投递、AI 智能回复 HR 消息等功能
+- **LeafSort（轻羽媒体整理）**：融合深度学习算法与多线程处理能力，可对海量照片与视频进行整理、归类及去重，通过微软应用商店、联想应用商店分发，适配 Windows 系统
+- **LeafPan**：基于 Vue 3 + Spring Boot 3 技术栈构建，为企业级文件管理平台
+- **LeafBoss**：基于 Spring Boot 3 + Vue3 + Element Plus + MySQL + JavaScript 技术栈构建，专注于卡密全生命周期管理与安全验证服务
+- **Lucky_SMS**：教育类开源系统，基于 Vue 3 和 Spring Boot 开发，具备多角色权限控制，适用于毕业设计、商业应用及教育管理场景，后续更新了用户信息脱敏功能
+- **HiTutor好会帮**：家教信息对接共享平台，采用 Flutter + Spring Boot 技术栈，为学生和家教老师提供免费、公平、透明的信息对接服务
 
 ---
 

@@ -114,6 +114,14 @@ public class AdminController {
             return ResponseEntity.badRequest().body(response);
         }
 
+        User existingUsernameUser = userService.getUserByUsername(username);
+        if (existingUsernameUser != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "用户名已被占用");
+            return ResponseEntity.status(409).body(response);
+        }
+
         if (password == null || password.trim().isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);

@@ -24,43 +24,31 @@
       </el-form>
 
       <el-table :data="complaintList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="投诉ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.id" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="userId" label="投诉人ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="targetUserId" label="被投诉用户ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.targetUserId" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="targetUserName" label="被投诉用户" width="150">
+        <el-table-column prop="id" label="投诉ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="userId" label="投诉人ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="targetUserId" label="被投诉用户ID" width="120" show-overflow-tooltip />
+        <el-table-column prop="targetUserName" label="被投诉用户" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.targetUserName || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="categoryName" label="分类名称" width="120" />
-        <el-table-column prop="typeText" label="投诉类型" width="150" />
-        <el-table-column prop="description" label="投诉说明" width="200" show-overflow-tooltip />
-        <el-table-column prop="contactPhone" label="联系电话" width="120" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="categoryName" label="分类名称" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="typeText" label="投诉类型" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="description" label="投诉说明" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="contactPhone" label="联系电话" min-width="110" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180">
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
-            {{ formatDateTime(row.createdAt) }}
+            {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="250">
+        <el-table-column label="操作" fixed="right" width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button
@@ -114,8 +102,8 @@
         <el-descriptions-item label="投诉说明" :span="2">
           {{ currentComplaint.description || '-' }}
         </el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ currentComplaint.createdAt || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ currentComplaint.updatedAt || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ currentComplaint.createTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ currentComplaint.updateTime || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -124,7 +112,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
 import api from '@/services/api'
 
 const loading = ref(false)

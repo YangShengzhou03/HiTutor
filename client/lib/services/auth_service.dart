@@ -3,13 +3,11 @@ import 'api_service.dart';
 
 class AuthResponse {
   final String accessToken;
-  final String refreshToken;
   final User user;
   final bool isFirstLogin;
 
   AuthResponse({
     required this.accessToken,
-    required this.refreshToken,
     required this.user,
     required this.isFirstLogin,
   });
@@ -17,7 +15,6 @@ class AuthResponse {
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
       accessToken: json['accessToken'] ?? json['token'] ?? '',
-      refreshToken: json['refreshToken'] ?? '',
       user: User.fromJson(json['user']),
       isFirstLogin: json['isFirstLogin'] == true || json['isFirstLogin'] == 1,
     );

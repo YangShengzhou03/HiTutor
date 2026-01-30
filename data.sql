@@ -21,7 +21,7 @@ CREATE TABLE `sys_user` (
   `last_login_ip` VARCHAR(45) COMMENT '最后登录IP',
   `last_login_time` DATETIME COMMENT '最后登录时间',
   `points` INT DEFAULT 0 COMMENT '积分余额',
-  `is_verified` BOOLEAN DEFAULT FALSE COMMENT '是否已认证',
+  `is_verified` TINYINT(1) DEFAULT 0 COMMENT '是否已认证',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -159,13 +159,13 @@ CREATE TABLE `complaints` (
   `description` TEXT NOT NULL COMMENT '投诉说明',
   `contact_phone` VARCHAR(20) COMMENT '联系电话',
   `status` ENUM('pending', 'processing', 'resolved', 'rejected') DEFAULT 'pending' COMMENT '状态',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_target_user_id` (`target_user_id`),
   KEY `idx_status` (`status`),
-  KEY `idx_created_at` (`created_at`),
+  KEY `idx_create_time` (`create_time`),
   CONSTRAINT `fk_complaint_user` FOREIGN KEY (`user_id`) REFERENCES `sys_user`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_complaint_target_user` FOREIGN KEY (`target_user_id`) REFERENCES `sys_user`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='投诉表';
@@ -211,7 +211,7 @@ CREATE TABLE `blacklist` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '黑名单ID',
   `user_id` VARCHAR(36) NOT NULL COMMENT '用户ID',
   `blocked_user_id` VARCHAR(36) NOT NULL COMMENT '被拉黑用户ID',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_blocked` (`user_id`, `blocked_user_id`),
   KEY `idx_user_id` (`user_id`),
@@ -294,7 +294,7 @@ CREATE TABLE `notifications` (
   `content` TEXT COMMENT '通知内容',
   `related_id` VARCHAR(36) COMMENT '关联ID（如申请ID、订单ID等）',
   `related_type` VARCHAR(50) COMMENT '关联类型（application, appointment, review, etc.）',
-  `is_read` BOOLEAN DEFAULT FALSE COMMENT '是否已读',
+  `is_read` TINYINT(1) DEFAULT 0 COMMENT '是否已读',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
@@ -322,4 +322,4 @@ INSERT INTO `tutor_subjects` (`name`) VALUES
 
 -- 插入管理员账户
 INSERT INTO `sys_user` (`id`, `username`, `password`, `email`, `role`, `status`, `is_verified`) VALUES
-('5bb98ebf-1408-40f1-9d4d-3d1f4932f386', 'admin', '$2a$10$iUWuLPbFaOgyXaBqeBarlOuxEh5cPabk4rJurX9SxOjj9SumXhFxC', 'admin@qq.com', 'admin', 'active', FALSE);
+('5bb98ebf-1408-40f1-9d4d-3d1f4932f386', 'admin', '123456', 'admin@qq.com', 'admin', 'active', 0);

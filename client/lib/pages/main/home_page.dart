@@ -668,7 +668,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Center(
                 child: Text(
-                  tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
+                  tutor.user.username.isNotEmpty ? tutor.user.username[0] : 'U',
                   style: TextStyle(
                     fontSize: 24,
                     color: accentColor,
@@ -690,7 +690,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Flexible(
                               child: Text(
-                                _truncateName(tutor.user.name),
+                                _truncateName(tutor.user.username),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,

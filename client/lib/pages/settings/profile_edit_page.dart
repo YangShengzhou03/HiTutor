@@ -44,7 +44,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     final user = authProvider.user;
     if (user == null) return;
 
-    _usernameController.text = user.username ?? '';
+    _usernameController.text = user.username;
     _gender = user.gender ?? 'male';
     _birthDate = user.birthDate != null ? DateTime.tryParse(user.birthDate!) : null;
   }
@@ -191,7 +191,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             ),
             child: Center(
               child: Text(
-                user?.name.isNotEmpty == true ? user!.name[0] : 'U',
+                user?.username.isNotEmpty == true ? user!.username[0] : 'U',
                 style: const TextStyle(
                   fontSize: 48,
                   color: AppTheme.primaryColor,

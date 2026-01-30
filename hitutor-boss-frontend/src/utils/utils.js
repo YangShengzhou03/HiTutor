@@ -1,26 +1,22 @@
 export function isLoggedIn() {
-  return !!localStorage.getItem('token')
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return false
+  }
+  const decoded = parseJWT(token)
+  return decoded && decoded.exp && decoded.exp * 1000 > Date.now()
 }
 
 export function saveToken(token) {
   localStorage.setItem('token', token)
 }
 
-export function saveRefreshToken(refreshToken) {
-  localStorage.setItem('refreshToken', refreshToken)
-}
-
 export function removeToken() {
   localStorage.removeItem('token')
-  localStorage.removeItem('refreshToken')
 }
 
 export function getToken() {
   return localStorage.getItem('token')
-}
-
-export function getRefreshToken() {
-  return localStorage.getItem('refreshToken')
 }
 
 export function parseJWT(token) {
@@ -43,14 +39,19 @@ export function parseJWT(token) {
 
     const payload = JSON.parse(jsonPayload);
 
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-      return {};
-    }
-
     return payload;
   } catch (error) {
     return {};
   }
+}
+
+export function getUserIdFromToken() {
+  const token = getToken()
+  if (!token) {
+    return null
+  }
+  const decoded = parseJWT(token)
+  return decoded.sub || null
 }
 
 export function saveCredentials(username, password) {

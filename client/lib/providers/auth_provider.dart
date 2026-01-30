@@ -12,8 +12,6 @@ class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   bool _isLoading = false;
   bool _isFirstLogin = true;
-  Timer? _tokenRefreshTimer;
-  bool _isRefreshingToken = false;
 
   User? get user => _user;
   String? get token => _token;
@@ -29,7 +27,6 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final savedToken = await StorageService.getToken();
-      final savedRefreshToken = await StorageService.getRefreshToken();
       final savedUserData = await StorageService.getUserData();
       final savedIsLoggedIn = await StorageService.isLoggedIn();
       final savedIsFirstLogin = await StorageService.isFirstLogin();
@@ -40,9 +37,6 @@ class AuthProvider with ChangeNotifier {
         _isFirstLogin = savedIsFirstLogin;
 
         ApiService.setToken(savedToken);
-        if (savedRefreshToken != null) {
-          ApiService.setRefreshToken(savedRefreshToken);
-        }
 
         if (savedUserData != null) {
           _user = User.fromJson(jsonDecode(savedUserData));
@@ -54,7 +48,6 @@ class AuthProvider with ChangeNotifier {
         }
 
         await _checkDailyLogin();
-        _startTokenRefreshTimer();
       }
     } catch (e) {
       await StorageService.clearUserData();
@@ -78,82 +71,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  void _startTokenRefreshTimer() {
-    _tokenRefreshTimer?.cancel();
-    _tokenRefreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      await _checkAndRefreshTokenIfNeeded();
-    });
-  }
-
-  Future<void> _checkAndRefreshTokenIfNeeded() async {
-    if (_token == null || _isRefreshingToken) return;
-    
-    try {
-      final claims = _parseTokenClaims(_token!);
-      if (claims == null) return;
-      
-      final expiration = claims['exp'] as int?;
-      if (expiration == null) return;
-      
-      final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiration * 1000);
-      final now = DateTime.now();
-      final minutesUntilExpiration = expirationDate.difference(now).inMinutes;
-      
-      if (minutesUntilExpiration <= 5) {
-        await _refreshToken();
-      }
-    } catch (e) {
-      // 静默处理错误
-    }
-  }
-
-  Map<String, dynamic>? _parseTokenClaims(String token) {
-    try {
-      final parts = token.split('.');
-      if (parts.length != 3) return null;
-      
-      var payload = parts[1];
-      
-      while (payload.length % 4 != 0) {
-        payload += '=';
-      }
-      
-      final decoded = const Utf8Decoder().convert(base64.decode(payload));
-      
-      return jsonDecode(decoded) as Map<String, dynamic>;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<void> _refreshToken() async {
-    if (_isRefreshingToken) return;
-    
-    _isRefreshingToken = true;
-    
-    try {
-      final refreshToken = await StorageService.getRefreshToken();
-      if (refreshToken == null) return;
-      
-      final response = await ApiService.refreshToken(refreshToken);
-      if (response['success'] == true && response['data'] != null) {
-        final data = response['data'];
-        _token = data['accessToken'];
-        ApiService.setToken(_token!);
-        await StorageService.saveToken(_token!);
-        
-        if (data['refreshToken'] != null) {
-          ApiService.setRefreshToken(data['refreshToken']);
-          await StorageService.saveRefreshToken(data['refreshToken']);
-        }
-      }
-    } catch (e) {
-      // 静默处理错误
-    } finally {
-      _isRefreshingToken = false;
-    }
-  }
-
 
 
   
@@ -168,7 +85,6 @@ class AuthProvider with ChangeNotifier {
       _isFirstLogin = response.isFirstLogin;
 
       ApiService.setToken(_token!);
-      ApiService.setRefreshToken(response.refreshToken);
 
       try {
         _user = await AuthService.getCurrentUser();
@@ -177,14 +93,11 @@ class AuthProvider with ChangeNotifier {
       }
 
       await StorageService.saveToken(_token!);
-      await StorageService.saveRefreshToken(response.refreshToken);
       await StorageService.saveUserId(_user!.id);
       await StorageService.saveUserData(jsonEncode(_user!.toJson()));
 
       await StorageService.setLoggedIn(true);
       await StorageService.setFirstLogin(_isFirstLogin);
-
-      _startTokenRefreshTimer();
 
       notifyListeners();
     } catch (e) {
@@ -208,7 +121,6 @@ class AuthProvider with ChangeNotifier {
       _isFirstLogin = response.isFirstLogin;
 
       await StorageService.saveToken(_token!);
-      await StorageService.saveRefreshToken(response.refreshToken);
       await StorageService.saveUserId(_user!.id);
       await StorageService.saveUserData(jsonEncode(_user!.toJson()));
 
@@ -216,9 +128,6 @@ class AuthProvider with ChangeNotifier {
       await StorageService.setFirstLogin(_isFirstLogin);
 
       ApiService.setToken(_token!);
-      ApiService.setRefreshToken(response.refreshToken);
-
-      _startTokenRefreshTimer();
 
       notifyListeners();
     } catch (e) {
@@ -235,7 +144,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final userToUse = _user ?? (userId != null ? User(id: userId, name: '', avatar: '', phone: '', email: '', createdAt: DateTime.now()) : null);
+      final userToUse = _user ?? (userId != null ? User(id: userId, username: '', avatar: '', phone: '', email: '', createTime: DateTime.now()) : null);
       if (userToUse == null) throw Exception('用户未登录');
 
       final request = {'roleId': roleId};
@@ -268,9 +177,6 @@ class AuthProvider with ChangeNotifier {
     _isLoggedIn = false;
     _isFirstLogin = false;
 
-    _tokenRefreshTimer?.cancel();
-    _tokenRefreshTimer = null;
-
     ApiService.clearToken();
 
     _isLoading = false;
@@ -282,15 +188,12 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loginWithToken(dynamic userData, String token, {bool isFirstLogin = false, String? refreshToken}) async {
+  Future<void> loginWithToken(dynamic userData, String token, {bool isFirstLogin = false}) async {
     _token = token;
     _isLoggedIn = true;
     _isFirstLogin = isFirstLogin;
 
     ApiService.setToken(token);
-    if (refreshToken != null) {
-      ApiService.setRefreshToken(refreshToken);
-    }
 
     try {
       final tempUser = userData != null ? User.fromJson(userData) : null;
@@ -302,9 +205,6 @@ class AuthProvider with ChangeNotifier {
     }
 
     await StorageService.saveToken(token);
-    if (refreshToken != null) {
-      await StorageService.saveRefreshToken(refreshToken);
-    }
     await StorageService.saveUserId(_user!.id);
     await StorageService.saveUserData(jsonEncode(_user!.toJson()));
     await StorageService.setLoggedIn(true);

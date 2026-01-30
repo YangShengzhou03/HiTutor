@@ -8,27 +8,15 @@
       </template>
 
       <el-table :data="blacklist" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="记录ID" width="120">
+        <el-table-column prop="id" label="记录ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="userId" label="用户ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="blockedUserId" label="被拉黑用户ID" width="120" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="创建时间" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="blockedUserId" label="被拉黑用户ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.blockedUserId" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180">
-          <template #default="{ row }">
-            {{ formatDateTime(row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
           </template>
@@ -53,7 +41,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
 import api from '@/services/api'
 
 const loading = ref(false)

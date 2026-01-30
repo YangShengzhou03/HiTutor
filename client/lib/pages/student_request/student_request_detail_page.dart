@@ -265,7 +265,7 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
           Routes.userProfile,
           arguments: {
             'userId': widget.request.user.id.toString(),
-            'userName': widget.request.user.name,
+            'userName': widget.request.user.username,
           },
         );
       },
@@ -285,7 +285,7 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
                   ),
                   child: Center(
                     child: Text(
-                      widget.request.user.name.isNotEmpty ? widget.request.user.name[0] : 'U',
+                      widget.request.user.username.isNotEmpty ? widget.request.user.username[0] : 'U',
                       style: TextStyle(
                         fontSize: 36,
                         color: accentColor,
@@ -303,7 +303,7 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
                         children: [
                           Flexible(
                             child: Text(
-                              widget.request.user.name,
+                              widget.request.user.username,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,

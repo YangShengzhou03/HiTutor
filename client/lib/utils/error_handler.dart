@@ -21,11 +21,15 @@ class ErrorHandler {
     }
 
     if (errorStr.contains('403') || errorStr.contains('Forbidden')) {
-      return '没有权限执行此操作';
+      return '权限不足，无法访问该资源';
     }
 
     if (errorStr.contains('404') || errorStr.contains('Not Found')) {
       return '请求的资源不存在';
+    }
+
+    if (errorStr.contains('409') || errorStr.contains('Conflict')) {
+      return '资源冲突，请检查数据';
     }
 
     if (errorStr.contains('500') || errorStr.contains('Internal Server Error')) {
@@ -33,7 +37,16 @@ class ErrorHandler {
     }
 
     if (errorStr.contains('Exception')) {
-      return errorStr.replaceFirst('Exception: ', '');
+      final message = errorStr.replaceFirst('Exception: ', '');
+      if (message.isNotEmpty && !message.contains('操作失败') && 
+          !message.contains('网络') && 
+          !message.contains('超时') && 
+          !message.contains('登录') && 
+          !message.contains('权限') && 
+          !message.contains('资源') && 
+          !message.contains('服务器')) {
+        return message;
+      }
     }
 
     return errorStr;

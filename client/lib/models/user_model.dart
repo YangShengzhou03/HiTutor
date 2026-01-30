@@ -1,7 +1,6 @@
 class User {
   final String id;
-  final String name;
-  final String? username;
+  final String username;
   final String avatar;
   final String phone;
   final String email;
@@ -11,15 +10,14 @@ class User {
   final String? role;
   final String? badge;
   final bool? isVerified;
-  final DateTime createdAt;
+  final DateTime createTime;
   final double? latitude;
   final double? longitude;
   final int? points;
 
   User({
     required this.id,
-    required this.name,
-    this.username,
+    required this.username,
     required this.avatar,
     required this.phone,
     required this.email,
@@ -29,7 +27,7 @@ class User {
     this.role,
     this.badge,
     this.isVerified,
-    required this.createdAt,
+    required this.createTime,
     this.latitude,
     this.longitude,
     this.points,
@@ -44,8 +42,7 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     final user = User(
       id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      username: json['username']?.toString(),
+      username: json['username']?.toString() ?? json['name']?.toString() ?? '',
       avatar: json['avatar']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
@@ -55,7 +52,7 @@ class User {
       role: json['role']?.toString(),
       badge: json['badge']?.toString(),
       isVerified: _parseBool(json['isVerified']),
-      createdAt: _parseDateTime(json['createdAt']),
+      createTime: _parseDateTime(json['createTime']),
       latitude: json['latitude'] is String ? double.tryParse(json['latitude']) : null,
       longitude: json['longitude'] is String ? double.tryParse(json['longitude']) : null,
       points: json['points'] is int ? json['points'] : null,
@@ -104,7 +101,6 @@ class User {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
       'username': username,
       'avatar': avatar,
       'phone': phone,
@@ -115,7 +111,7 @@ class User {
       'role': role,
       'badge': badge,
       'isVerified': isVerified,
-      'createdAt': createdAt.toIso8601String(),
+      'createTime': createTime.toIso8601String(),
       'points': points,
     };
   }

@@ -30,47 +30,47 @@
       </el-form>
 
       <el-table :data="appointmentList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="预约ID" width="120">
+        <el-table-column prop="id" label="预约ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="tutorId" label="家教老师ID" width="120">
+        <el-table-column prop="tutorId" label="家教老师ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.tutorId" />
+            {{ row.tutorId ? (row.tutorId.length > 4 ? row.tutorId.substring(0, 4) + '...' : row.tutorId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="studentId" label="学生ID" width="120">
+        <el-table-column prop="studentId" label="学生ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.studentId" />
+            {{ row.studentId ? (row.studentId.length > 4 ? row.studentId.substring(0, 4) + '...' : row.studentId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="subjectName" label="科目" width="100" />
-        <el-table-column prop="appointmentTime" label="预约时间" width="180" />
-        <el-table-column prop="duration" label="时长" width="100">
+        <el-table-column prop="subjectName" label="科目" width="100" show-overflow-tooltip />
+        <el-table-column prop="appointmentTime" label="预约时间" width="160" show-overflow-tooltip />
+        <el-table-column prop="duration" label="时长" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.duration }}小时
           </template>
         </el-table-column>
-        <el-table-column prop="hourlyRate" label="时薪" width="100">
+        <el-table-column prop="hourlyRate" label="时薪" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             ¥{{ row.hourlyRate }}/小时
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="上课地址" width="200" show-overflow-tooltip />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="address" label="上课地址" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="250">
+        <el-table-column label="操作" fixed="right" width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button
@@ -147,7 +147,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

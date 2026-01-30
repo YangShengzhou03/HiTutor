@@ -58,10 +58,9 @@ class _PasswordLoginPageState extends State<PasswordLoginPage> {
           final data = response['data'];
           final user = data['user'];
           final accessToken = data['accessToken'] ?? data['token'];
-          final refreshToken = data['refreshToken'];
           final isFirstLogin = data['isFirstLogin'] ?? false;
           
-          await authProvider.loginWithToken(user, accessToken, isFirstLogin: isFirstLogin, refreshToken: refreshToken);
+          await authProvider.loginWithToken(user, accessToken, isFirstLogin: isFirstLogin);
           
           if (!mounted) return;
           

@@ -2,7 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
   static const String _tokenKey = 'auth_token';
-  static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'user_id';
   static const String _userDataKey = 'user_data';
   static const String _isLoggedInKey = 'is_logged_in';
@@ -24,22 +23,6 @@ class StorageService {
   static Future<void> removeToken() async {
     final prefs = await _prefs;
     await prefs.remove(_tokenKey);
-  }
-
-  
-  static Future<void> saveRefreshToken(String refreshToken) async {
-    final prefs = await _prefs;
-    await prefs.setString(_refreshTokenKey, refreshToken);
-  }
-
-  static Future<String?> getRefreshToken() async {
-    final prefs = await _prefs;
-    return prefs.getString(_refreshTokenKey);
-  }
-
-  static Future<void> removeRefreshToken() async {
-    final prefs = await _prefs;
-    await prefs.remove(_refreshTokenKey);
   }
 
   
@@ -100,7 +83,6 @@ class StorageService {
   static Future<void> clearUserData() async {
     final prefs = await _prefs;
     await prefs.remove(_tokenKey);
-    await prefs.remove(_refreshTokenKey);
     await prefs.remove(_userIdKey);
     await prefs.remove(_userDataKey);
     await prefs.setBool(_isLoggedInKey, false);

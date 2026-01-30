@@ -29,54 +29,54 @@
       </el-form>
 
       <el-table :data="profileList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="信息ID" width="120">
+        <el-table-column prop="id" label="信息ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="120">
+        <el-table-column prop="userId" label="用户ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
+            {{ row.userId ? (row.userId.length > 4 ? row.userId.substring(0, 4) + '...' : row.userId) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="subjectName" label="科目" width="100">
+        <el-table-column prop="subjectName" label="科目" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.subjectName || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="hourlyRate" label="时薪" width="100">
+        <el-table-column prop="hourlyRate" label="时薪" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             ¥{{ row.hourlyRate || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="address" label="授课地址" width="200" show-overflow-tooltip>
+        <el-table-column prop="address" label="授课地址" min-width="150" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.address || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="targetGradeLevels" label="目标年级" width="150" show-overflow-tooltip>
+        <el-table-column prop="targetGradeLevels" label="目标年级" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatGradeLevels(row.targetGradeLevels) }}
           </template>
         </el-table-column>
-        <el-table-column prop="availableTime" label="可授课时间" width="150" show-overflow-tooltip>
+        <el-table-column prop="availableTime" label="可授课时间" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
             {{ row.availableTime || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
@@ -124,7 +124,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

@@ -321,7 +321,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     
     
-    final initial = user.name.isNotEmpty ? user.name[0] : 'U';
+    final initial = user.username.isNotEmpty ? user.username[0] : 'U';
     
     
     String userLabel = '';
@@ -376,7 +376,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Flexible(
                       child: Text(
-                        user.name,
+                        user.username,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,

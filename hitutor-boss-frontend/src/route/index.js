@@ -245,9 +245,12 @@ router.beforeEach(async (to, from, next) => {
     }
 
     if (!store.state.user) {
-      await store.fetchCurrentUser().catch((error) => {
-        console.log('路由守卫获取用户信息失败，但 token 仍然有效:', error)
-      });
+      try {
+        await store.fetchCurrentUser();
+      } catch (error) {
+        console.log('路由守卫获取用户信息失败:', error);
+        // 不要立即清除用户信息，只在token确实过期时才清除
+      }
     }
 
     next();

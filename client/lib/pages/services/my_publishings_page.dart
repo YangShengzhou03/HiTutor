@@ -67,8 +67,8 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
       
       final combinedPublishings = [...studentRequests, ...tutorServices];
       combinedPublishings.sort((a, b) {
-        final dateA = a['createdAt'] != null ? DateTime.tryParse(a['createdAt']) : DateTime.now();
-        final dateB = b['createdAt'] != null ? DateTime.tryParse(b['createdAt']) : DateTime.now();
+        final dateA = a['createTime'] != null ? DateTime.tryParse(a['createTime']) : DateTime.now();
+        final dateB = b['createTime'] != null ? DateTime.tryParse(b['createTime']) : DateTime.now();
         if (dateA == null || dateB == null) return 0;
         return dateB.compareTo(dateA);
       });
@@ -195,8 +195,8 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
 
   Widget _buildPublishingItem(dynamic item) {
     
-    final createTime = item['createdAt'] != null 
-        ? DateTime.parse(item['createdAt']) 
+    final createTime = item['createTime'] != null 
+        ? DateTime.parse(item['createTime']) 
         : DateTime.now();
     final formattedDate = '${createTime.year}-${createTime.month.toString().padLeft(2, '0')}-${createTime.day.toString().padLeft(2, '0')} ${createTime.hour.toString().padLeft(2, '0')}:${createTime.minute.toString().padLeft(2, '0')}';
 

@@ -362,7 +362,7 @@ class DiscoverPage extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
+                      tutor.user.username.isNotEmpty ? tutor.user.username[0] : 'U',
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -380,7 +380,7 @@ class DiscoverPage extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              tutor.user.name,
+                              tutor.user.username,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,

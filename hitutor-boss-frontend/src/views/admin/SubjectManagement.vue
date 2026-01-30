@@ -23,30 +23,30 @@
       </el-form>
 
       <el-table :data="subjectList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="科目ID" width="120">
+        <el-table-column prop="id" label="科目ID" width="100" show-overflow-tooltip>
           <template #default="{ row }">
-            <IdDisplay :id="row.id" />
+            {{ row.id ? (row.id.length > 4 ? row.id.substring(0, 4) + '...' : row.id) : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="科目名称" width="150" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="name" label="科目名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
               {{ row.status === 'active' ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="createTime" label="创建时间" width="180" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="更新时间" width="180">
+        <el-table-column prop="updateTime" label="更新时间" width="180" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.updateTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right" width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
@@ -78,7 +78,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
+
 import api from '@/services/api'
 
 const loading = ref(false)

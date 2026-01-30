@@ -38,19 +38,11 @@
       </el-form>
 
       <el-table :data="notifications" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="通知ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.id" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="120">
-          <template #default="{ row }">
-            <IdDisplay :id="row.userId" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="title" label="标题" width="200" show-overflow-tooltip />
-        <el-table-column prop="content" label="内容" show-overflow-tooltip />
-        <el-table-column prop="type" label="类型" width="120">
+        <el-table-column prop="id" label="通知ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="userId" label="用户ID" width="100" show-overflow-tooltip />
+        <el-table-column prop="title" label="标题" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="content" label="内容" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="type" label="类型" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag v-if="row.type === 'system'" type="info">系统通知</el-tag>
             <el-tag v-else-if="row.type === 'activity'" type="success">活动通知</el-tag>
@@ -65,18 +57,18 @@
             <el-tag v-else>{{ row.type }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="isRead" label="状态" width="100">
+        <el-table-column prop="isRead" label="状态" width="100" show-overflow-tooltip>
           <template #default="{ row }">
             <el-tag v-if="row.isRead === 0" type="danger">未读</el-tag>
             <el-tag v-else type="success">已读</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="createTime" label="创建时间" width="160" show-overflow-tooltip>
           <template #default="{ row }">
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="120" show-overflow-tooltip>
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
@@ -185,7 +177,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showSendDialog = false">取消</el-button>
-        <el-button type="primary" @click="sendNotification" :loading="sending">
+        <el-button type="primary" @click="sendNotification" :loading="sending" :disabled="sending">
           发送通知
         </el-button>
       </template>
@@ -196,7 +188,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import IdDisplay from '@/components/IdDisplay.vue'
 import Server from '@/utils/Server'
 
 const sendFormRef = ref(null)
@@ -206,6 +197,7 @@ const notifications = ref([])
 const dialogVisible = ref(false)
 const currentNotification = ref(null)
 const isLoading = ref(false)
+const sendDebounceTimer = ref(null)
 
 const searchForm = reactive({
   type: '',
@@ -291,48 +283,69 @@ const handleReset = () => {
 }
 
 const sendNotification = async () => {
+  console.log('=== sendNotification 被调用 ===')
+  console.log('sending.value:', sending.value)
+  
   if (!sendFormRef.value) return
   
   if (sending.value) {
+    console.log('正在发送中，阻止重复请求')
     ElMessage.warning('正在发送中，请稍候...')
     return
   }
 
-  await sendFormRef.value.validate(async (valid) => {
-    if (!valid) return
+  if (sendDebounceTimer.value) {
+    console.log('清除之前的定时器')
+    clearTimeout(sendDebounceTimer.value)
+  }
 
-    if (sendForm.targetType === 'user' && !sendForm.userId) {
-      ElMessage.warning('请输入用户ID')
-      return
-    }
+  sendDebounceTimer.value = setTimeout(async () => {
+    console.log('开始执行发送逻辑')
+    await sendFormRef.value.validate(async (valid) => {
+      if (!valid) return
 
-    sending.value = true
-    try {
-      const data = {
-        type: sendForm.type,
-        title: sendForm.title,
-        content: sendForm.content
+      if (sendForm.targetType === 'user' && !sendForm.userId) {
+        ElMessage.warning('请输入用户ID')
+        return
       }
 
-      if (sendForm.targetType === 'user') {
-        data.userId = sendForm.userId
-      }
+      sending.value = true
+      console.log('sending.value 设置为 true')
+      try {
+        const data = {
+          type: sendForm.type,
+          title: sendForm.title,
+          content: sendForm.content
+        }
 
-      const response = await Server.post('/api/notifications/admin/send', data)
-      if (response.success) {
-        ElMessage.success(response.message || '发送成功')
-        resetForm()
-        showSendDialog.value = false
-        loadNotifications()
-      } else {
-        ElMessage.error(response.message || '发送失败')
+        if (sendForm.targetType === 'user') {
+          data.userId = sendForm.userId
+        }
+
+        console.log('准备发送请求，数据:', data)
+        const response = await Server.post('/api/notifications/admin/send', data)
+        console.log('收到响应:', response)
+        if (response.success) {
+          ElMessage.success(response.message || '发送成功')
+          resetForm()
+          showSendDialog.value = false
+          await new Promise(resolve => setTimeout(resolve, 500))
+          loadNotifications()
+        } else {
+          ElMessage.error(response.message || '发送失败')
+        }
+      } catch (error) {
+        console.error('发送失败:', error)
+        if (error.message !== '请求重复') {
+          ElMessage.error('发送失败')
+        }
+      } finally {
+        sending.value = false
+        sendDebounceTimer.value = null
+        console.log('sending.value 设置为 false')
       }
-    } catch (error) {
-      ElMessage.error('发送失败')
-    } finally {
-      sending.value = false
-    }
-  })
+    })
+  }, 300)
 }
 
 const resetForm = () => {

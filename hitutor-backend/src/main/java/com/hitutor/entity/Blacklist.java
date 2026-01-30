@@ -19,9 +19,9 @@ public class Blacklist {
     @TableField("blocked_user_id")
     private String blockedUserId;
 
-    @TableField("created_at")
+    @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
     
     @TableField(exist = false)
     private User user;
@@ -30,7 +30,7 @@ public class Blacklist {
     private User blockedUser;
     
     public Blacklist() {
-        this.createdAt = LocalDateTime.now();
+        this.createTime = LocalDateTime.now();
     }
     
     public Long getId() {
@@ -57,12 +57,12 @@ public class Blacklist {
         this.blockedUserId = blockedUserId;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreateTime() {
+        return createTime;
     }
     
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
     
     public User getUser() {

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -116,11 +117,18 @@ public class NotificationController {
     }
 
     @PostMapping("/admin/send")
+    @Transactional
     public ResponseEntity<Map<String, Object>> sendNotification(@RequestBody Map<String, Object> request) {
         String userId = request.get("userId") != null ? request.get("userId").toString() : null;
         String title = request.get("title") != null ? request.get("title").toString() : null;
         String content = request.get("content") != null ? request.get("content").toString() : null;
         String type = request.get("type") != null ? request.get("type").toString() : "system";
+        
+        System.out.println("=== 发送通知请求 ===");
+        System.out.println("userId: " + userId);
+        System.out.println("title: " + title);
+        System.out.println("content: " + content);
+        System.out.println("type: " + type);
         
         if (title == null || title.trim().isEmpty()) {
             Map<String, Object> response = new HashMap<>();
@@ -137,6 +145,7 @@ public class NotificationController {
         }
         
         if (userId != null && !userId.trim().isEmpty()) {
+            System.out.println("发送给指定用户: " + userId);
             Notification notification = new Notification();
             notification.setUserId(userId);
             notification.setType(type);
@@ -146,7 +155,10 @@ public class NotificationController {
             notificationService.createNotification(notification);
         } else {
             List<String> allUserIds = userService.getAllUserIds();
+            System.out.println("群发通知，用户数量: " + allUserIds.size());
+            System.out.println("用户ID列表: " + allUserIds);
             for (String uid : allUserIds) {
+                System.out.println("正在发送给用户: " + uid);
                 Notification notification = new Notification();
                 notification.setUserId(uid);
                 notification.setType(type);
