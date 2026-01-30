@@ -26,11 +26,12 @@
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
           <el-button @click="handleReset">重置</el-button>
+          <el-button type="success" @click="handleAddUser">添加用户</el-button>
         </el-form-item>
       </el-form>
 
       <el-table :data="userList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="用户ID" width="200">
+        <el-table-column prop="id" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.id" />
           </template>
@@ -62,11 +63,17 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="isVerified" label="已认证" width="100">
+        <el-table-column prop="badge" label="头衔" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.isVerified ? 'success' : 'info'">
-              {{ row.isVerified ? '是' : '否' }}
-            </el-tag>
+            <el-tag v-if="row.badge" type="warning">{{ row.badge }}</el-tag>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="gender" label="性别" width="80">
+          <template #default="{ row }">
+            <el-tag v-if="row.gender === 'male'" type="primary">男</el-tag>
+            <el-tag v-else-if="row.gender === 'female'" type="danger">女</el-tag>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="lastLoginTime" label="最后登录时间" width="180">
@@ -84,10 +91,12 @@
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="260">
+        <el-table-column label="操作" fixed="right" width="400">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">查看</el-button>
             <el-button type="warning" size="small" @click="handleAdjustPoints(row)">调整积分</el-button>
+            <el-button type="info" size="small" @click="handleResetPassword(row)">重置密码</el-button>
+            <el-button type="success" size="small" @click="handleSetBadge(row)">赐予头衔</el-button>
             <el-button
               :type="row.status === 'active' ? 'danger' : 'success'"
               size="small"
@@ -123,6 +132,10 @@
         <el-descriptions-item label="用户名">{{ currentUser.username || '-' }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ currentUser.phone || '-' }}</el-descriptions-item>
         <el-descriptions-item label="邮箱">{{ currentUser.email || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="头衔">
+          <el-tag v-if="currentUser.badge" type="warning">{{ currentUser.badge }}</el-tag>
+          <span v-else>-</span>
+        </el-descriptions-item>
         <el-descriptions-item label="角色">
           <el-tag :type="getRoleType(currentUser.role)">{{ getRoleText(currentUser.role) }}</el-tag>
         </el-descriptions-item>
@@ -131,16 +144,8 @@
             {{ currentUser.status === 'active' ? '活跃' : '禁用' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="已认证">
-          <el-tag :type="currentUser.isVerified ? 'success' : 'info'">
-            {{ currentUser.isVerified ? '是' : '否' }}
-          </el-tag>
-        </el-descriptions-item>
         <el-descriptions-item label="性别">{{ currentUser.gender || '-' }}</el-descriptions-item>
         <el-descriptions-item label="出生日期">{{ currentUser.birthDate || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="学历">{{ currentUser.education || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="学校">{{ currentUser.school || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="专业">{{ currentUser.major || '-' }}</el-descriptions-item>
         <el-descriptions-item label="教学经验">{{ currentUser.teachingExperience || '-' }}年</el-descriptions-item>
         <el-descriptions-item label="积分">{{ currentUser.points || 0 }}</el-descriptions-item>
         <el-descriptions-item label="最后登录时间">{{ formatDateTime(currentUser.lastLoginTime) }}</el-descriptions-item>
@@ -187,6 +192,69 @@
         <el-button type="primary" @click="handleConfirmPoints">确定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="badgeDialogVisible" title="赐予头衔" width="500px">
+      <el-form v-if="badgeForm" :model="badgeForm" label-width="100px">
+        <el-form-item label="用户ID">
+          <IdDisplay :id="badgeForm.userId" />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <span>{{ badgeForm.username }}</span>
+        </el-form-item>
+        <el-form-item label="当前头衔">
+          <el-tag v-if="badgeForm.currentBadge" type="warning">{{ badgeForm.currentBadge }}</el-tag>
+          <span v-else>-</span>
+        </el-form-item>
+        <el-form-item label="新头衔">
+          <el-input v-model="badgeForm.badge" placeholder="请输入头衔，留空则移除头衔" maxlength="8" show-word-limit />
+        </el-form-item>
+        <el-form-item label="推荐头衔">
+          <div class="badge-suggestions">
+            <el-tag
+              v-for="suggestion in badgeSuggestions"
+              :key="suggestion"
+              class="badge-suggestion"
+              @click="badgeForm.badge = suggestion"
+              style="cursor: pointer; margin-right: 8px; margin-bottom: 8px;"
+            >
+              {{ suggestion }}
+            </el-tag>
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="badgeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleConfirmBadge">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="addUserDialogVisible" title="添加用户" width="600px">
+      <el-form v-if="addUserForm" :model="addUserForm" :rules="addUserRules" ref="addUserFormRef" label-width="100px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addUserForm.username" placeholder="请输入用户名" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="addUserForm.email" placeholder="请输入邮箱" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addUserForm.password" type="password" placeholder="请输入密码" show-password maxlength="50" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="addUserForm.phone" placeholder="请输入手机号" maxlength="20" />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-select v-model="addUserForm.role" placeholder="请选择角色">
+            <el-option label="学生" value="student" />
+            <el-option label="家教老师" value="tutor" />
+            <el-option label="管理员" value="admin" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="addUserDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleConfirmAddUser">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -202,6 +270,45 @@ const dialogVisible = ref(false)
 const currentUser = ref(null)
 const pointsDialogVisible = ref(false)
 const pointsForm = ref(null)
+const badgeDialogVisible = ref(false)
+const badgeForm = ref(null)
+const addUserDialogVisible = ref(false)
+const addUserForm = ref(null)
+const addUserFormRef = ref(null)
+
+const badgeSuggestions = [
+  '金牌家教',
+  '优秀家教',
+  '资深家教',
+  '明星家教',
+  '人气家教',
+  '好评家教',
+  '认证家教',
+  '金牌学员',
+  '优秀学员',
+  '活跃学员'
+]
+
+const addUserRules = {
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 2, max: 50, message: '用户名长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
+  email: [
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 50, message: '密码长度在 6 到 50 个字符', trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }
+  ],
+  role: [
+    { required: true, message: '请选择角色', trigger: 'change' }
+  ]
+}
 
 const searchForm = reactive({
   role: '',
@@ -323,6 +430,97 @@ const handleAdjustPoints = (row) => {
     description: ''
   }
   pointsDialogVisible.value = true
+}
+
+const handleResetPassword = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要重置用户 ${row.username} 的密码为 123456 吗？`,
+      '重置密码',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const response = await api.admin.resetUserPassword(row.id)
+    if (response.success) {
+      ElMessage.success(response.message || '密码重置成功')
+    } else {
+      ElMessage.error(response.message || '密码重置失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('密码重置失败')
+    }
+  }
+}
+
+const handleSetBadge = (row) => {
+  badgeForm.value = {
+    userId: row.id,
+    username: row.username,
+    currentBadge: row.badge || '',
+    badge: row.badge || ''
+  }
+  badgeDialogVisible.value = true
+}
+
+const handleConfirmBadge = async () => {
+  try {
+    const response = await api.admin.setUserBadge(badgeForm.value.userId, badgeForm.value.badge)
+    if (response.success) {
+      ElMessage.success(response.message || '头衔设置成功')
+      badgeDialogVisible.value = false
+      fetchUserList()
+    } else {
+      ElMessage.error(response.message || '头衔设置失败')
+    }
+  } catch (error) {
+    ElMessage.error('头衔设置失败')
+  }
+}
+
+const handleAddUser = () => {
+  addUserForm.value = {
+    username: '',
+    email: '',
+    password: '',
+    phone: '',
+    role: 'student'
+  }
+  addUserDialogVisible.value = true
+}
+
+const handleConfirmAddUser = async () => {
+  if (!addUserFormRef.value) return
+
+  try {
+    await addUserFormRef.value.validate()
+  } catch (error) {
+    return
+  }
+
+  try {
+    const response = await api.admin.createUser({
+      username: addUserForm.value.username,
+      email: addUserForm.value.email,
+      password: addUserForm.value.password,
+      phone: addUserForm.value.phone,
+      role: addUserForm.value.role
+    })
+
+    if (response.success) {
+      ElMessage.success(response.message || '添加用户成功')
+      addUserDialogVisible.value = false
+      fetchUserList()
+    } else {
+      ElMessage.error(response.message || '添加用户失败')
+    }
+  } catch (error) {
+    ElMessage.error('添加用户失败')
+  }
 }
 
 const handleConfirmPoints = async () => {

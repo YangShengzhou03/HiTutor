@@ -10,6 +10,8 @@ class Tutor {
   final String pricePerHour;
   final String experience;
   final String educationBackground;
+  final String school;
+  final String major;
   final String description;
   final String? address;
   final List<String> certifications;
@@ -30,6 +32,8 @@ class Tutor {
     required this.pricePerHour,
     required this.experience,
     required this.educationBackground,
+    this.school = '',
+    this.major = '',
     required this.description,
     this.address,
     required this.certifications,
@@ -43,17 +47,18 @@ class Tutor {
 
   factory Tutor.fromJson(Map<String, dynamic> json) {
     final user = json.containsKey('user') ? User.fromJson(json['user']) : 
-                 json.containsKey('tutor') ? User.fromJson(json['tutor']) : 
                  User(
-                   id: json['userId']?.toString() ?? json['id']?.toString() ?? '',
-                   name: json['userName']?.toString() ?? json['name']?.toString() ?? '',
-                   username: json['userName']?.toString(),
-                   avatar: json['userAvatar']?.toString() ?? json['avatar']?.toString() ?? '',
-                   phone: '',
-                   email: '',
-                   isVerified: json['userVerified'] == true || json['userVerified'] == 1,
-                   createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) ?? DateTime.now() : DateTime.now(),
-                 );
+                  id: json['userId']?.toString() ?? '',
+                  name: json['userName']?.toString() ?? '',
+                  username: json['userName']?.toString(),
+                  avatar: json['userAvatar']?.toString() ?? '',
+                  phone: '',
+                  email: '',
+                  gender: json['userGender']?.toString(),
+                  badge: json['badge']?.toString(),
+                  isVerified: _parseBool(json['userVerified']),
+                  createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) ?? DateTime.now() : DateTime.now(),
+                );
     
     List<GradeLevel> gradeLevels = [];
     if (json['targetGradeLevels'] != null) {
@@ -77,38 +82,6 @@ class Tutor {
               .toList();
         }
       }
-    } else if (json['gradeLevels'] != null) {
-      if (json['gradeLevels'] is List) {
-        gradeLevels = (json['gradeLevels'] as List)
-            .map((e) => GradeLevel.fromJson(e))
-            .toList();
-      } else if (json['gradeLevels'] is String) {
-        final gradeLevelsStr = json['gradeLevels'].toString();
-        if (gradeLevelsStr.isNotEmpty) {
-          final gradeLevelIds = gradeLevelsStr.split(',');
-          gradeLevels = gradeLevelIds
-              .map((id) => GradeLevel.allGradeLevels.firstWhere(
-                    (gl) => gl.id == id,
-                    orElse: () => GradeLevel(
-                      id: id,
-                      name: id,
-                      displayName: id,
-                    ),
-                  ))
-              .toList();
-        }
-      }
-    } else if (json['childGrade'] != null) {
-      final childGrade = json['childGrade'];
-      if (childGrade != null && childGrade.toString().isNotEmpty) {
-        gradeLevels = [
-          GradeLevel(
-            id: childGrade.toString(),
-            name: childGrade.toString(),
-            displayName: childGrade.toString(),
-          ),
-        ];
-      }
     }
     
     return Tutor(
@@ -122,9 +95,11 @@ class Tutor {
       reviewCount: json['reviewCount'] ?? 0,
       pricePerHour: json['hourlyRate']?.toString() ?? json['pricePerHour'] ?? (json['hourlyRateMin'] != null || json['hourlyRateMax'] != null ? '${json['hourlyRateMin'] ?? 0}-${json['hourlyRateMax'] ?? 0}' : '0'),
       experience: user.teachingExperienceText,
-      educationBackground: user.education ?? '',
+      educationBackground: json['education']?.toString() ?? '',
+      school: json['school']?.toString() ?? '',
+      major: json['major']?.toString() ?? '',
       description: json['description'] ?? '',
-      address: json['address'],
+      address: json['address']?.toString() ?? '',
       certifications: [],
       isAvailable: json['status'] == 'available' || json['status'] == 'active' || json['isAvailable'] == true,
       createdAt: json['createdAt'] != null 
@@ -135,6 +110,14 @@ class Tutor {
       latitude: json['latitude']?.toString(),
       longitude: json['longitude']?.toString(),
     );
+  }
+
+  static bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) return value.toLowerCase() == 'true' || value == '1';
+    return false;
   }
 }
 
@@ -277,7 +260,6 @@ class Review {
           avatar: json['reviewerAvatar'] ?? '',
           phone: '',
           email: '',
-          isVerified: false,
           createdAt: DateTime.now(),
         ),
         content: json['comment'] ?? '',
@@ -294,7 +276,7 @@ class Review {
       content: json['content'] ?? '',
       rating: (json['rating'] ?? 0).toDouble(),
       createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt']) 
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
     );
   }

@@ -34,7 +34,7 @@
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="200">
+        <el-table-column prop="userId" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.userId" />
           </template>

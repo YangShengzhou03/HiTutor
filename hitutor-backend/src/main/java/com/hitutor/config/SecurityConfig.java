@@ -42,18 +42,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()  
-                .requestMatchers("/api/subjects/**").permitAll()  
-                .requestMatchers("/api/verifications/**").permitAll()
-                .requestMatchers("/api/points/**").permitAll()
-                .requestMatchers("/api/tutor-resumes/**").permitAll()
-                .requestMatchers("/api/tutor-certifications/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/tutor-profiles/**").permitAll()
-                .requestMatchers("/api/student-requests/**").permitAll()
-                .requestMatchers("/api/admin/register").permitAll()  // 管理员注册接口公开
                 .requestMatchers("/api/admin/**").hasRole("admin")  
-                .anyRequest().authenticated()  
+                .anyRequest().permitAll()  
             )
             .exceptionHandling(exception -> exception
                 .accessDeniedHandler(accessDeniedHandler)

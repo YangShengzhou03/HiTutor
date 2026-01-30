@@ -2,19 +2,22 @@ import '../models/user_model.dart';
 import 'api_service.dart';
 
 class AuthResponse {
-  final String token;
+  final String accessToken;
+  final String refreshToken;
   final User user;
   final bool isFirstLogin;
 
   AuthResponse({
-    required this.token,
+    required this.accessToken,
+    required this.refreshToken,
     required this.user,
     required this.isFirstLogin,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
-      token: json['token'],
+      accessToken: json['accessToken'] ?? json['token'] ?? '',
+      refreshToken: json['refreshToken'] ?? '',
       user: User.fromJson(json['user']),
       isFirstLogin: json['isFirstLogin'] == true || json['isFirstLogin'] == 1,
     );
@@ -68,8 +71,18 @@ class AuthService {
   }
 
   static Future<User> getCurrentUser() async {
-    final response = await ApiService.getUser('me', needAuth: true);
-    return User.fromJson(response['data']);
+    final response = await ApiService.getUser('me', needAuth: false);
+    final user = User.fromJson(response['data']);
+    return user;
+  }
+
+  static Future<User> getCurrentUserWithUserId(String? userId) async {
+    if (userId == null || userId.isEmpty) {
+      throw Exception('用户ID不能为空');
+    }
+    final response = await ApiService.getUser('me', needAuth: false, actualUserId: userId);
+    final user = User.fromJson(response['data']);
+    return user;
   }
 
   static Future<void> logout() async {

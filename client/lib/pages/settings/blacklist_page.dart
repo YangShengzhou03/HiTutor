@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class BlacklistPage extends StatefulWidget {
   const BlacklistPage({super.key});
@@ -27,7 +29,12 @@ class _BlacklistPageState extends State<BlacklistPage> {
     });
 
     try {
-      final response = await ApiService.getBlacklist();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.user == null) {
+        throw Exception('用户未登录');
+      }
+
+      final response = await ApiService.getBlacklist(userId: authProvider.user!.id);
 
       if (!mounted) return;
 
@@ -57,6 +64,11 @@ class _BlacklistPageState extends State<BlacklistPage> {
   }
 
   Future<void> _removeFromBlacklist(String blockedUserId, String blockedUserName) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (authProvider.user == null) {
+      throw Exception('用户未登录');
+    }
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -78,7 +90,7 @@ class _BlacklistPageState extends State<BlacklistPage> {
     if (confirm != true) return;
 
     try {
-      await ApiService.removeFromBlacklist(blockedUserId);
+      await ApiService.removeFromBlacklist(blockedUserId, userId: authProvider.user!.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('已从黑名单移除')),

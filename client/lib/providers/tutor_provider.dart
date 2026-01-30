@@ -19,6 +19,24 @@ class TutorProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   bool get hasMore => _hasMore;
 
+  static bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) return value.toLowerCase() == 'true' || value == '1';
+    return false;
+  }
+
+  static String? _normalizeGender(dynamic value) {
+    if (value == null) return null;
+    final raw = value.toString().trim();
+    if (raw.isEmpty) return null;
+    final lower = raw.toLowerCase();
+    if (lower == 'male' || lower == 'm' || raw == '男') return 'male';
+    if (lower == 'female' || lower == 'f' || raw == '女') return 'female';
+    return raw;
+  }
+
   
   Future<void> getNearbyStudents({int page = 1, int limit = 10}) async {
     if (_isLoading && page != 1) return;
@@ -28,23 +46,27 @@ class TutorProvider with ChangeNotifier {
 
     try {
       final response = await ApiService.getStudentRequests(page: page - 1, size: limit);
+      
       final data = response['data'] ?? {};
+      
       final requestsData = data['content'] as List? ?? [];
       
       final students = requestsData.map((item) {
+        final userVerified = _parseBool(item['userVerified']);
+        
         return Tutor(
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['childName'] != null ? '${item['childName']}的需求' : '学生需求',
+            name: item['userName'] ?? item['childName'] ?? '学生需求',
             username: 'student_request',
             avatar: item['userAvatar'] ?? '',
             phone: '',
             email: '',
-            education: '',
-            major: '',
+            gender: _normalizeGender(item['userGender']),
+            badge: item['badge']?.toString(),
+            isVerified: userVerified,
             teachingExperience: 0,
-            isVerified: false,
             createdAt: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
@@ -106,15 +128,15 @@ class TutorProvider with ChangeNotifier {
           id: item['id']?.toString() ?? '',
           user: User(
             id: item['userId']?.toString() ?? '',
-            name: item['childName'] != null ? '${item['childName']}的需求' : '学生需求',
+            name: item['userName'] ?? item['childName'] ?? '学生需求',
             username: 'student_request',
             avatar: item['userAvatar'] ?? '',
             phone: '',
             email: '',
-            education: '',
-            major: '',
+            gender: _normalizeGender(item['userGender']),
+            badge: item['badge']?.toString(),
+            isVerified: _parseBool(item['userVerified']),
             teachingExperience: 0,
-            isVerified: false,
             createdAt: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
@@ -156,10 +178,14 @@ class TutorProvider with ChangeNotifier {
 
     try {
       final response = await ApiService.getTutors(page: page - 1, size: limit);
+      
       final data = response['data'] ?? {};
+      
       final tutorsData = data['content'] as List? ?? [];
       
       final tutors = tutorsData.map((item) {
+        final userVerified = _parseBool(item['userVerified']);
+        
         List<GradeLevel> gradeLevels = [];
         if (item['targetGradeLevels'] != null) {
           if (item['targetGradeLevels'] is List) {
@@ -211,13 +237,13 @@ class TutorProvider with ChangeNotifier {
             id: item['userId']?.toString() ?? '',
             name: item['userName'] ?? '家教',
             username: item['username'] ?? 'tutor',
-            avatar: item['avatar'] ?? '',
+            avatar: item['userAvatar'] ?? '',
             phone: item['phone'] ?? '',
             email: item['email'] ?? '',
-            education: item['education'] ?? '',
-            major: item['major'] ?? '',
+            gender: _normalizeGender(item['userGender']),
+            badge: item['badge']?.toString(),
             teachingExperience: item['teachingExperience'] ?? 0,
-            isVerified: item['userVerified'] == true || item['userVerified'] ==1,
+            isVerified: userVerified,
             createdAt: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 
@@ -327,13 +353,13 @@ class TutorProvider with ChangeNotifier {
             id: item['userId']?.toString() ?? '',
             name: item['userName'] ?? '家教',
             username: item['username'] ?? 'tutor',
-            avatar: item['avatar'] ?? '',
+            avatar: item['userAvatar'] ?? '',
             phone: item['phone'] ?? '',
             email: item['email'] ?? '',
-            education: item['education'] ?? '',
-            major: item['major'] ?? '',
+            gender: _normalizeGender(item['userGender']),
+            badge: item['badge']?.toString(),
             teachingExperience: item['teachingExperience'] ?? 0,
-            isVerified: item['userVerified'] == true || item['userVerified'] == 1,
+            isVerified: _parseBool(item['userVerified']),
             createdAt: DateTime.now(),
           ),
           subjects: item['subjectName'] != null 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class ComplaintPage extends StatefulWidget {
   final String? targetUserId;
@@ -76,7 +78,13 @@ class _ComplaintPageState extends State<ComplaintPage> {
     });
 
     try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.user == null) {
+        throw Exception('用户未登录');
+      }
+
       final Map<String, dynamic> complaintData = {
+        'userId': authProvider.user!.id,
         'categoryName': _selectedCategory,
         'typeText': _selectedType,
         'description': _descriptionController.text,

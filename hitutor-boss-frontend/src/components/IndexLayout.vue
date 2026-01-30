@@ -405,7 +405,7 @@ onUnmounted(() => {
 /* 英雄区域 */
 .hero-section {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 120px 0 80px;
+  padding: 80px 0 60px;
   position: relative;
 }
 
@@ -459,7 +459,7 @@ onUnmounted(() => {
 
 /* 功能特色区域 */
 .features-section {
-  padding: 80px 0;
+  padding: 60px 0;
   background-color: #ffffff;
 }
 
@@ -474,13 +474,13 @@ onUnmounted(() => {
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
+  gap: 24px;
 }
 
 .feature-card {
   background: #ffffff;
   border: 1px solid #f3f4f6;
-  padding: 32px 24px;
+  padding: 24px 20px;
   border-radius: 12px;
   transition: all 0.3s ease;
   text-align: center;
@@ -521,8 +521,8 @@ onUnmounted(() => {
 .footer-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 32px;
-  margin-bottom: 32px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .footer-section h3,
@@ -598,7 +598,7 @@ onUnmounted(() => {
   }
 
   .hero-section {
-    padding: 80px 0 60px;
+    padding: 60px 0 40px;
   }
 
   .hero-title {

@@ -27,24 +27,22 @@ public class UserController {
     private PasswordUtil passwordUtil;
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getCurrentUser() {
-        org.springframework.security.core.Authentication authentication = 
-            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@RequestParam(required = false) String userId) {
         Map<String, Object> response = new java.util.HashMap<>();
         
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (userId == null || userId.isEmpty()) {
             response.put("success", false);
             response.put("message", "未授权");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            response.put("data", new java.util.HashMap<>());
+            return ResponseEntity.status(401).body(response);
         }
         
-        String userId = authentication.getName();
         User user = userService.getUserById(userId);
         if (user == null) {
             response.put("success", false);
             response.put("message", "用户不存在");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("data", new java.util.HashMap<>());
+            return ResponseEntity.status(404).body(response);
         }
         
         response.put("success", true);
@@ -66,31 +64,14 @@ public class UserController {
         
         response.put("success", true);
         response.put("message", "获取用户信息成功");
-        response.put("data", user);
+        response.put("data", DtoConverter.toUserDTO(user));
         return ResponseEntity.ok(response);
     }
     
     
     @PatchMapping("/{id}/role")
     public ResponseEntity<Map<String, Object>> updateUserRole(@PathVariable String id, @RequestBody Map<String, Object> userData) {
-        org.springframework.security.core.Authentication authentication = 
-            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        
         Map<String, Object> response = new java.util.HashMap<>();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            response.put("success", false);
-            response.put("message", "禁止访问");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
-        
-        String currentUserId = authentication.getName();
-        
-        if (!currentUserId.equals(id)) {
-            response.put("success", false);
-            response.put("message", "禁止访问");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
         
         User user = userService.getUserById(id);
         if (user == null) {
@@ -138,24 +119,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateUser(@PathVariable String id, @RequestBody Map<String, Object> userData) {
-        org.springframework.security.core.Authentication authentication = 
-            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        
         Map<String, Object> response = new java.util.HashMap<>();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            response.put("success", false);
-            response.put("message", "禁止访问");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
-        
-        String currentUserId = authentication.getName();
-        
-        if (!currentUserId.equals(id)) {
-            response.put("success", false);
-            response.put("message", "禁止访问");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
         
         User user = userService.getUserById(id);
         if (user == null) {
@@ -167,13 +131,6 @@ public class UserController {
         if (userData.containsKey("role") || userData.containsKey("roleId")) {
             String newRole = (String) (userData.containsKey("role") ? 
                 userData.get("role") : userData.get("roleId"));
-            
-            if (!"student".equals(user.getRole()) && !"tutor".equals(user.getRole()) && 
-                !"unassigned".equals(user.getRole()) && user.getRole() != null) {
-                response.put("success", false);
-                response.put("message", "禁止修改角色");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-            }
             
             user.setRole(newRole);
         }
@@ -200,15 +157,6 @@ public class UserController {
         if (userData.containsKey("birthDate")) {
             user.setBirthDate(java.time.LocalDate.parse((String) userData.get("birthDate")));
         }
-        if (userData.containsKey("education")) {
-            user.setEducation((String) userData.get("education"));
-        }
-        if (userData.containsKey("school")) {
-            user.setSchool((String) userData.get("school"));
-        }
-        if (userData.containsKey("major")) {
-            user.setMajor((String) userData.get("major"));
-        }
         if (userData.containsKey("teachingExperience")) {
             user.setTeachingExperience((Integer) userData.get("teachingExperience"));
         }
@@ -222,7 +170,7 @@ public class UserController {
         
         response.put("success", true);
         response.put("message", "更新成功");
-        response.put("data", user);
+        response.put("data", DtoConverter.toUserDTO(user));
         return ResponseEntity.ok(response);
     }
 
@@ -252,15 +200,6 @@ public class UserController {
         if (data.containsKey("birthDate")) {
             user.setBirthDate(java.time.LocalDate.parse((String) data.get("birthDate")));
         }
-        if (data.containsKey("education")) {
-            user.setEducation((String) data.get("education"));
-        }
-        if (data.containsKey("school")) {
-            user.setSchool((String) data.get("school"));
-        }
-        if (data.containsKey("major")) {
-            user.setMajor((String) data.get("major"));
-        }
         if (data.containsKey("teachingExperience")) {
             user.setTeachingExperience((Integer) data.get("teachingExperience"));
         }
@@ -274,7 +213,7 @@ public class UserController {
         
         response.put("success", true);
         response.put("message", "更新成功");
-        response.put("data", user);
+        response.put("data", DtoConverter.toUserDTO(user));
         return ResponseEntity.ok(response);
     }
 
@@ -345,54 +284,27 @@ public class UserController {
 
     @PutMapping("/me/password")
     public ResponseEntity<Map<String, Object>> changePassword(@RequestBody Map<String, String> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> response = new java.util.HashMap<>();
+        response.put("success", false);
+        response.put("message", "未授权");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<Map<String, Object>> getUserStatistics(@PathVariable String id) {
+        Map<String, Object> response = new java.util.HashMap<>();
         
-        if (authentication == null || !authentication.isAuthenticated()) {
-            Map<String, Object> response = new java.util.HashMap<>();
-            response.put("success", false);
-            response.put("message", "未授权");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-        
-        String userId = authentication.getName();
-        String oldPassword = request.get("oldPassword");
-        String newPassword = request.get("newPassword");
-        
-        if (oldPassword == null || newPassword == null) {
-            Map<String, Object> response = new java.util.HashMap<>();
-            response.put("success", false);
-            response.put("message", "密码不能为空");
-            return ResponseEntity.badRequest().body(response);
-        }
-        
-        User user = userService.getUserById(userId);
+        User user = userService.getUserById(id);
         if (user == null) {
-            Map<String, Object> response = new java.util.HashMap<>();
             response.put("success", false);
             response.put("message", "用户不存在");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         
-        if (!passwordUtil.validatePassword(oldPassword, user.getPassword())) {
-            Map<String, Object> response = new java.util.HashMap<>();
-            response.put("success", false);
-            response.put("message", "原密码错误");
-            return ResponseEntity.badRequest().body(response);
-        }
-        
-        user.setPassword(passwordUtil.encodePassword(newPassword));
-        boolean updated = userService.updateUser(user);
-        
-        if (!updated) {
-            Map<String, Object> response = new java.util.HashMap<>();
-            response.put("success", false);
-            response.put("message", "密码修改失败");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        
-        Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> statistics = userService.getUserStatistics(id);
         response.put("success", true);
-        response.put("message", "密码修改成功");
+        response.put("message", "获取用户统计信息成功");
+        response.put("data", statistics);
         return ResponseEntity.ok(response);
     }
 }

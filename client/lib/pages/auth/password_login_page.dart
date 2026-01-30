@@ -31,12 +31,6 @@ class _PasswordLoginPageState extends State<PasswordLoginPage> {
   @override
   void initState() {
     super.initState();
-    _phoneController.addListener(_updateFormState);
-    _passwordController.addListener(_updateFormState);
-  }
-
-  void _updateFormState() {
-    setState(() {});
   }
 
   @override
@@ -63,10 +57,11 @@ class _PasswordLoginPageState extends State<PasswordLoginPage> {
         if (response['success'] == true) {
           final data = response['data'];
           final user = data['user'];
-          final token = data['token'];
+          final accessToken = data['accessToken'] ?? data['token'];
+          final refreshToken = data['refreshToken'];
           final isFirstLogin = data['isFirstLogin'] ?? false;
           
-          await authProvider.loginWithToken(user, token, isFirstLogin: isFirstLogin);
+          await authProvider.loginWithToken(user, accessToken, isFirstLogin: isFirstLogin, refreshToken: refreshToken);
           
           if (!mounted) return;
           
@@ -148,6 +143,9 @@ class _PasswordLoginPageState extends State<PasswordLoginPage> {
                         hintText: '请输入手机号',
                         prefixIcon: Icon(Icons.phone_rounded),
                       ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return '请输入手机号';
@@ -177,6 +175,9 @@ class _PasswordLoginPageState extends State<PasswordLoginPage> {
                           },
                         ),
                       ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return '请输入密码';

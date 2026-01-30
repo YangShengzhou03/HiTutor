@@ -275,7 +275,7 @@ class _MessagePageState extends State<MessagePage> {
                   ),
                   child: Center(
                     child: Text(
-                      conversation.name[0],
+                      conversation.name.isNotEmpty ? conversation.name[0] : 'U',
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -308,12 +308,32 @@ class _MessagePageState extends State<MessagePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        conversation.name,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                conversation.name,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.textPrimary,
+                                ),
+                              ),
+                            ),
+                            if (conversation.otherUser.gender != null && conversation.otherUser.gender!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Text(
+                                  conversation.otherUser.gender == 'male' ? '♂' : '♀',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: conversation.otherUser.gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       Text(

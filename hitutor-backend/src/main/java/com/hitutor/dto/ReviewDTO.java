@@ -9,10 +9,11 @@ public class ReviewDTO {
     private String reviewerId;
     private String reviewerName;
     private String reviewerAvatar;
+    private String reviewerGender;
     private String reviewedId;
     private Integer rating;
     private String comment;
-    private String createdAt;
+    private String createTime;
 
     public ReviewDTO() {
     }
@@ -57,6 +58,14 @@ public class ReviewDTO {
         this.reviewerAvatar = reviewerAvatar;
     }
 
+    public String getReviewerGender() {
+        return reviewerGender;
+    }
+
+    public void setReviewerGender(String reviewerGender) {
+        this.reviewerGender = reviewerGender;
+    }
+
     public String getReviewedId() {
         return reviewedId;
     }
@@ -81,11 +90,11 @@ public class ReviewDTO {
         this.comment = comment;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

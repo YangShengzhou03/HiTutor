@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 public class Complaint {
     @TableId(type = IdType.AUTO)
     private Long id;
-    
+
     @TableField("user_id")
     private String userId;
-    
+
     @TableField("target_user_id")
     private String targetUserId;
 

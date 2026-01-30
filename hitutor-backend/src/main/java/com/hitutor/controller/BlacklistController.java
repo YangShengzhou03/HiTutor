@@ -21,14 +21,15 @@ public class BlacklistController {
     private BlacklistService blacklistService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getUserBlacklist(@AuthenticationPrincipal User user) {
-        if (user == null) {
+    public ResponseEntity<Map<String, Object>> getUserBlacklist(
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "用户未登录");
             return ResponseEntity.status(401).body(result);
         }
-        List<Blacklist> blacklist = blacklistService.getUserBlacklist(user.getId());
+        List<Blacklist> blacklist = blacklistService.getUserBlacklist(userId);
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("message", "获取黑名单成功");
@@ -37,7 +38,6 @@ public class BlacklistController {
     }
 
     @GetMapping("/admin/all")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getAllBlacklist(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -58,7 +58,6 @@ public class BlacklistController {
     }
 
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> deleteBlacklistEntry(
             @PathVariable Long id) {
         boolean deleted = blacklistService.deleteBlacklistEntry(id);
@@ -76,14 +75,14 @@ public class BlacklistController {
     @GetMapping("/check/{blockedUserId}")
     public ResponseEntity<Map<String, Object>> checkBlocked(
             @PathVariable String blockedUserId,
-            @AuthenticationPrincipal User user) {
-        if (user == null) {
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "用户未登录");
             return ResponseEntity.status(401).body(result);
         }
-        boolean isBlocked = blacklistService.isBlocked(user.getId(), blockedUserId);
+        boolean isBlocked = blacklistService.isBlocked(userId, blockedUserId);
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("message", "查询成功");
@@ -93,9 +92,9 @@ public class BlacklistController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> addToBlacklist(
-            @RequestBody Map<String, Object> request,
-            @AuthenticationPrincipal User user) {
-        if (user == null) {
+            @RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "用户未登录");
@@ -105,7 +104,7 @@ public class BlacklistController {
             String blockedUserId = ((String) request.get("blockedUserId"));
             
             Blacklist blacklist = blacklistService.addToBlacklist(
-                user.getId(),
+                userId,
                 blockedUserId
             );
             
@@ -125,14 +124,14 @@ public class BlacklistController {
     @DeleteMapping("/{blockedUserId}")
     public ResponseEntity<Map<String, Object>> removeFromBlacklist(
             @PathVariable String blockedUserId,
-            @AuthenticationPrincipal User user) {
-        if (user == null) {
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);
             result.put("message", "用户未登录");
             return ResponseEntity.status(401).body(result);
         }
-        boolean removed = blacklistService.removeFromBlacklist(user.getId(), blockedUserId);
+        boolean removed = blacklistService.removeFromBlacklist(userId, blockedUserId);
         if (!removed) {
             Map<String, Object> result = new HashMap<>();
             result.put("success", false);

@@ -93,7 +93,7 @@ export default {
 .page-header {
   background: #2d3748;
   color: white;
-  padding: 60px 0;
+  padding: 40px 0;
   text-align: center;
 }
 
@@ -111,13 +111,13 @@ export default {
 }
 
 .page-content {
-  padding: 60px 0 80px;
+  padding: 40px 0 60px;
 }
 
 .faq-sections {
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: 40px;
 }
 
 .faq-section {
@@ -140,7 +140,7 @@ export default {
 }
 
 .faq-content {
-  padding: 32px;
+  padding: 24px;
 }
 
 .collapse-content {

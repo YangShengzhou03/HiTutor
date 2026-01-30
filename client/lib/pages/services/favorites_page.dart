@@ -229,6 +229,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final targetData = favorite['target'] ?? {};
     final targetId = favorite['targetId']?.toString() ?? '';
     
+    final isVerified = targetData['isVerified'] as bool?;
+    final badge = targetData['badge']?.toString();
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -289,14 +292,77 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      isTutor
-                          ? (targetData['username'] ?? '未知家教')
-                          : (targetData['username'] ?? '未知需求'),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            isTutor
+                                ? (targetData['username'] ?? '未知家教')
+                                : (targetData['username'] ?? '未知需求'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (targetData['gender'] != null && targetData['gender'].toString().isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Text(
+                              targetData['gender'] == 'male' ? '♂' : '♀',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: targetData['gender'] == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        if (isVerified == true)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.verified, size: 11, color: Colors.blue.shade700),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    '已认证',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.blue.shade700,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (badge != null && badge.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDF2F8),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                badge,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFFEC4899),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(

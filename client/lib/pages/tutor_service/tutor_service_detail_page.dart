@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../models/tutor_model.dart';
+import '../../models/user_model.dart';
 import '../application/application_form_page.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_service.dart';
@@ -45,8 +46,44 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
       if (response is Map && response['success'] == true) {
         final data = response['data'];
         if (data is Map) {
+          Tutor tutor = Tutor.fromJson(Map<String, dynamic>.from(data));
+          
+          final userId = data['userId']?.toString();
+          if (userId != null) {
+            final userResponse = await ApiService.getUser(userId);
+            if (userResponse is Map && userResponse['success'] == true) {
+              final userData = userResponse['data'];
+              
+              if (userData is Map) {
+                final updatedUser = User.fromJson(Map<String, dynamic>.from(userData));
+                tutor = Tutor(
+                  id: tutor.id,
+                  user: updatedUser,
+                  subjects: tutor.subjects,
+                  tags: tutor.tags,
+                  rating: tutor.rating,
+                  reviewCount: tutor.reviewCount,
+                  pricePerHour: tutor.pricePerHour,
+                  experience: tutor.experience,
+                  educationBackground: tutor.educationBackground,
+                  school: tutor.school,
+                  major: tutor.major,
+                  description: tutor.description,
+                  address: tutor.address,
+                  certifications: tutor.certifications,
+                  isAvailable: tutor.isAvailable,
+                  createdAt: tutor.createdAt,
+                  type: tutor.type,
+                  targetGradeLevels: tutor.targetGradeLevels,
+                  latitude: tutor.latitude,
+                  longitude: tutor.longitude,
+                );
+              }
+            }
+          }
+          
           setState(() {
-            _updatedTutor = Tutor.fromJson(Map<String, dynamic>.from(data));
+            _updatedTutor = tutor;
           });
         }
       }
@@ -192,7 +229,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
           color: AppTheme.textPrimary,
         ),
         title: const Text(
-          '家教信息详情',
+          '家教需求',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -237,7 +274,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
             icon: const Icon(Icons.share_outlined),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('分享功能还在开发中')),
+                const SnackBar(content: Text('分享服务还在开发中')),
               );
             },
             color: AppTheme.textSecondary,
@@ -284,6 +321,8 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
   }
 
   Widget _buildHeaderSection(Color accentColor) {
+    final bool isVerified = _currentTutor.user.isVerified ?? false;
+    
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -311,7 +350,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                   ),
                   child: Center(
                     child: Text(
-                      _currentTutor.user.name[0],
+                      _currentTutor.user.name.isNotEmpty ? _currentTutor.user.name[0] : 'U',
                       style: TextStyle(
                         fontSize: 36,
                         color: accentColor,
@@ -331,7 +370,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                             child: Text(
                               _currentTutor.user.name,
                               style: const TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 color: AppTheme.textPrimary,
                               ),
@@ -339,37 +378,48 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 4),
-                          if (_currentTutor.user.isVerified)
+                          const SizedBox(width: 2),
+                          if (isVerified == true)
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF0F9FF),
-                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(3),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.verified_rounded,
-                                    size: 12,
-                                    color: Color(0xFF0EA5E9),
-                                  ),
-                                  SizedBox(width: 4),
+                                  Icon(Icons.verified, size: 9, color: Colors.blue.shade700),
+                                  const SizedBox(width: 1),
                                   Text(
                                     '已认证',
                                     style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF0EA5E9),
+                                      fontSize: 9,
+                                      color: Colors.blue.shade700,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                          const SizedBox(width: 2),
+                          if (_currentTutor.user.badge != null && _currentTutor.user.badge!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDF2F8),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                _currentTutor.user.badge!,
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: Color(0xFFEC4899),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(width: 2),
                         ],
                       ),
                     const SizedBox(height: 8),
@@ -397,6 +447,16 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                             color: AppTheme.textSecondary,
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        if (_currentTutor.user.gender != null && _currentTutor.user.gender!.isNotEmpty)
+                          Text(
+                            (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? '♂' : '♀',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                       ],
                     ),
                   ],
@@ -584,7 +644,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                 child: _buildEducationCard(
                   Icons.account_balance_outlined,
                   '院校',
-                  _currentTutor.user.school ?? '暂无信息',
+                  _currentTutor.school.isNotEmpty ? _currentTutor.school : '暂无信息',
                 ),
               ),
             ],
@@ -593,7 +653,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
           _buildEducationCard(
             Icons.menu_book_outlined,
             '专业',
-            (_currentTutor.user.major ?? '').isNotEmpty ? _currentTutor.user.major! : '暂无信息',
+            _currentTutor.major.isNotEmpty ? _currentTutor.major : '暂无信息',
           ),
         ],
       ),
@@ -665,7 +725,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
               _buildTag('认真负责'),
               _buildTag('耐心细致'),
               _buildTag('因材施教'),
-              _buildTag('方法灵活'),
+              _buildTag('服务很好'),
             ],
           ),
         ],
@@ -776,6 +836,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                   review.content,
                   review.rating,
                   review.createdAt.toString().split(' ')[0],
+                  review.reviewer.gender,
                 ),
               );
             })
@@ -792,7 +853,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
     );
   }
 
-  Widget _buildReviewItem(String name, String content, double rating, String date) {
+  Widget _buildReviewItem(String name, String content, double rating, String date, String? gender) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -805,13 +866,28 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
-                ),
+              Row(
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  if (gender != null && gender.isNotEmpty) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      gender == 'male' ? '♂' : '♀',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ],
               ),
               Row(
                 children: [

@@ -53,10 +53,6 @@ class _LocationPickerPageState extends State<LocationPickerPage> with AutomaticK
       _addressController.text =
           '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}';
     }
-
-    if (!_isDisposed) {
-      setState(() {});
-    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -108,9 +104,6 @@ class _LocationPickerPageState extends State<LocationPickerPage> with AutomaticK
       if (_isDisposed) return;
 
       _selectedLocation = LatLng(position.latitude, position.longitude);
-      if (mounted) {
-        setState(() {});
-      }
 
       if (_mapController != null) {
         _mapController!.moveCamera(

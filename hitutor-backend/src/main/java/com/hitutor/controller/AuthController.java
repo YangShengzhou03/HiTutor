@@ -1,9 +1,11 @@
 package com.hitutor.controller;
 
+import com.hitutor.dto.UserDTO;
 import com.hitutor.entity.User;
 import com.hitutor.service.UserService;
 import com.hitutor.service.PointService;
 import com.hitutor.service.VerificationService;
+import com.hitutor.util.DtoConverter;
 import com.hitutor.util.JwtUtil;
 import com.hitutor.util.PasswordUtil;
 import com.hitutor.util.UsernameGenerator;
@@ -65,11 +67,13 @@ public class AuthController {
             user.setLastLoginTime(LocalDateTime.now());
             userService.updateUser(user);
             
-            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
-            data.put("token", token);
-            data.put("user", user);
+            data.put("accessToken", accessToken);
+            data.put("refreshToken", refreshToken);
+            data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
             response.put("success", true);
@@ -108,11 +112,13 @@ public class AuthController {
             user.setLastLoginIp(IpUtil.getClientIp(httpRequest));
             userService.updateUser(user);
             
-            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
-            data.put("token", token);
-            data.put("user", user);
+            data.put("accessToken", accessToken);
+            data.put("refreshToken", refreshToken);
+            data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
             response.put("success", true);
@@ -160,11 +166,13 @@ public class AuthController {
             user.setLastLoginIp(IpUtil.getClientIp(httpRequest));
             userService.updateUser(user);
             
-            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
-            data.put("token", token);
-            data.put("user", user);
+            data.put("accessToken", accessToken);
+            data.put("refreshToken", refreshToken);
+            data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", false); 
             response.put("data", data);
             response.put("success", true);
@@ -192,16 +200,17 @@ public class AuthController {
             
             boolean saved = userService.saveUser(newUser);
             if (saved) {
-                // 新用户注册登录，也给5积分
                 pointService.addPoints(newUser.getId(), 5, "login", "每日登录奖励");
                 
-                String token = jwtUtil.generateToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
+                String accessToken = jwtUtil.generateAccessToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
+                String refreshToken = jwtUtil.generateRefreshToken(newUser.getId(), newUser.getUsername(), newUser.getRole());
                 Map<String, Object> response = new HashMap<>();
                 Map<String, Object> data = new HashMap<>();
-            data.put("token", token);
-            data.put("user", newUser);
-            data.put("isFirstLogin", true); 
-            response.put("data", data);
+                data.put("accessToken", accessToken);
+                data.put("refreshToken", refreshToken);
+                data.put("user", DtoConverter.toUserDTO(newUser));
+                data.put("isFirstLogin", true); 
+                response.put("data", data);
                 response.put("success", true);
                 response.put("message", "注册并登录成功");
                 return ResponseEntity.ok(response);
@@ -219,17 +228,37 @@ public class AuthController {
         
         String refreshToken = request.get("refreshToken");
         try {
+            if (!jwtUtil.validateRefreshToken(refreshToken)) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "无效的刷新令牌");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
             
             String userId = jwtUtil.getUserIdFromToken(refreshToken);
             String username = jwtUtil.getUsernameFromToken(refreshToken);
             String role = jwtUtil.getRoleFromToken(refreshToken);
             
+            User user = userService.getUserById(userId);
+            if (user == null || !"active".equals(user.getStatus())) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "账号已被禁用，请联系管理员");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
             
-            String newToken = jwtUtil.generateToken(userId, username, role);
+            String newAccessToken = jwtUtil.generateAccessToken(userId, username, role);
+            String newRefreshToken = jwtUtil.generateRefreshToken(userId, username, role);
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "令牌刷新成功");
-            response.put("token", newToken);
+            Map<String, Object> data = new HashMap<>();
+            data.put("accessToken", newAccessToken);
+            data.put("refreshToken", newRefreshToken);
+            response.put("data", data);
+            response.put("accessToken", newAccessToken);
+            response.put("refreshToken", newRefreshToken);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
@@ -280,11 +309,13 @@ public class AuthController {
 
         boolean saved = userService.saveUser(user);
         if (saved) {
-            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getRole());
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> data = new HashMap<>();
-            data.put("token", token);
-            data.put("user", user);
+            data.put("accessToken", accessToken);
+            data.put("refreshToken", refreshToken);
+            data.put("user", DtoConverter.toUserDTO(user));
             data.put("isFirstLogin", true); 
             response.put("data", data);
             response.put("success", true);

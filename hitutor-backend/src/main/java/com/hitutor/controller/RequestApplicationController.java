@@ -29,10 +29,12 @@ public class RequestApplicationController {
     public ResponseEntity<Map<String, Object>> createApplication(@RequestBody RequestApplication application) {
         boolean created = applicationService.createApplication(application);
         if (created) {
+            User applicant = userService.getUserById(application.getApplicantId());
+            RequestApplicationDTO applicationDTO = DtoConverter.toRequestApplicationDTO(application, applicant);
             Map<String, Object> response = new java.util.HashMap<>();
             response.put("success", true);
             response.put("message", "申请提交成功");
-            response.put("data", application);
+            response.put("data", applicationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
             Map<String, Object> response = new java.util.HashMap<>();

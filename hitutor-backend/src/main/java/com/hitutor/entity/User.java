@@ -16,9 +16,9 @@ public class User {
     
     @TableId(type = IdType.INPUT)
     private String id;
-    
+
     @TableField("username")
-    @Size(min = 3, max = 50, message = "用户名长度必须在3-50个字符之间")
+    @Size(min = 3, max = 6, message = "用户名长度必须在3-6个字之间")
     private String username;
     
     @TableField("password")
@@ -35,29 +35,20 @@ public class User {
     @TableField("avatar")
     private String avatar;
     
+    @TableField("badge")
+    private String badge;
+    
     @TableField("role")
     private String role;
     
     @TableField("status")
     private String status;
     
-    @TableField("is_verified")
-    private Integer isVerified;
-    
     @TableField("gender")
     private String gender;
     
     @TableField("birth_date")
     private LocalDate birthDate;
-    
-    @TableField("education")
-    private String education;
-    
-    @TableField("school")
-    private String school;
-    
-    @TableField("major")
-    private String major;
     
     @TableField("teaching_experience")
     private Integer teachingExperience;
@@ -71,11 +62,14 @@ public class User {
     
     @TableField("points")
     private Integer points;
-    
+
+    @TableField("is_verified")
+    private Boolean isVerified;
+
     @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-    
+
     @TableField("update_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
@@ -129,6 +123,14 @@ public class User {
         this.avatar = avatar;
     }
 
+    public String getBadge() {
+        return badge;
+    }
+
+    public void setBadge(String badge) {
+        this.badge = badge;
+    }
+
     public String getRole() {
         return role;
     }
@@ -145,14 +147,6 @@ public class User {
         this.status = status;
     }
 
-    public Integer getIsVerified() {
-        return isVerified;
-    }
-
-    public void setIsVerified(Integer isVerified) {
-        this.isVerified = isVerified;
-    }
-
     public String getGender() {
         return gender;
     }
@@ -167,30 +161,6 @@ public class User {
 
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public String getSchool() {
-        return school;
-    }
-
-    public void setSchool(String school) {
-        this.school = school;
-    }
-
-    public String getMajor() {
-        return major;
-    }
-
-    public void setMajor(String major) {
-        this.major = major;
     }
 
     public Integer getTeachingExperience() {
@@ -223,6 +193,14 @@ public class User {
 
     public void setPoints(Integer points) {
         this.points = points;
+    }
+
+    public Boolean getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Boolean isVerified) {
+        this.isVerified = isVerified;
     }
 
     public LocalDateTime getCreateTime() {

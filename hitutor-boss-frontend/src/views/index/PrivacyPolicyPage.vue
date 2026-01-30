@@ -109,7 +109,7 @@ export default {
 .page-header {
   background: #2d3748;
   color: white;
-  padding: 60px 0;
+  padding: 40px 0;
   text-align: center;
 }
 
@@ -127,7 +127,7 @@ export default {
 }
 
 .page-content {
-  padding: 60px 0 80px;
+  padding: 40px 0 60px;
 }
 
 .privacy-sections {
@@ -156,12 +156,12 @@ export default {
 }
 
 .privacy-content {
-  padding: 32px;
+  padding: 24px;
 }
 
 .privacy-content h3 {
   font-size: 18px;
-  margin: 24px 0 12px 0;
+  margin: 20px 0 12px 0;
   color: #2c3e50;
   font-weight: 600;
   text-align: left;

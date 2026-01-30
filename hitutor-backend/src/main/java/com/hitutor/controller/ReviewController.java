@@ -61,8 +61,13 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createReview(@RequestBody Map<String, Object> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
+        String userId = (String) request.get("userId");
+        if (userId == null || userId.isEmpty()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", false);
+            result.put("message", "未授权");
+            return ResponseEntity.status(401).body(result);
+        }
         
         request.put("reviewerId", userId);
         

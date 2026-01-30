@@ -231,7 +231,7 @@ class _TutorCertificationPageState extends State<TutorCertificationPage> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -294,7 +294,7 @@ class _TutorCertificationPageState extends State<TutorCertificationPage> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -379,7 +379,7 @@ class _TutorCertificationPageState extends State<TutorCertificationPage> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -477,9 +477,13 @@ class _TutorCertificationPageState extends State<TutorCertificationPage> {
                   '真实姓名',
                   '请输入真实姓名',
                   Icons.person_rounded,
+                  maxLength: 6,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return '请输入真实姓名';
+                    }
+                    if (value.length > 6) {
+                      return '真实姓名最多6个字';
                     }
                     return null;
                   },
@@ -604,9 +608,11 @@ class _TutorCertificationPageState extends State<TutorCertificationPage> {
     String hint,
     IconData icon, {
     String? Function(String?)? validator,
+    int? maxLength,
   }) {
     return TextFormField(
       controller: controller,
+      maxLength: maxLength,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -722,7 +728,7 @@ class ApprovedCertificationPage extends StatelessWidget {
                   ],
                 ),
               ),
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -767,7 +773,7 @@ class ApprovedCertificationPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Divider(color: AppTheme.dividerColor),
                   const SizedBox(height: 24),
-                  _buildInfoRow('真实姓名', certificationData['realName'] ?? ''),
+                  _buildInfoRow('用户名', certificationData['username'] ?? ''),
                   const SizedBox(height: 16),
                   _buildInfoRow('身份证号', certificationData['idCard'] ?? ''),
                   const SizedBox(height: 16),
@@ -781,7 +787,7 @@ class ApprovedCertificationPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Divider(color: AppTheme.dividerColor),
                   const SizedBox(height: 16),
-                  _buildInfoRow('认证时间', _formatDate(certificationData['createTime'])),
+                  _buildInfoRow('认证时间', _formatDate(certificationData['createdAt'])),
                   const SizedBox(height: 32),
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -794,13 +800,15 @@ class ApprovedCertificationPage extends StatelessWidget {
                       children: [
                         Icon(Icons.info_outline, color: Colors.blue.shade700),
                         const SizedBox(width: 12),
-                        Expanded(
+                        Flexible(
                           child: Text(
-                            '兹证明${certificationData['realName'][0]}老师已通过好会帮资格审核',
+                            '兹证明${(certificationData['username'] ?? '').isEmpty ? '' : (certificationData['username'] ?? '')[0]}老师已通过好会帮资格审核',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.blue.shade700,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -831,7 +839,7 @@ class ApprovedCertificationPage extends StatelessWidget {
           ),
         ),
         const Text('：'),
-        Expanded(
+        Flexible(
           child: Text(
             value,
             style: const TextStyle(
@@ -839,6 +847,8 @@ class ApprovedCertificationPage extends StatelessWidget {
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

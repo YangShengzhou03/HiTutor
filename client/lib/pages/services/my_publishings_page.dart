@@ -4,6 +4,8 @@ import '../../services/api_service.dart';
 import '../../models/tutor_model.dart';
 import '../../utils/error_handler.dart';
 import '../application/application_list_page.dart';
+import '../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyPublishingsPage extends StatefulWidget {
   const MyPublishingsPage({super.key});
@@ -28,8 +30,19 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
     });
 
     try {
-      final requestsResponse = await ApiService.getUserRequests();
-      final servicesResponse = await ApiService.getUserServices();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.id;
+
+      if (userId == null || userId.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _allPublishings = [];
+        });
+        return;
+      }
+
+      final requestsResponse = await ApiService.getUserRequestsWithUserId(userId);
+      final servicesResponse = await ApiService.getUserServicesWithUserId(userId);
 
       
       final studentRequests = (requestsResponse['data']?['content'] ?? [])
@@ -101,7 +114,7 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
             ? const Center(child: CircularProgressIndicator())
             : _allPublishings.isEmpty
                 ? const Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: EdgeInsets.all(16),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -182,10 +195,14 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
 
   Widget _buildPublishingItem(dynamic item) {
     
-    final createdAt = item['createdAt'] != null 
+    final createTime = item['createdAt'] != null 
         ? DateTime.parse(item['createdAt']) 
         : DateTime.now();
-    final formattedDate = '${createdAt.year}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')} ${createdAt.hour.toString().padLeft(2, '0')}:${createdAt.minute.toString().padLeft(2, '0')}';
+    final formattedDate = '${createTime.year}-${createTime.month.toString().padLeft(2, '0')}-${createTime.day.toString().padLeft(2, '0')} ${createTime.hour.toString().padLeft(2, '0')}:${createTime.minute.toString().padLeft(2, '0')}';
+
+    final isVerified = item['userVerified'] as bool?;
+    final badge = item['badge']?.toString();
+    final gender = item['userGender']?.toString() ?? item['gender']?.toString();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -224,33 +241,60 @@ class _MyPublishingsPageState extends State<MyPublishingsPage> {
                               ),
                             ),
                           ),
-                          if (item['type'] == 'service' && item['isVerified'] == true)
+                          if (gender != null && gender.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Text(
+                                gender == 'male' ? '♂' : '♀',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          if (isVerified == true)
                             Padding(
                               padding: const EdgeInsets.only(left: 6),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF0F9FF),
+                                  color: Colors.blue.shade50,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      Icons.verified_rounded,
-                                      size: 10,
-                                      color: Color(0xFF0EA5E9),
-                                    ),
-                                    SizedBox(width: 2),
+                                    Icon(Icons.verified, size: 10, color: Colors.blue.shade700),
+                                    const SizedBox(width: 2),
                                     Text(
-                                      '家教认证',
+                                      '已认证',
                                       style: TextStyle(
                                         fontSize: 9,
-                                        color: Color(0xFF0EA5E9),
+                                        color: Colors.blue.shade700,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+                            ),
+                          if (badge != null && badge.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFDF2F8),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  badge,
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    color: Color(0xFFEC4899),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),

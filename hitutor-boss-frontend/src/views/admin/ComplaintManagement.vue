@@ -29,12 +29,12 @@
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="投诉人ID" width="200">
+        <el-table-column prop="userId" label="投诉人ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.userId" />
           </template>
         </el-table-column>
-        <el-table-column prop="targetUserId" label="被投诉用户ID" width="200">
+        <el-table-column prop="targetUserId" label="被投诉用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.targetUserId" />
           </template>
@@ -267,32 +267,7 @@ const handleReject = async (row) => {
   }
 }
 
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确定要删除投诉 #${row.id} 吗？此操作不可恢复。`,
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
 
-    const response = await api.complaint.deleteComplaint(row.id)
-    if (response.status === 200) {
-      ElMessage.success('删除成功')
-      fetchComplaintList()
-    } else {
-      ElMessage.error('删除失败')
-    }
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('删除失败')
-      console.error(error)
-    }
-  }
-}
 
 const handleSizeChange = (size) => {
   pagination.size = size

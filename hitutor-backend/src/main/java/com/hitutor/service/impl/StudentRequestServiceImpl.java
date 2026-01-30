@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hitutor.entity.StudentRequest;
 import com.hitutor.mapper.StudentRequestMapper;
 import com.hitutor.service.StudentRequestService;
+import com.hitutor.util.DistanceUtil;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,7 +30,7 @@ public class StudentRequestServiceImpl extends ServiceImpl<StudentRequestMapper,
         
         return allRequests.stream()
             .filter(request -> {
-                double distance = calculateDistance(
+                double distance = DistanceUtil.calculateDistance(
                     latitude, longitude,
                     request.getLatitude().doubleValue(),
                     request.getLongitude().doubleValue()
@@ -163,21 +164,6 @@ public class StudentRequestServiceImpl extends ServiceImpl<StudentRequestMapper,
     @Override
     public boolean deleteStudentRequest(Long id) {
         return baseMapper.deleteById(id) > 0;
-    }
-
-    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371;
-        
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        
-        return R * c;
     }
     
     @Override

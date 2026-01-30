@@ -1,14 +1,17 @@
 package com.hitutor.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ComplaintDTO {
     private Long id;
     private String userId;
+    @Size(max = 6, message = "用户名最多6个字")
     private String userName;
     private String userAvatar;
     private String targetUserId;
+    @Size(max = 6, message = "用户名最多6个字")
     private String targetUserName;
     private String targetUserAvatar;
     private String categoryName;
@@ -17,6 +20,7 @@ public class ComplaintDTO {
     private String contactPhone;
     private String status;
     private String createdAt;
+    private String updatedAt;
 
     public ComplaintDTO() {
     }
@@ -123,5 +127,13 @@ public class ComplaintDTO {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

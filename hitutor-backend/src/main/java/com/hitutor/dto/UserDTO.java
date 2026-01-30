@@ -1,6 +1,8 @@
 package com.hitutor.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
@@ -12,14 +14,18 @@ public class UserDTO {
     private String email;
     private String gender;
     private String birthDate;
-    private String education;
-    private String school;
-    private String major;
     private Integer teachingExperience;
-    private Boolean isVerified;
+    private boolean isVerified;
     private String role;
+    private String status;
+    private String badge;
     private String createdAt;
+    private String updatedAt;
+    private String lastLoginTime;
+    private String lastLoginIp;
     private Integer points;
+    private String latitude;
+    private String longitude;
 
     public UserDTO() {
     }
@@ -88,30 +94,6 @@ public class UserDTO {
         this.birthDate = birthDate;
     }
 
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public String getSchool() {
-        return school;
-    }
-
-    public void setSchool(String school) {
-        this.school = school;
-    }
-
-    public String getMajor() {
-        return major;
-    }
-
-    public void setMajor(String major) {
-        this.major = major;
-    }
-
     public Integer getTeachingExperience() {
         return teachingExperience;
     }
@@ -120,11 +102,11 @@ public class UserDTO {
         this.teachingExperience = teachingExperience;
     }
 
-    public Boolean getIsVerified() {
+    public boolean getIsVerified() {
         return isVerified;
     }
 
-    public void setIsVerified(Boolean isVerified) {
+    public void setIsVerified(boolean isVerified) {
         this.isVerified = isVerified;
     }
 
@@ -136,6 +118,22 @@ public class UserDTO {
         this.role = role;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getBadge() {
+        return badge;
+    }
+
+    public void setBadge(String badge) {
+        this.badge = badge;
+    }
+
     public String getCreatedAt() {
         return createdAt;
     }
@@ -144,11 +142,51 @@ public class UserDTO {
         this.createdAt = createdAt;
     }
 
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(String lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+
+    public void setLastLoginIp(String lastLoginIp) {
+        this.lastLoginIp = lastLoginIp;
+    }
+
     public Integer getPoints() {
         return points;
     }
 
     public void setPoints(Integer points) {
         this.points = points;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 }

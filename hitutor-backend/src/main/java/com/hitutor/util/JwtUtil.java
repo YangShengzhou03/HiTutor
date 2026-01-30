@@ -19,8 +19,11 @@ public class JwtUtil {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration}")
-    private Long jwtExpiration;
+    @Value("${app.jwt.access-token-expiration}")
+    private Long accessTokenExpiration;
+
+    @Value("${app.jwt.refresh-token-expiration}")
+    private Long refreshTokenExpiration;
 
     private SecretKey getSigningKey() {
         
@@ -29,12 +32,43 @@ public class JwtUtil {
 
     public String generateToken(String userId, String username, String role) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("username", username)
                 .claim("role", role)
+                .claim("type", "access")
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateAccessToken(String userId, String username, String role) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("username", username)
+                .claim("role", role)
+                .claim("type", "access")
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateRefreshToken(String userId, String username, String role) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshTokenExpiration);
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("username", username)
+                .claim("role", role)
+                .claim("type", "refresh")
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())
@@ -96,6 +130,38 @@ public class JwtUtil {
             return !expiration.before(new Date());
         } catch (Exception e) {
             logger.error("Token validation failed: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    public Boolean validateAccessToken(String token) {
+        try {
+            Claims claims = getClaimsFromToken(token);
+            String type = claims.get("type", String.class);
+            if (!"access".equals(type)) {
+                logger.error("Token type is not access token");
+                return false;
+            }
+            Date expiration = claims.getExpiration();
+            return !expiration.before(new Date());
+        } catch (Exception e) {
+            logger.error("Access token validation failed: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    public Boolean validateRefreshToken(String token) {
+        try {
+            Claims claims = getClaimsFromToken(token);
+            String type = claims.get("type", String.class);
+            if (!"refresh".equals(type)) {
+                logger.error("Token type is not refresh token");
+                return false;
+            }
+            Date expiration = claims.getExpiration();
+            return !expiration.before(new Date());
+        } catch (Exception e) {
+            logger.error("Refresh token validation failed: {}", e.getMessage());
             return false;
         }
     }

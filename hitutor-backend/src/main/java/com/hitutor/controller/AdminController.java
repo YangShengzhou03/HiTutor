@@ -1,11 +1,13 @@
 package com.hitutor.controller;
 
+import com.hitutor.dto.UserDTO;
 import com.hitutor.entity.User;
 import com.hitutor.service.ComplaintService;
 import com.hitutor.service.PointService;
 import com.hitutor.service.StudentRequestService;
 import com.hitutor.service.TutorProfileService;
 import com.hitutor.service.UserService;
+import com.hitutor.util.DtoConverter;
 import com.hitutor.util.JwtUtil;
 import com.hitutor.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -96,8 +99,83 @@ public class AdminController {
         }
     }
 
+    @PostMapping("/users")
+    public ResponseEntity<Map<String, Object>> createUser(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String email = request.get("email");
+        String password = request.get("password");
+        String phone = request.get("phone");
+        String role = request.get("role");
+
+        if (username == null || username.trim().isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "用户名不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "密码不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (phone == null || phone.trim().isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "手机号不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (role == null || role.trim().isEmpty()) {
+            role = "student";
+        }
+
+        if (email != null && !email.trim().isEmpty()) {
+            User existingUser = userService.getUserByEmail(email);
+            if (existingUser != null) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "邮箱已被占用");
+                return ResponseEntity.status(409).body(response);
+            }
+        }
+
+        User existingPhoneUser = userService.getUserByPhone(phone);
+        if (existingPhoneUser != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "手机号已被占用");
+            return ResponseEntity.status(409).body(response);
+        }
+
+        User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordUtil.encodePassword(password));
+        user.setPhone(phone);
+        user.setRole(role);
+        user.setStatus("active");
+        user.setIsVerified(true);
+
+        boolean saved = userService.saveUser(user);
+        if (saved) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "添加用户成功");
+            response.put("data", DtoConverter.toUserDTO(user));
+            return ResponseEntity.status(201).body(response);
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "添加用户失败");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
     @GetMapping("/users")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -108,9 +186,13 @@ public class AdminController {
             user.setPoints(totalPoints);
         }
         
+        List<UserDTO> userDTOs = users.stream()
+                .map(DtoConverter::toUserDTO)
+                .collect(Collectors.toList());
+        
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("users", users);
-        dataMap.put("total", users.size());
+        dataMap.put("users", userDTOs);
+        dataMap.put("total", userDTOs.size());
         dataMap.put("page", page);
         dataMap.put("size", size);
 
@@ -123,7 +205,6 @@ public class AdminController {
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getUser(@PathVariable String id) {
         User user = userService.getUserById(id);
         Map<String, Object> response = new HashMap<>();
@@ -134,12 +215,11 @@ public class AdminController {
         }
         response.put("success", true);
         response.put("message", "获取用户信息成功");
-        response.put("data", user);
+        response.put("data", DtoConverter.toUserDTO(user));
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/users/{id}/status")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> updateUserStatus(@PathVariable String id, @RequestBody Map<String, String> requestData) {
         User user = userService.getUserById(id);
         Map<String, Object> response = new HashMap<>();
@@ -156,7 +236,7 @@ public class AdminController {
             if (updated) {
                 response.put("success", true);
                 response.put("message", "更新用户状态成功");
-                response.put("data", user);
+                response.put("data", DtoConverter.toUserDTO(user));
                 return ResponseEntity.ok(response);
             } else {
                 response.put("success", false);
@@ -170,8 +250,55 @@ public class AdminController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @PutMapping("/users/{id}/reset-password")
+    public ResponseEntity<Map<String, Object>> resetUserPassword(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        Map<String, Object> response = new HashMap<>();
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "用户不存在");
+            return ResponseEntity.status(404).body(response);
+        }
+        
+        user.setPassword(passwordUtil.encodePassword("123456"));
+        boolean updated = userService.updateUser(user);
+        if (updated) {
+            response.put("success", true);
+            response.put("message", "密码重置成功，新密码为：123456");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("success", false);
+            response.put("message", "密码重置失败");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @PutMapping("/users/{id}/badge")
+    public ResponseEntity<Map<String, Object>> setUserBadge(@PathVariable String id, @RequestBody Map<String, String> requestData) {
+        User user = userService.getUserById(id);
+        Map<String, Object> response = new HashMap<>();
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "用户不存在");
+            return ResponseEntity.status(404).body(response);
+        }
+        
+        String badge = requestData.get("badge");
+        user.setBadge(badge);
+        boolean updated = userService.updateUser(user);
+        if (updated) {
+            response.put("success", true);
+            response.put("message", badge == null || badge.isEmpty() ? "移除头衔成功" : "赐予头衔成功");
+            response.put("data", DtoConverter.toUserDTO(user));
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("success", false);
+            response.put("message", "设置头衔失败");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String id) {
         boolean deleted = userService.deleteUser(id);
         Map<String, Object> response = new HashMap<>();
@@ -187,7 +314,6 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getSystemStats() {
         Map<String, Object> stats = new HashMap<>();
         
@@ -219,7 +345,6 @@ public class AdminController {
     }
 
     @GetMapping("/stats/subject-distribution")
-    @PreAuthorize("hasRole('admin')")
     @SuppressWarnings("unchecked")
     public ResponseEntity<Map<String, Object>> getSubjectDistribution() {
         Map<String, Object> result = new HashMap<>();

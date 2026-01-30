@@ -121,7 +121,7 @@ export default {
 .page-header {
   background-color: #2d3748;
   color: white;
-  padding: 60px 0;
+  padding: 40px 0;
   text-align: center;
 }
 
@@ -139,13 +139,13 @@ export default {
 }
 
 .page-content {
-  padding: 60px 0 80px;
+  padding: 40px 0 60px;
 }
 
 .author-sections {
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: 40px;
 }
 
 .author-section {
@@ -173,7 +173,7 @@ export default {
 .author-profile {
   display: flex;
   align-items: flex-start;
-  gap: 40px;
+  gap: 24px;
   max-width: 800px;
   margin: 0 auto;
 }

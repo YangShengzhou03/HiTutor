@@ -110,7 +110,7 @@ export default {
 .guide-sections {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
 }
 
 .guide-section {

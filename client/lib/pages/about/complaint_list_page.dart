@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class ComplaintListPage extends StatefulWidget {
   const ComplaintListPage({super.key});
@@ -40,7 +42,12 @@ class _ComplaintListPageState extends State<ComplaintListPage> with SingleTicker
     });
 
     try {
-      final response = await ApiService.getComplaints();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (authProvider.user == null) {
+        throw Exception('用户未登录');
+      }
+
+      final response = await ApiService.getComplaints(userId: authProvider.user!.id);
 
       if (!mounted) return;
 

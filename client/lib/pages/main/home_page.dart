@@ -62,13 +62,12 @@ class _HomePageState extends State<HomePage> {
 
   void _loadDataBasedOnRole() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final tutorProvider = Provider.of<TutorProvider>(context, listen: false);
     final user = authProvider.user;
     if (user != null && user.userRole == 'tutor') {
-      
-      Provider.of<TutorProvider>(context, listen: false).getNearbyStudents();
+      tutorProvider.getNearbyStudents();
     } else {
-      
-      Provider.of<TutorProvider>(context, listen: false).getNearbyTutors();
+      tutorProvider.getNearbyTutors();
     }
   }
 
@@ -587,6 +586,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCard(Tutor tutor, String role) {
+    final bool isVerified = tutor.user.isVerified ?? false;
+
     Color accentColor;
     final subjectName = tutor.subjects.firstOrNull?.name.toLowerCase() ?? '';
     if (subjectName.contains('数学') || subjectName.contains('math')) {
@@ -667,7 +668,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Center(
                 child: Text(
-                  tutor.user.name[0],
+                  tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
                   style: TextStyle(
                     fontSize: 24,
                     color: accentColor,
@@ -689,41 +690,58 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Flexible(
                               child: Text(
-                                tutor.user.name,
+                                _truncateName(tutor.user.name),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: AppTheme.textPrimary,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            if (tutor.user.isVerified)
+                            if (isVerified == true)
                               Padding(
-                                padding: const EdgeInsets.only(left: 6),
+                                padding: const EdgeInsets.only(left: 4),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF0F9FF),
-                                    borderRadius: BorderRadius.circular(4),
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(3),
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        Icons.verified_rounded,
-                                        size: 10,
-                                        color: Color(0xFF0EA5E9),
-                                      ),
-                                      SizedBox(width: 2),
+                                      Icon(Icons.verified, size: 8, color: Colors.blue.shade700),
+                                      const SizedBox(width: 2),
                                       Text(
-                                        '家教认证',
+                                        '已认证',
                                         style: TextStyle(
-                                          fontSize: 9,
-                                          color: Color(0xFF0EA5E9),
+                                          fontSize: 8,
+                                          color: Colors.blue.shade700,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],
+                                  ),
+                                ),
+                              ),
+                            if (tutor.user.badge != null && tutor.user.badge!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFDF2F8),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                  child: Text(
+                                    tutor.user.badge!,
+                                    style: const TextStyle(
+                                      fontSize: 8,
+                                      color: Color(0xFFEC4899),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -752,11 +770,29 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      if (tutor.user.gender != null && tutor.user.gender!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Text(
+                            (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? '♂' : '♀',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: Text(
+                          subtitle,
+                          style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 6),
                   Row(
@@ -801,5 +837,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  String _truncateName(String name) {
+    if (name.length > 6) {
+      return '${name.substring(0, 6)}...';
+    }
+    return name;
   }
 }

@@ -113,6 +113,9 @@ public class FavoriteController {
                     if (user != null) {
                         targetData.put("username", user.getUsername());
                         targetData.put("userId", user.getId());
+                        targetData.put("isVerified", user.getIsVerified() != null ? user.getIsVerified() : false);
+                        targetData.put("badge", user.getBadge());
+                        targetData.put("gender", user.getGender());
                     }
                     targetData.put("subjectName", profile.getSubjectName());
                     targetData.put("hourlyRate", profile.getHourlyRate());
@@ -124,6 +127,9 @@ public class FavoriteController {
                     if (user != null) {
                         targetData.put("username", user.getUsername());
                         targetData.put("userId", user.getId());
+                        targetData.put("isVerified", user.getIsVerified() != null ? user.getIsVerified() : false);
+                        targetData.put("badge", user.getBadge());
+                        targetData.put("gender", user.getGender());
                     }
                     targetData.put("subjectName", request.getSubjectName());
                     targetData.put("childGrade", request.getChildGrade());

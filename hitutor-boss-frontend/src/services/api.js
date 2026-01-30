@@ -11,9 +11,17 @@ const AdminService = {
     return Promise.resolve({ success: true, message: '退出登录成功' })
   },
 
+  refreshToken(data) {
+    return Server.post('/api/auth/refresh-token', data)
+  },
+
   // 管理员专用注册接口 - 仅需邮箱和密码，不需要验证码
   register(data) {
     return Server.post('/api/admin/register', data)
+  },
+
+  createUser(data) {
+    return Server.post('/api/admin/users', data)
   },
 
   getUserInfo() {
@@ -53,6 +61,14 @@ const AdminService = {
 
   updateUserStatus(id, status) {
     return Server.put(`/api/admin/users/${id}/status`, { status })
+  },
+
+  resetUserPassword(id) {
+    return Server.put(`/api/admin/users/${id}/reset-password`)
+  },
+
+  setUserBadge(id, badge) {
+    return Server.put(`/api/admin/users/${id}/badge`, { badge })
   },
 
   deleteUser(id) {
@@ -149,8 +165,13 @@ const TutorCertificationService = {
     return Server.get(`/api/tutor-certifications/user/${userId}`)
   },
 
-  getAllCertifications() {
-    return Server.get('/api/tutor-certifications/all')
+  getAllCertifications(params) {
+    const safeParams = params || {}
+    return Server.get('/api/tutor-certifications/all', {
+      page: safeParams.page || 0,
+      size: safeParams.size || 10,
+      status: safeParams.status
+    })
   },
 
   submitCertification(data) {
@@ -409,6 +430,7 @@ const PointService = {
 export default {
   admin: AdminService,
   user: UserService,
+  auth: AdminService,
   complaint: ComplaintService,
   tutorCertification: TutorCertificationService,
   studentRequest: StudentRequestService,

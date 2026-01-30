@@ -27,17 +27,16 @@ public class NotificationController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getUserNotifications(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String userId) {
         
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "未授权");
             return ResponseEntity.status(401).body(response);
         }
         
-        String userId = authentication.getName();
         List<Notification> notifications = notificationService.getUserNotifications(userId, page, size);
         
         Map<String, Object> response = new HashMap<>();
@@ -48,16 +47,15 @@ public class NotificationController {
     }
 
     @GetMapping("/unread-count")
-    public ResponseEntity<Map<String, Object>> getUnreadCount() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public ResponseEntity<Map<String, Object>> getUnreadCount(
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "未授权");
             return ResponseEntity.status(401).body(response);
         }
         
-        String userId = authentication.getName();
         int unreadCount = notificationService.getUnreadCount(userId);
         
         Map<String, Object> response = new HashMap<>();
@@ -84,16 +82,15 @@ public class NotificationController {
     }
 
     @PutMapping("/read-all")
-    public ResponseEntity<Map<String, Object>> markAllAsRead() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public ResponseEntity<Map<String, Object>> markAllAsRead(
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "未授权");
             return ResponseEntity.status(401).body(response);
         }
         
-        String userId = authentication.getName();
         notificationService.markAllAsRead(userId);
         
         Map<String, Object> response = new HashMap<>();
@@ -119,7 +116,6 @@ public class NotificationController {
     }
 
     @PostMapping("/admin/send")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> sendNotification(@RequestBody Map<String, Object> request) {
         String userId = request.get("userId") != null ? request.get("userId").toString() : null;
         String title = request.get("title") != null ? request.get("title").toString() : null;
@@ -168,7 +164,6 @@ public class NotificationController {
     }
 
     @GetMapping("/admin/list")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getAllNotifications(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -180,6 +175,8 @@ public class NotificationController {
         
         Map<String, Object> data = new HashMap<>();
         data.put("content", notifications);
+        data.put("page", page);
+        data.put("size", size);
         data.put("totalElements", notifications.size());
         response.put("data", data);
         

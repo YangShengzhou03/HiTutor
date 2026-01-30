@@ -59,16 +59,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         logger.info("JWT token validated for user: {}", username);
                     } catch (IllegalArgumentException e) {
                         logger.error("Unable to get JWT Token: {}", e.getMessage());
+                        unauthorized(response, "Token无效");
+                        return;
                     } catch (ExpiredJwtException e) {
                         logger.error("JWT Token has expired: {}", e.getMessage());
+                        unauthorized(response, "Token过期");
+                        return;
                     } catch (Exception e) {
                         logger.error("Other error getting JWT Token: {}", e.getMessage());
+                        unauthorized(response, "Token无效");
+                        return;
                     }
                 }
             }
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (jwtUtil.validateToken(jwtToken)) {
+                if (jwtUtil.validateAccessToken(jwtToken)) {
                     String role = jwtUtil.getRoleFromToken(jwtToken);
                     
                     UsernamePasswordAuthenticationToken authToken = 
@@ -86,6 +92,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         filterChain.doFilter(request, response);
     }
+
+    private void unauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"success\":false,\"message\":\"" + message + "\"}");
+    }
     
     private boolean isPublicEndpoint(String requestURI) {
         return requestURI.startsWith("/api/auth/") ||
@@ -93,6 +105,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                requestURI.startsWith("/api/verifications/") ||
                requestURI.startsWith("/api/points/") ||
                requestURI.startsWith("/api/tutor-resumes/") ||
-               requestURI.startsWith("/api/tutor-certifications/");
+               requestURI.startsWith("/api/tutor-certifications/") ||
+               requestURI.startsWith("/api/users/") ||
+               requestURI.startsWith("/api/tutor-profiles/") ||
+               requestURI.startsWith("/api/student-requests/") ||
+               requestURI.startsWith("/api/admin/register");
     }
 }

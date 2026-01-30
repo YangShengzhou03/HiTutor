@@ -285,7 +285,7 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
                   ),
                   child: Center(
                     child: Text(
-                      widget.request.user.name[0],
+                      widget.request.user.name.isNotEmpty ? widget.request.user.name[0] : 'U',
                       style: TextStyle(
                         fontSize: 36,
                         color: accentColor,
@@ -301,45 +301,32 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            widget.request.user.name,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(width: 4),
-                          if (widget.request.user.isVerified)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
+                          Flexible(
+                            child: Text(
+                              widget.request.user.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textPrimary,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (widget.request.user.badge != null && widget.request.user.badge!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF0F9FF),
+                                color: const Color(0xFFFDF2F8),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.verified_rounded,
-                                    size: 12,
-                                    color: Color(0xFF0EA5E9),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    '已认证',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF0EA5E9),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                widget.request.user.badge!,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFFEC4899),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                         ],
@@ -347,6 +334,16 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
+                          if (widget.request.user.gender != null && widget.request.user.gender!.isNotEmpty)
+                            Text(
+                              (widget.request.user.gender!.toLowerCase() == 'male' || widget.request.user.gender == '男') ? '♂' : '♀',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: (widget.request.user.gender!.toLowerCase() == 'male' || widget.request.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          const SizedBox(width: 12),
                           Text(
                             widget.request.educationBackground,
                             style: const TextStyle(
@@ -433,7 +430,7 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
           _buildInfoRow(
             Icons.location_on_outlined,
             '授课地点',
-            widget.request.address ?? '暂无地址信息',
+            (widget.request.address != null && widget.request.address!.isNotEmpty) ? widget.request.address! : '暂无地址信息',
           ),
           const SizedBox(height: 16),
           Container(

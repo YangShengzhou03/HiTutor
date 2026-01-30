@@ -465,6 +465,7 @@ class _AppointmentPageState extends State<AppointmentPage> with SingleTickerProv
                       '家教',
                       order['tutorName'],
                       order['tutorPhone'],
+                      gender: order['tutorGender']?.toString(),
                     ),
                   if (order['tutorName'] != null && order['studentName'] != null)
                     const SizedBox(height: 12),
@@ -473,6 +474,7 @@ class _AppointmentPageState extends State<AppointmentPage> with SingleTickerProv
                       '学生',
                       order['studentName'],
                       order['studentPhone'],
+                      gender: order['studentGender']?.toString(),
                     ),
                 ],
               ),
@@ -602,17 +604,32 @@ class _AppointmentPageState extends State<AppointmentPage> with SingleTickerProv
     );
   }
 
-  Widget _buildContactInfo(String role, String name, String? phone) {
+  Widget _buildContactInfo(String role, String name, String? phone, {String? gender}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '$role：$name',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
+        Row(
+          children: [
+            Text(
+              '$role：$name',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            if (gender != null && gender.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              Text(
+                gender == 'male' ? '♂' : '♀',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ],
         ),
         if (phone != null && phone.isNotEmpty) ...[
           const SizedBox(height: 4),

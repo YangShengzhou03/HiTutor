@@ -3,9 +3,8 @@ import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
 import '../../providers/auth_provider.dart';
-import '../../utils/error_handler.dart';
 import '../../models/tutor_model.dart';
-import '../../routes.dart';
+
 import '../tutor_service/tutor_service_detail_page.dart';
 import '../student_request/student_request_detail_page.dart';
 
@@ -29,7 +28,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   List<dynamic> _userServices = [];
   List<dynamic> _userRequests = [];
   String _errorMessage = '';
-  bool _isBlocked = false;
 
   static const _padding16 = EdgeInsets.all(16);
   static const _padding12 = EdgeInsets.all(12);
@@ -55,64 +53,62 @@ class _UserProfilePageState extends State<UserProfilePage> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       
-      if (authProvider.isAuthenticated && authProvider.user?.id != widget.userId) {
-        try {
-          final blockedResponse = await ApiService.checkBlocked(widget.userId);
-          if (blockedResponse['success'] == true) {
-            _isBlocked = blockedResponse['data'] ?? false;
-          }
-        } catch (e) {
-        }
-      }
-
       final userResponse = await ApiService.getUser(widget.userId, needAuth: false);
+      Map<String, dynamic>? userData;
+      List<dynamic> userServices = [];
+      List<dynamic> userRequests = [];
+      
       if (userResponse['success'] == true) {
-        setState(() {
-          _userData = userResponse['data'];
-        });
+        userData = userResponse['data'];
       }
 
       final isOwnProfile = authProvider.user?.id == widget.userId;
       
       try {
         if (isOwnProfile) {
-          final servicesResponse = await ApiService.getUserServices();
+          final servicesResponse = await ApiService.getUserServicesWithUserId(widget.userId);
           if (servicesResponse['success'] == true) {
-            final content = servicesResponse['data']?['content'] ?? [];
-            setState(() {
-              _userServices = content;
-            });
+            userServices = servicesResponse['data']?['content'] ?? [];
           }
 
-          final requestsResponse = await ApiService.getUserRequests();
+          final requestsResponse = await ApiService.getUserRequestsWithUserId(widget.userId);
           if (requestsResponse['success'] == true) {
-            final content = requestsResponse['data']?['content'] ?? [];
-            setState(() {
-              _userRequests = content;
-            });
+            userRequests = requestsResponse['data']?['content'] ?? [];
           }
         } else {
           final servicesResponse = await ApiService.getUserServicesByUserId(widget.userId, needAuth: false);
           if (servicesResponse['success'] == true) {
-            final content = servicesResponse['data']?['content'] ?? [];
-            setState(() {
-              _userServices = content;
-            });
+            userServices = servicesResponse['data']?['content'] ?? [];
           }
 
           final requestsResponse = await ApiService.getUserRequestsByUserId(widget.userId, needAuth: false);
           if (requestsResponse['success'] == true) {
-            final content = requestsResponse['data']?['content'] ?? [];
-            setState(() {
-              _userRequests = content;
-            });
+            userRequests = requestsResponse['data']?['content'] ?? [];
           }
         }
       } catch (e) {
+        // 静默处理错误，因为这不是关键数据
       }
+
+      if (!mounted) return;
+      
+      setState(() {
+        _userData = userData;
+        _userServices = userServices;
+        _userRequests = userRequests;
+        // 从第一个家教服务中获取教育背景信息
+        if (userServices.isNotEmpty && userData != null) {
+          final firstService = userServices[0];
+          userData['education'] = firstService['education'] ?? '';
+          userData['school'] = firstService['school'] ?? '';
+          userData['major'] = firstService['major'] ?? '';
+        }
+      });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString();
+        _isLoading = false;
       });
     } finally {
       if (mounted) {
@@ -123,72 +119,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  Future<void> _startChat() async {
-    try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final userId = authProvider.user?.id;
-      
-      if (userId == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('请先登录')),
-          );
-        }
-        return;
-      }
-      
-      final response = await ApiService.createConversation(userId, widget.userId);
-      if (response['success'] == true) {
-        final conversationId = response['data']['id']?.toString() ?? '';
-        if (mounted && conversationId.isNotEmpty) {
-          Navigator.pushNamed(
-            context,
-            Routes.chatDetail,
-            arguments: {
-              'conversationId': conversationId,
-              'otherUserId': widget.userId,
-              'otherUserName': widget.userName,
-            },
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('启动聊天失败: $e')),
-        );
-      }
-    }
+  void _startChat() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('聊天功能开发中')),
+    );
   }
 
-  Future<void> _toggleBlock() async {
-    try {
-      if (_isBlocked) {
-        await ApiService.removeFromBlacklist(widget.userId);
-        setState(() {
-          _isBlocked = false;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('已从黑名单移除')),
-          );
-        }
-      } else {
-        await ApiService.addToBlacklist(widget.userId);
-        setState(() {
-          _isBlocked = true;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('已添加到黑名单')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ErrorHandler.showErrorSnackBar(context, e);
-      }
-    }
+  bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) return value.toLowerCase() == 'true' || value == '1';
+    return false;
   }
 
   @override
@@ -214,29 +156,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
           color: AppTheme.textPrimary,
         ),
         actions: !isOwnProfile ? [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppTheme.textPrimary),
-            onSelected: (value) {
-              if (value == 'block') {
-                _toggleBlock();
-              }
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('分享功能开发中')),
+              );
             },
-            itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'block',
-                child: Row(
-                  children: [
-                    Icon(
-                      _isBlocked ? Icons.block : Icons.block,
-                      color: _isBlocked ? AppTheme.textSecondary : AppTheme.errorColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(_isBlocked ? '解除拉黑' : '拉黑'),
-                  ],
-                ),
-              ),
-            ],
+            color: AppTheme.textSecondary,
           ),
         ] : null,
       ),
@@ -280,6 +207,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Widget _buildContent() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final isOwnProfile = authProvider.user?.id == widget.userId;
+    
     return ListView(
       padding: _padding12,
       children: [
@@ -287,11 +217,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
         const SizedBox(height: 16),
         _buildUserStatistics(),
         const SizedBox(height: 16),
+        if (!isOwnProfile) ...[
+          _buildActionButtons(),
+          const SizedBox(height: 16),
+        ],
+        _buildEducationSection(),
+        const SizedBox(height: 16),
         if (_userServices.isNotEmpty) _buildUserServices(),
         if (_userServices.isNotEmpty) const SizedBox(height: 16),
         if (_userRequests.isNotEmpty) _buildUserRequests(),
         if (_userRequests.isNotEmpty) const SizedBox(height: 16),
-        _buildActionButtons(),
       ],
     );
   }
@@ -304,16 +239,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final isOwnProfile = authProvider.user?.id == widget.userId;
     
-    final name = _userData?['username']?.toString() ?? widget.userName;
+    final name = _userData?['name']?.toString() ?? widget.userName;
+
+    final badge = _userData?['badge']?.toString();
+    final isVerified = _parseBool(_userData?['isVerified']);
+    final gender = _userData?['gender']?.toString();
     final role = _userData?['role']?.toString() ?? 'student';
-    final isVerified = _userData?['isVerified'] == true || _userData?['isVerified'] == 1;
     final initial = name.isNotEmpty ? name[0] : 'U';
-    final education = _userData?['education']?.toString() ?? '';
     final phone = _userData?['phone']?.toString() ?? '';
-    final email = _userData?['email']?.toString() ?? '';
-    final teachingExperience = _userData?['teachingExperience']?.toString() ?? '';
-    final school = _userData?['school']?.toString() ?? '';
-    final major = _userData?['major']?.toString() ?? '';
 
     return Container(
       padding: _padding16,
@@ -368,87 +301,126 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(width: 4),
-                        if (isVerified)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0F9FF),
-                              borderRadius: BorderRadius.circular(4),
+                        if (gender != null && gender.isNotEmpty)
+                          Text(
+                            gender == 'male' ? '♂' : '♀',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                              fontWeight: FontWeight.w700,
                             ),
-                            child: const Row(
+                          ),
+                        const SizedBox(width: 4),
+                        if (isVerified == true) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.blue.shade200, width: 0.5),
+                            ),
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.verified_rounded,
+                                  Icons.verified,
                                   size: 12,
-                                  color: Color(0xFF0EA5E9),
+                                  color: Colors.blue.shade700,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 2),
                                 Text(
                                   '已认证',
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFF0EA5E9),
+                                    fontSize: 10,
+                                    color: Colors.blue.shade700,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                        ],
+                        const SizedBox(width: 4),
+                        if (badge != null && badge.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFDF2F8),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              badge,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFFEC4899),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      role == 'tutor' ? '家教' : '学生',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          role == 'tutor' ? '家教' : '学生',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                        if (isOwnProfile && phone.isNotEmpty)
+                          const SizedBox(width: 8),
+                        if (isOwnProfile && phone.isNotEmpty)
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.phone_outlined,
+                                size: 12,
+                                color: AppTheme.textSecondary,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                phone,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            children: [
-              if (education.isNotEmpty) _buildInfoChip('教育背景', education, Icons.school),
-              if (school.isNotEmpty) _buildInfoChip('学校', school, Icons.location_city),
-              if (major.isNotEmpty) _buildInfoChip('专业', major, Icons.menu_book),
-              if (teachingExperience.isNotEmpty) _buildInfoChip('教学经验', '$teachingExperience年', Icons.work_history),
-              if (isOwnProfile && phone.isNotEmpty) _buildInfoChip('手机号', phone, Icons.phone),
-              if (email.isNotEmpty) _buildInfoChip('邮箱', email, Icons.email),
-            ],
-          ),
+          ),  
         ],
       ),
     );
   }
 
-  Widget _buildInfoChip(String label, String value, IconData icon) {
+  Widget _buildEducationCard(IconData icon, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        color: AppTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.dividerColor, width: 0.5),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: AppTheme.textSecondary,
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          Row(
             children: [
+              Icon(
+                icon,
+                size: 14,
+                color: AppTheme.textSecondary,
+              ),
+              const SizedBox(width: 4),
               Text(
                 label,
                 style: const TextStyle(
@@ -456,25 +428,35 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   color: AppTheme.textTertiary,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
             ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 
+
+
   Widget _buildUserStatistics() {
+    if (_userData == null) {
+      return const SizedBox.shrink();
+    }
+
+    final reviews = _userData?['reviewCount']?.toString() ?? '0';
+    final rating = _userData?['rating']?.toString() ?? '0.0';
+    final points = _userData?['points']?.toString() ?? '0';
+
     return Container(
       padding: _padding16,
       decoration: BoxDecoration(
@@ -488,30 +470,43 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStatisticItem(_userServices.length.toString(), '发布服务'),
-          _buildStatisticItem(_userRequests.length.toString(), '发布需求'),
-          _buildStatisticItem('0', '完成预约'),
-          _buildStatisticItem('0', '获得评价'),
+          const Text(
+            '统计信息',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('评分', '$rating分'),
+              _buildStatItem('评价', '$reviews条'),
+              _buildStatItem('积分', '$points分'),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatisticItem(String count, String label) {
+  Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
         Text(
-          count,
+          value,
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 0),
         Text(
           label,
           style: const TextStyle(
@@ -527,7 +522,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+       const Text(
           '发布的服务',
           style: TextStyle(
             fontSize: 16,
@@ -725,6 +720,74 @@ class _UserProfilePageState extends State<UserProfilePage> {
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEducationSection() {
+    if (_userData == null) {
+      return const SizedBox.shrink();
+    }
+
+    final education = _userData?['education']?.toString() ?? '';
+    final school = _userData?['school']?.toString() ?? '';
+    final major = _userData?['major']?.toString() ?? '';
+
+    if (education.isEmpty && school.isEmpty && major.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: _padding16,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: _borderRadius16,
+        boxShadow: const [
+          BoxShadow(
+            color: AppTheme.shadowColor,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '教育背景',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildEducationCard(
+                  Icons.school_outlined,
+                  '学历',
+                  education.isNotEmpty ? education : '暂无信息',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildEducationCard(
+                  Icons.account_balance_outlined,
+                  '院校',
+                  school.isNotEmpty ? school : '暂无信息',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildEducationCard(
+            Icons.menu_book_outlined,
+            '专业',
+            major.isNotEmpty ? major : '暂无信息',
+          ),
+        ],
       ),
     );
   }

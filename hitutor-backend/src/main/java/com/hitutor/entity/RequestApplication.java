@@ -10,32 +10,32 @@ public class RequestApplication {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    @TableField(value = "request_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("request_id")
     private Long requestId;
     
-    @TableField(value = "request_type", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("request_type")
     private String requestType;
     
-    @TableField(value = "applicant_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("applicant_id")
     private String applicantId;
     
-    @TableField(value = "applicant_name", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("applicant_name")
     private String applicantName;
     
-    @TableField(value = "applicant_phone", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("applicant_phone")
     private String applicantPhone;
     
-    @TableField(value = "message", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("message")
     private String message;
     
-    @TableField(value = "status", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("status")
     private String status;
     
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField("update_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 

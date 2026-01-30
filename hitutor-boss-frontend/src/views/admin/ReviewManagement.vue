@@ -35,12 +35,12 @@
             <IdDisplay :id="row.orderId" />
           </template>
         </el-table-column>
-        <el-table-column prop="reviewerId" label="评价人ID" width="200">
+        <el-table-column prop="reviewerId" label="评价人ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.reviewerId" />
           </template>
         </el-table-column>
-        <el-table-column prop="reviewedId" label="被评价人ID" width="200">
+        <el-table-column prop="reviewedId" label="被评价人ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.reviewedId" />
           </template>

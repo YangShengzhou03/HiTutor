@@ -12,18 +12,16 @@ CREATE TABLE `sys_user` (
   `email` VARCHAR(100) COMMENT '邮箱',
   `phone` VARCHAR(20) COMMENT '手机号',
   `avatar` VARCHAR(255) COMMENT '头像URL',
+  `badge` VARCHAR(8) COMMENT '头衔',
   `role` ENUM('admin', 'student', 'tutor') NOT NULL COMMENT '角色',
   `status` ENUM('active', 'inactive') DEFAULT 'active' COMMENT '状态',
-  `is_verified` TINYINT(1) DEFAULT 0 COMMENT '是否已认证',
   `gender` ENUM('male', 'female') COMMENT '性别',
   `birth_date` DATE COMMENT '出生日期',
-  `education` ENUM('初中及以下', '高中', '大专', '本科', '硕士', '博士及以上') COMMENT '学历',
-  `school` VARCHAR(100) COMMENT '学校',
-  `major` VARCHAR(50) COMMENT '专业',
   `teaching_experience` INT COMMENT '教学经验',
   `last_login_ip` VARCHAR(45) COMMENT '最后登录IP',
   `last_login_time` DATETIME COMMENT '最后登录时间',
   `points` INT DEFAULT 0 COMMENT '积分余额',
+  `is_verified` BOOLEAN DEFAULT FALSE COMMENT '是否已认证',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
@@ -274,7 +272,7 @@ CREATE TABLE `tutor_certifications` (
   `user_id` VARCHAR(36) NOT NULL COMMENT '用户ID',
   `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
   `id_card` VARCHAR(18) NOT NULL COMMENT '身份证号',
-  `education` VARCHAR(20) NOT NULL COMMENT '学历',
+  `education` ENUM('初中及以下', '高中', '大专', '本科', '硕士', '博士及以上') COMMENT '学历',
   `school` VARCHAR(100) NOT NULL COMMENT '毕业院校',
   `major` VARCHAR(50) NOT NULL COMMENT '专业',
   `certificate_number` VARCHAR(50) COMMENT '教师资格证号',
@@ -296,7 +294,7 @@ CREATE TABLE `notifications` (
   `content` TEXT COMMENT '通知内容',
   `related_id` VARCHAR(36) COMMENT '关联ID（如申请ID、订单ID等）',
   `related_type` VARCHAR(50) COMMENT '关联类型（application, appointment, review, etc.）',
-  `is_read` TINYINT(1) DEFAULT 0 COMMENT '是否已读',
+  `is_read` BOOLEAN DEFAULT FALSE COMMENT '是否已读',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
@@ -321,3 +319,7 @@ INSERT INTO `tutor_subjects` (`name`) VALUES
 ('音乐'),
 ('美术'),
 ('体育');
+
+-- 插入管理员账户
+INSERT INTO `sys_user` (`id`, `username`, `password`, `email`, `role`, `status`, `is_verified`) VALUES
+('5bb98ebf-1408-40f1-9d4d-3d1f4932f386', 'admin', '$2a$10$iUWuLPbFaOgyXaBqeBarlOuxEh5cPabk4rJurX9SxOjj9SumXhFxC', 'admin@qq.com', 'admin', 'active', FALSE);

@@ -27,6 +27,15 @@ const store = {
     }
   },
 
+  setTokens(accessToken, refreshToken) {
+    if (accessToken) {
+      utils.saveToken(accessToken)
+    }
+    if (refreshToken) {
+      utils.saveRefreshToken(refreshToken)
+    }
+  },
+
   clearUser() {
     state.user = null
     state.isAuthenticated = false
@@ -49,19 +58,23 @@ const store = {
     try {
       const response = await api.admin.login(credentials)
 
-      if (response && response.code === 200 && response.data) {
-        const { token, user } = response.data
+      const isSuccess = (response && (response.code === 200 || response.success === true))
 
-        if (token) {
-          utils.saveToken(token)
+      if (isSuccess && response.data) {
+          const { accessToken, refreshToken, user } = response.data
+
+          if (accessToken) {
+            this.setTokens(accessToken, refreshToken)
+          }
+
+          if (user) {
+            this.setUser(user)
+          } else {
+            await this.fetchCurrentUser()
+          }
+
+          return { success: true, message: response.message || '登录成功', user }
         }
-
-        if (user) {
-          this.setUser(user)
-        }
-
-        return { success: true, message: response.message || '登录成功', user }
-      }
 
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
@@ -72,8 +85,20 @@ const store = {
   },
 
   async adminRegister(registerData) {
-    const response = await api.admin.register(registerData);
-    return { success: true, message: response.message };
+    state.loading = true
+    try {
+      const response = await api.admin.register(registerData);
+      const isSuccess = (response && (response.code === 200 || response.success === true))
+      if (isSuccess) {
+        return { success: true, message: response.message || '注册成功' };
+      } else {
+        return { success: false, message: response?.message || '注册失败' };
+      }
+    } catch (error) {
+      return { success: false, message: '注册失败，请检查网络连接' };
+    } finally {
+      state.loading = false
+    }
   },
 
   async login(credentials) {
@@ -84,20 +109,20 @@ const store = {
       const isSuccess = (response && (response.code === 200 || response.success === true))
 
       if (isSuccess && response.data) {
-        const { token, user } = response.data
+          const { accessToken, refreshToken, user } = response.data
 
-        if (token) {
-          utils.saveToken(token)
+          if (accessToken) {
+            this.setTokens(accessToken, refreshToken)
+          }
+
+          if (user) {
+            this.setUser(user)
+          } else {
+            await this.fetchCurrentUser()
+          }
+
+          return { success: true, message: response.message || '登录成功', user }
         }
-
-        if (user) {
-          this.setUser(user)
-        } else {
-          await this.fetchCurrentUser()
-        }
-
-        return { success: true, message: response.message || '登录成功', user }
-      }
 
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
@@ -154,7 +179,12 @@ const store = {
     try {
       const decoded = utils.parseJWT(token)
 
-      if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
+      if (!decoded || !decoded.exp) {
+        this.clearUser()
+        return false
+      }
+
+      if (decoded.exp * 1000 < Date.now()) {
         this.clearUser()
         return false
       }
@@ -165,7 +195,9 @@ const store = {
       }
 
       if (!state.user) {
-        await this.fetchCurrentUser()
+        await this.fetchCurrentUser().catch((error) => {
+          console.log('获取用户信息失败，但 token 仍然有效:', error)
+        })
       }
 
       return true
@@ -191,54 +223,54 @@ const store = {
       const isSuccess = (response && (response.code === 200 || response.success === true))
 
       if (isSuccess) {
-        const data = response.data || {}
-        const { token, user } = data
+          const data = response.data || {}
+          const { accessToken, user } = data
 
-        if (token) {
-          utils.saveToken(token)
+          if (accessToken) {
+            utils.saveToken(accessToken)
 
-          if (user) {
-            this.setUser(user)
-          } else {
-            await this.fetchCurrentUser().catch(() => {
-              console.log('无法获取用户信息，但token已保存')
-            })
-          }
-
-          return { success: true, message: response.message || '注册成功', user, token }
-        } else {
-          try {
-            const loginResponse = await api.user.login({
-              email: userData.email,
-              password: userData.password
-            })
-
-            const isLoginSuccess = (loginResponse && (loginResponse.code === 200 || loginResponse.success === true))
-
-            if (isLoginSuccess && loginResponse.data) {
-              const { token: loginToken, user: loginUser } = loginResponse.data
-
-              if (loginToken) {
-                utils.saveToken(loginToken)
-
-                if (loginUser) {
-                  this.setUser(loginUser)
-                } else {
-                  await this.fetchCurrentUser().catch(() => {
-                    console.log('无法获取用户信息，但token已保存')
-                  })
-                }
-
-                return { success: true, message: response.message || '注册成功并自动登录', loginUser, loginToken }
-              }
+            if (user) {
+              this.setUser(user)
+            } else {
+              await this.fetchCurrentUser().catch(() => {
+                console.log('无法获取用户信息，但token已保存')
+              })
             }
-          } catch (loginError) {
-            console.log('自动登录失败', loginError)
-          }
 
-          return { success: true, message: response.message || '注册成功，请手动登录' }
+            return { success: true, message: response.message || '注册成功', user, token: accessToken }
+          } else {
+            try {
+              const loginResponse = await api.user.login({
+                email: userData.email,
+                password: userData.password
+              })
+
+              const isLoginSuccess = (loginResponse && (loginResponse.code === 200 || loginResponse.success === true))
+
+              if (isLoginSuccess && loginResponse.data) {
+                const { accessToken: loginToken, user: loginUser } = loginResponse.data
+
+                if (loginToken) {
+                  utils.saveToken(loginToken)
+
+                  if (loginUser) {
+                    this.setUser(loginUser)
+                  } else {
+                    await this.fetchCurrentUser().catch(() => {
+                      console.log('无法获取用户信息，但token已保存')
+                    })
+                  }
+
+                  return { success: true, message: response.message || '注册成功并自动登录', loginUser, loginToken }
+                }
+              }
+            } catch (loginError) {
+              console.log('自动登录失败', loginError)
+            }
+
+            return { success: true, message: response.message || '注册成功，请手动登录' }
+          }
         }
-      }
 
       return { success: false, message: response?.message || '注册失败' }
     } catch (error) {
@@ -267,7 +299,10 @@ const store = {
         }
       }
     } catch (error) {
-      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      const token = utils.getToken()
+      const decoded = utils.parseJWT(token)
+      
+      if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
         this.clearUser()
       }
     }
@@ -339,28 +374,56 @@ const store = {
     try {
       await api.user.logout()
     } catch (error) {
-      // 忽略登出错误，继续清理用户信息
     } finally {
       this.clearUser()
     }
   },
 
+  async refreshToken() {
+    const refreshToken = utils.getRefreshToken()
+    if (!refreshToken) {
+      return false
+    }
+
+    try {
+      const response = await api.auth.refreshToken({ refreshToken })
+      const isSuccess = (response && (response.code === 200 || response.success === true))
+
+      if (isSuccess && response.data) {
+        const { accessToken, refreshToken: newRefreshToken } = response.data
+        this.setTokens(accessToken, newRefreshToken)
+        return true
+      }
+
+      return false
+    } catch (error) {
+      this.clearUser()
+      return false
+    }
+  },
+
   async init() {
     if (utils.isLoggedIn()) {
+      const token = utils.getToken()
+      const decoded = utils.parseJWT(token)
+      
+      if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
+        this.clearUser()
+        return false
+      }
+
       try {
         await this.fetchCurrentUser()
         await this.fetchStorageInfo()
-        return true
       } catch (error) {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-          this.clearUser()
-        }
-        return false
+        console.log('初始化时获取用户信息失败，但 token 仍然有效:', error)
       }
+      
+      return true
     } else {
       this.clearUser()
+      return false
     }
-    return false
   }
 }
 

@@ -43,7 +43,7 @@
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="200">
+        <el-table-column prop="userId" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.userId" />
           </template>
@@ -205,6 +205,7 @@ const loading = ref(false)
 const notifications = ref([])
 const dialogVisible = ref(false)
 const currentNotification = ref(null)
+const isLoading = ref(false)
 
 const searchForm = reactive({
   type: '',
@@ -250,6 +251,11 @@ const formatDateTime = (dateTime) => {
 }
 
 const loadNotifications = async () => {
+  if (isLoading.value) {
+    return
+  }
+  
+  isLoading.value = true
   loading.value = true
   try {
     const response = await Server.get('/api/notifications/admin/list', {
@@ -268,6 +274,7 @@ const loadNotifications = async () => {
     ElMessage.error('获取通知列表失败')
   } finally {
     loading.value = false
+    isLoading.value = false
   }
 }
 
@@ -285,6 +292,11 @@ const handleReset = () => {
 
 const sendNotification = async () => {
   if (!sendFormRef.value) return
+  
+  if (sending.value) {
+    ElMessage.warning('正在发送中，请稍候...')
+    return
+  }
 
   await sendFormRef.value.validate(async (valid) => {
     if (!valid) return

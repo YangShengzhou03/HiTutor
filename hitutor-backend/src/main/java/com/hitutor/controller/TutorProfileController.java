@@ -28,15 +28,10 @@ public class TutorProfileController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createTutorProfile(@RequestBody Map<String, Object> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = null;
         Map<String, Object> response = new java.util.HashMap<>();
         
-        if (authentication != null && authentication.isAuthenticated()) {
-            userId = authentication.getName();
-        }
-        
-        if (userId == null) {
+        String userId = (String) request.get("userId");
+        if (userId == null || userId.isEmpty()) {
             response.put("success", false);
             response.put("message", "未授权");
             return ResponseEntity.status(401).body(response);
@@ -76,9 +71,19 @@ public class TutorProfileController {
             @RequestParam(defaultValue = "10") double radius,
             @RequestParam(required = false) String subject) {
         List<TutorProfile> profiles = tutorProfileService.getNearbyTutors(latitude, longitude, radius, subject);
+        
+        List<String> userIds = profiles.stream()
+                .map(TutorProfile::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        List<User> users = userIds.isEmpty() ? List.of() : userService.getUsersByIds(userIds);
+        Map<String, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        
         List<TutorProfileDTO> profileDTOs = profiles.stream()
                 .map(profile -> {
-                    User user = userService.getUserById(profile.getUserId());
+                    User user = userMap.get(profile.getUserId());
                     return DtoConverter.toTutorProfileDTO(profile, user);
                 })
                 .collect(Collectors.toList());
@@ -97,9 +102,19 @@ public class TutorProfileController {
             @RequestParam(defaultValue = "10") int size) {
         Map<String, Object> result = tutorProfileService.getAllTutorProfiles(page, size);
         List<TutorProfile> profiles = (List<TutorProfile>) result.get("content");
+        
+        List<String> userIds = profiles.stream()
+                .map(TutorProfile::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        List<User> users = userIds.isEmpty() ? List.of() : userService.getUsersByIds(userIds);
+        Map<String, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        
         List<TutorProfileDTO> profileDTOs = profiles.stream()
                 .map(profile -> {
-                    User user = userService.getUserById(profile.getUserId());
+                    User user = userMap.get(profile.getUserId());
                     return DtoConverter.toTutorProfileDTO(profile, user);
                 })
                 .collect(Collectors.toList());
@@ -168,12 +183,28 @@ public class TutorProfileController {
 
     @GetMapping("/user")
     public ResponseEntity<Map<String, Object>> getUserProfiles(
-            Authentication authentication) {
-        String userId = authentication.getName();
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", false);
+            response.put("message", "未授权");
+            return ResponseEntity.status(401).body(response);
+        }
+        
         List<TutorProfile> profiles = tutorProfileService.getProfilesByUserId(userId);
+        
+        List<String> userIds = profiles.stream()
+                .map(TutorProfile::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        List<User> users = userIds.isEmpty() ? List.of() : userService.getUsersByIds(userIds);
+        Map<String, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        
         List<TutorProfileDTO> profileDTOs = profiles.stream()
                 .map(profile -> {
-                    User user = userService.getUserById(profile.getUserId());
+                    User user = userMap.get(profile.getUserId());
                     return DtoConverter.toTutorProfileDTO(profile, user);
                 })
                 .collect(Collectors.toList());
@@ -192,9 +223,19 @@ public class TutorProfileController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<Map<String, Object>> getProfilesByUserId(@PathVariable String userId) {
         List<TutorProfile> profiles = tutorProfileService.getProfilesByUserId(userId);
+        
+        List<String> userIds = profiles.stream()
+                .map(TutorProfile::getUserId)
+                .distinct()
+                .collect(Collectors.toList());
+        
+        List<User> users = userIds.isEmpty() ? List.of() : userService.getUsersByIds(userIds);
+        Map<String, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        
         List<TutorProfileDTO> profileDTOs = profiles.stream()
                 .map(profile -> {
-                    User user = userService.getUserById(profile.getUserId());
+                    User user = userMap.get(profile.getUserId());
                     return DtoConverter.toTutorProfileDTO(profile, user);
                 })
                 .collect(Collectors.toList());

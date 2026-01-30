@@ -5,7 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/stargazers)&nbsp;[![GitHub forks](https://img.shields.io/github/forks/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/network/members)&nbsp;[![GitHub issues](https://img.shields.io/github/issues/YangShengzhou03/HiTutor?style=for-the-badge&logo=github)](https://github.com/YangShengzhou03/HiTutor/issues)&nbsp;[![GitHub license](https://img.shields.io/github/license/YangShengzhou03/HiTutor?style=for-the-badge)](https://github.com/YangShengzhou03/HiTutor/blob/main/LICENSE)&nbsp;[![Flutter](https://img.shields.io/badge/Flutter-3.2.6-02569B?style=for-the-badge&logo=flutter)](https://flutter.dev/)&nbsp;[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.0-6DB33F?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 
 <div align="center">
-  <img src="https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/logo.svg" alt="HiTutor Logo" width="120" height="120">
+  <img src="https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/logo.svg" alt="HiTutor Logo" width="120" height="120">
   <h3>一个现代化的家教信息对接共享平台，采用前后端分离架构</h3>
 </div>
 
@@ -32,13 +32,13 @@ HiTutor好会帮是一个纯公益的家教信息对接共享平台，连接学�
 **用户认证** - 手机号注册登录、密码登录、短信验证码登录、实名认证、家教教师资质认证
 
 **家教信息** - 发布家教信息、设置授课科目、时薪价格、授课地点、可授课时间段
-![发布家教信息](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/publish_tutor_service_page.jpg)
+![发布家教信息](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/publish_tutor_service_page.jpg)
 
 **学生需求** - 发布家教需求、选择辅导科目、设置学生年级、时薪预算、上课地点
-![发布学生需求](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/publish_student_request_page.jpg)
+![发布学生需求](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/publish_student_request_page.jpg)
 
 **智能搜索** - 按科目筛选、按年级筛选、基于地理位置的附近搜索、按时薪范围筛选、关键词搜索
-![地图页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/map_page.jpg)
+![地图页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/map_page.jpg)
 
 **在线沟通** - 用户间即时聊天、聊天会话管理、消息实时推送、支持文字和图片消息
 
@@ -53,41 +53,41 @@ HiTutor好会帮是一个纯公益的家教信息对接共享平台，连接学�
 **黑名单** - 添加用户到黑名单、黑名单列表管理、黑名单用户隔离
 
 **积分系统** - 积分获取和消耗、积分余额查看、积分明细记录
-![积分页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/points_page.jpg)
+![积分页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/points_page.jpg)
 
 **投诉举报** - 用户投诉功能、投诉分类、投诉进度查看
 
 **消息通知** - 系统消息推送、报名申请通知、预约状态变更通知、消息已读/未读管理
 
 **用户主页** - 个人信息展示、已发布信息/需求列表、评价记录、积分信息
-![我的页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/profile_page.jpg)
+![我的页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/profile_page.jpg)
 
 ## 页面展示
 
 ### 首页
 **首页** - 展示平台主要功能入口，包括家教信息、学生需求、搜索功能等
-![首页](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/home_page.jpg)
+![首页](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/home_page.jpg)
 
 ### 启动页面
 **启动页面** - 应用启动时展示的欢迎页面
-![启动页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/splash_page.jpg)
+![启动页面](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/splash_page.jpg)
 
 ### 学生需求详情
 **学生需求详情** - 查看学生发布的家教需求详细信息
-![学生需求详情](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/student_request_detail_page.jpg)
+![学生需求详情](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/student_request_detail_page.jpg)
 
 ### 家教认证
 **家教认证** - 家教教师资质认证流程，包括填写认证信息、提交材料、审核等步骤
-![家教认证表单](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/tutor_certification_form_page.jpg)
+![家教认证表单](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/tutor_certification_form_page.jpg)
 
 **认证状态** - 家教认证通过后显示已认证状态
-![家教已认证](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/tutor_certified_page.jpg)
+![家教已认证](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/tutor_certified_page.jpg)
 
 **认证证书** - 家教认证通过后获得的电子版认证证书
-![家教认证证书](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/tutor_certification_certificate.jpg)
+![家教认证证书](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/tutor_certification_certificate.jpg)
 
 **认证提交成功** - 提交认证信息后显示的成功提示页面
-![认证提交成功](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assest/certification_submitted_successfully.jpg)
+![认证提交成功](https://gitee.com/Yangshengzhou/hi-tutor/raw/master/assets/certification_submitted_successfully.jpg)
 
 ## 快速开始
 
@@ -444,7 +444,7 @@ HiTutor/
 │   │   ├── application.yml               # 应用配置
 │   │   └── application.properties        # 应用配置
 │   └── pom.xml                         # Maven配置
-├── assest/                             # 项目资源
+├── assets/                             # 项目资源
 │   ├── certification_submitted_successfully.jpg
 │   ├── home_page.jpg
 │   ├── logo.svg

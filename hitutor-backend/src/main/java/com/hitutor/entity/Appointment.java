@@ -11,57 +11,57 @@ public class Appointment {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    @TableField(value = "tutor_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("tutor_id")
     private String tutorId;
     
-    @TableField(value = "student_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("student_id")
     private String studentId;
     
-    @TableField(value = "subject_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("subject_id")
     private Long subjectId;
     
-    @TableField(value = "subject_name", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("subject_name")
     private String subjectName;
     
-    @TableField(value = "appointment_time", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("appointment_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime appointmentTime;
     
-    @TableField(value = "duration", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("duration")
     private Integer duration;
     
-    @TableField(value = "address", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("address")
     private String address;
     
-    @TableField(value = "latitude", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("latitude")
     private BigDecimal latitude;
     
-    @TableField(value = "longitude", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("longitude")
     private BigDecimal longitude;
     
-    @TableField(value = "hourly_rate", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("hourly_rate")
     private BigDecimal hourlyRate;
     
-    @TableField(value = "total_amount", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("total_amount")
     private BigDecimal totalAmount;
     
-    @TableField(value = "status", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("status")
     private String status;
     
-    @TableField(value = "notes", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("notes")
     private String notes;
     
-    @TableField(value = "request_id")
+    @TableField("request_id")
     private Long requestId;
     
-    @TableField(value = "request_type")
+    @TableField("request_type")
     private String requestType;
     
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField("update_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 

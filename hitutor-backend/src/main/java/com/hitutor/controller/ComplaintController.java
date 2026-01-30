@@ -30,14 +30,9 @@ public class ComplaintController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createComplaint(@RequestBody Map<String, Object> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = null;
+        String userId = (String) request.get("userId");
         
-        if (authentication != null && authentication.isAuthenticated()) {
-            userId = authentication.getName();
-        }
-        
-        if (userId == null) {
+        if (userId == null || userId.isEmpty()) {
             return ResponseEntity.status(401).build();
         }
         
@@ -63,7 +58,6 @@ public class ComplaintController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getComplaints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -85,8 +79,15 @@ public class ComplaintController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Map<String, Object>> getMyComplaints(Authentication authentication) {
-        String userId = authentication.getName();
+    public ResponseEntity<Map<String, Object>> getMyComplaints(
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("success", false);
+            result.put("message", "未授权");
+            return ResponseEntity.status(401).body(result);
+        }
+        
         List<Complaint> complaints = complaintService.getComplaintsByUserId(userId);
         List<ComplaintDTO> complaintDTOs = complaints.stream()
                 .map(complaint -> {
@@ -104,7 +105,6 @@ public class ComplaintController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> getComplaint(@PathVariable Long id) {
         Complaint complaint = complaintService.getById(id);
         Map<String, Object> result = new HashMap<>();
@@ -122,7 +122,6 @@ public class ComplaintController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> updateComplaintStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String status = request.get("status");
         Complaint complaint = complaintService.updateComplaintStatus(id, status);
@@ -141,7 +140,6 @@ public class ComplaintController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Void> deleteComplaint(@PathVariable Long id) {
         boolean deleted = complaintService.removeById(id);
         if (!deleted) {

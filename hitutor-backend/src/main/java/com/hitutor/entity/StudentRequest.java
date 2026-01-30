@@ -2,6 +2,7 @@ package com.hitutor.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class StudentRequest {
     private String userId;
     
     @TableField("child_name")
+    @Size(max = 6, message = "孩子姓名最多6个字")
     private String childName;
     
     @TableField("child_grade")

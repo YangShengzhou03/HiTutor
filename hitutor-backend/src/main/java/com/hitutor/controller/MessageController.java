@@ -33,8 +33,7 @@ public class MessageController {
 
     @GetMapping("/conversations")
     public ResponseEntity<Map<String, Object>> getConversations(
-            @RequestParam String userId,
-            Authentication authentication) {
+            @RequestParam String userId) {
         
         List<Map<String, Object>> conversations = messageService.getConversationsByUserId(userId);
         
@@ -92,8 +91,7 @@ public class MessageController {
 
     @PostMapping("/conversations")
     public ResponseEntity<Map<String, Object>> createConversation(
-            @RequestBody Map<String, String> request,
-            Authentication authentication) {
+            @RequestBody Map<String, String> request) {
         
         String user1Id = request.get("user1Id");
         String user2Id = request.get("user2Id");
@@ -111,8 +109,7 @@ public class MessageController {
     @PostMapping("/conversations/{sessionId}/messages")
     public ResponseEntity<Map<String, Object>> sendMessage(
             @PathVariable String sessionId,
-            @RequestBody Map<String, Object> request,
-            Authentication authentication) {
+            @RequestBody Map<String, Object> request) {
         
         String senderId = (String) request.get("senderId");
         String receiverId = (String) request.get("receiverId");
@@ -171,8 +168,7 @@ public class MessageController {
     @PutMapping("/conversations/{sessionId}/read")
     public ResponseEntity<Map<String, Object>> markMessagesAsRead(
             @PathVariable String sessionId,
-            @RequestParam String userId,
-            Authentication authentication) {
+            @RequestParam String userId) {
         
         chatMessageRepository.findByConversationIdOrderByCreateTimeAsc(sessionId)
                 .stream()

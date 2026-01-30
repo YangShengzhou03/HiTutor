@@ -1,9 +1,6 @@
 package com.hitutor.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RequestApplicationDTO {
@@ -17,10 +14,8 @@ public class RequestApplicationDTO {
     private Boolean applicantVerified;
     private String message;
     private String status;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
+    private String createdAt;
+    private String updatedAt;
 
     public RequestApplicationDTO() {
     }
@@ -105,19 +100,19 @@ public class RequestApplicationDTO {
         this.status = status;
     }
 
-    public LocalDateTime getCreateTime() {
-        return createTime;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -30,15 +30,10 @@ public class StudentRequestController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createStudentRequest(@RequestBody Map<String, Object> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = null;
+        String userId = (String) request.get("userId");
+        Map<String, Object> response = new HashMap<>();
         
-        if (authentication != null && authentication.isAuthenticated()) {
-            userId = authentication.getName();
-        }
-        
-        if (userId == null) {
-            Map<String, Object> response = new HashMap<>();
+        if (userId == null || userId.isEmpty()) {
             response.put("success", false);
             response.put("message", "用户未登录");
             return ResponseEntity.status(401).body(response);
@@ -46,14 +41,12 @@ public class StudentRequestController {
         
         User user = userService.getUserById(userId);
         if (user == null) {
-            Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "用户不存在");
             return ResponseEntity.status(404).body(response);
         }
         
         if (!"active".equals(user.getStatus())) {
-            Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "账号已被禁用，无法发布学生需求");
             return ResponseEntity.status(403).body(response);
@@ -63,23 +56,19 @@ public class StudentRequestController {
         try {
             StudentRequest studentRequest = studentRequestService.createStudentRequest(request);
             if (studentRequest == null) {
-                Map<String, Object> response = new HashMap<>();
                 response.put("success", false);
                 response.put("message", "创建学生需求失败");
                 return ResponseEntity.badRequest().body(response);
             }
-            Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "创建学生需求成功");
             response.put("data", DtoConverter.toStudentRequestDTO(studentRequest, user));
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "系统错误，请稍后重试");
             return ResponseEntity.status(500).body(response);
@@ -182,8 +171,14 @@ public class StudentRequestController {
 
     @GetMapping("/user")
     public ResponseEntity<Map<String, Object>> getUserRequests(
-            Authentication authentication) {
-        String userId = authentication.getName();
+            @RequestParam(required = false) String userId) {
+        if (userId == null || userId.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "未授权");
+            return ResponseEntity.status(401).body(response);
+        }
+        
         List<StudentRequest> requests = studentRequestService.getRequestsByUserId(userId);
         List<StudentRequestDTO> requestDTOs = requests.stream()
                 .map(request -> {
@@ -191,11 +186,11 @@ public class StudentRequestController {
                     return DtoConverter.toStudentRequestDTO(request, user);
                 })
                 .collect(Collectors.toList());
-        Map<String, Object> dataMap = new java.util.HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("content", requestDTOs);
         dataMap.put("totalElements", requestDTOs.size());
         
-        Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "获取我的需求成功");
         response.put("data", dataMap);

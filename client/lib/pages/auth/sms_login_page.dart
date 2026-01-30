@@ -33,12 +33,6 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
   @override
   void initState() {
     super.initState();
-    _phoneController.addListener(_updateFormState);
-    _verificationCodeController.addListener(_updateFormState);
-  }
-
-  void _updateFormState() {
-    setState(() {});
   }
 
   @override
@@ -120,10 +114,11 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
         if (response['success'] == true) {
           final data = response['data'];
           final user = data['user'];
-          final token = data['token'];
+          final accessToken = data['accessToken'] ?? data['token'];
+          final refreshToken = data['refreshToken'];
           final isFirstLogin = data['isFirstLogin'] ?? false;
 
-          await authProvider.loginWithToken(user, token, isFirstLogin: isFirstLogin);
+          await authProvider.loginWithToken(user, accessToken, isFirstLogin: isFirstLogin, refreshToken: refreshToken);
 
           if (!mounted) return;
           

@@ -214,10 +214,6 @@ const handleCommand = async (command) => {
 
 onMounted(async () => {
   try {
-    if (!store.state.user) {
-      await store.fetchCurrentUser()
-    }
-
     await nextTick()
   } catch (error) {
     ElMessage.error('初始化失败，请刷新页面重试')

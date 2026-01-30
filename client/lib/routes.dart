@@ -18,7 +18,6 @@ import 'pages/about/complaint_page.dart';
 import 'pages/about/complaint_list_page.dart';
 import 'pages/publish/publish_student_request_page.dart';
 import 'pages/publish/publish_tutor_service_page.dart';
-import 'pages/tutor/tutor_detail_page.dart';
 import 'pages/student_request/student_request_detail_page.dart';
 import 'pages/tutor_service/tutor_service_detail_page.dart';
 import 'pages/review/review_page.dart';
@@ -101,10 +100,6 @@ class Routes {
       privacyPolicy: (context) => const PrivacyPolicyPage(),
       publishStudentRequest: (context) => const PublishStudentRequestPage(),
       publishTutorService: (context) => const PublishTutorServicePage(),
-      tutorDetail: (context) {
-        final tutor = ModalRoute.of(context)?.settings.arguments as dynamic;
-        return TutorDetailPage(tutor: tutor);
-      },
       studentRequestDetail: (context) {
         final request = ModalRoute.of(context)?.settings.arguments as dynamic;
         return StudentRequestDetailPage(request: request);

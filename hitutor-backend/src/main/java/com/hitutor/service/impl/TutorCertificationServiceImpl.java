@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hitutor.entity.TutorCertification;
 import com.hitutor.entity.User;
 import com.hitutor.mapper.TutorCertificationMapper;
+import com.hitutor.mapper.UserMapper;
 import com.hitutor.service.TutorCertificationService;
-import com.hitutor.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +17,9 @@ public class TutorCertificationServiceImpl implements TutorCertificationService 
 
     @Autowired
     private TutorCertificationMapper tutorCertificationMapper;
-
+    
     @Autowired
-    private UserService userService;
+    private UserMapper userMapper;
 
     @Override
     public TutorCertification getCertificationByUserId(String userId) {
@@ -70,17 +70,21 @@ public class TutorCertificationServiceImpl implements TutorCertificationService 
         certification.setUpdateTime(LocalDateTime.now());
         boolean updated = tutorCertificationMapper.updateById(certification) > 0;
         
-        if (updated && "approved".equals(status)) {
-            User user = userService.getUserById(certification.getUserId());
-            if (user != null) {
-                user.setIsVerified(1);
-                userService.updateUser(user);
-            }
-        } else if (updated && "rejected".equals(status)) {
-            User user = userService.getUserById(certification.getUserId());
-            if (user != null) {
-                user.setIsVerified(0);
-                userService.updateUser(user);
+        if (updated) {
+            if ("approved".equals(status)) {
+                User user = userMapper.selectById(certification.getUserId());
+                if (user != null) {
+                    user.setIsVerified(true);
+                    user.setUpdateTime(LocalDateTime.now());
+                    userMapper.updateById(user);
+                }
+            } else if ("rejected".equals(status)) {
+                User user = userMapper.selectById(certification.getUserId());
+                if (user != null) {
+                    user.setIsVerified(false);
+                    user.setUpdateTime(LocalDateTime.now());
+                    userMapper.updateById(user);
+                }
             }
         }
         

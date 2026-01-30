@@ -10,28 +10,28 @@ public class Notification {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    @TableField(value = "user_id", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("user_id")
     private String userId;
     
-    @TableField(value = "type", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("type")
     private String type;
     
-    @TableField(value = "title", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("title")
     private String title;
     
-    @TableField(value = "content")
+    @TableField("content")
     private String content;
     
-    @TableField(value = "related_id")
+    @TableField("related_id")
     private String relatedId;
     
-    @TableField(value = "related_type")
+    @TableField("related_type")
     private String relatedType;
     
-    @TableField(value = "is_read", insertStrategy = FieldStrategy.NOT_EMPTY)
+    @TableField("is_read")
     private Integer isRead;
     
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField("create_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 

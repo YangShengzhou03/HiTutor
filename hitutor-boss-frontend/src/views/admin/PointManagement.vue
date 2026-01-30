@@ -18,7 +18,7 @@
       </el-form>
 
       <el-table :data="userList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="用户ID" width="200">
+        <el-table-column prop="id" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.id" />
           </template>
@@ -136,7 +136,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import IdDisplay from '@/components/IdDisplay.vue'
 import api from '@/services/api'
 

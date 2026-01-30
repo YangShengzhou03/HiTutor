@@ -276,7 +276,7 @@ class _NotificationPageState extends State<NotificationPage> {
     final isRead = notification['isRead'] == 1 || notification['isRead'] == true;
     final title = notification['title']?.toString() ?? '通知';
     final content = notification['content']?.toString() ?? '';
-    final createTime = notification['createTime']?.toString() ?? '';
+    final createTime = notification['createdAt']?.toString() ?? notification['createTime']?.toString() ?? '';
     
     return Dismissible(
       key: Key(notification['id'].toString()),

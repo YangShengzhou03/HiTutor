@@ -7,9 +7,11 @@ import 'theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/tutor_provider.dart';
 import 'providers/message_provider.dart';
+import 'services/api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.initTokens();
   runApp(const HiTutorApp());
 }
 

@@ -228,33 +228,36 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.requiresAuth) {
-    const isAuthenticated = await store.checkAuthStatus();
-
-    if (!isAuthenticated) {
+    const token = utils.getToken();
+    
+    if (!token) {
       store.clearUser();
       next('/login');
       return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      next();
+    const decoded = utils.parseJWT(token);
+    
+    if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
+      store.clearUser();
+      next('/login');
       return;
     }
 
     if (!store.state.user) {
-      try {
-        await store.fetchCurrentUser();
-      } catch (error) {
-        store.clearUser();
-        next('/login');
-        return;
-      }
+      await store.fetchCurrentUser().catch((error) => {
+        console.log('路由守卫获取用户信息失败，但 token 仍然有效:', error)
+      });
     }
+
+    next();
+    return;
   }
 
   if (to.path === '/login' && utils.isLoggedIn()) {
-    const isAuthenticated = await store.checkAuthStatus();
-    if (isAuthenticated) {
+    const decoded = utils.parseJWT(utils.getToken());
+    
+    if (decoded && decoded.exp && decoded.exp * 1000 >= Date.now()) {
       next('/admin');
       return;
     } else {

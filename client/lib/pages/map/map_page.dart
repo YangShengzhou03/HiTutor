@@ -31,7 +31,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   LatLng? _currentLocation;
   bool _isDisposed = false;
   bool _isLoadingLocation = true;
-  bool _isInitialized = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -45,7 +44,6 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   }
 
   Future<void> _initLocationAndMap() async {
-    _isInitialized = true;
     
     final hasPermission = await _requestLocationPermission();
     if (!hasPermission) {
@@ -55,6 +53,10 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         });
       }
       _currentLocation = const LatLng(28.66999503, 115.82297033);
+      
+      if (_mapController != null) {
+        _loadMarkers();
+      }
       return;
     }
 
@@ -62,6 +64,15 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     
     if (_mapController != null && _currentLocation != null) {
       await _loadMarkers();
+    }
+  }
+
+  void _onMapCreated(AMapController controller) {
+    _mapController = controller;
+    
+    if (_currentLocation != null) {
+      _moveCameraToLocation(_currentLocation!);
+      _loadMarkers();
     }
   }
 
@@ -264,6 +275,9 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       final tutorsData = tutorProvider.tutors;
       
+      final newMarkers = <Marker>[];
+      final newTutors = <Tutor>[];
+      
       for (var tutor in tutorsData) {
         final latitude = tutor.latitude;
         final longitude = tutor.longitude;
@@ -283,40 +297,32 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             double.tryParse(longitude.toString()) ?? 0,
           );
           
-          _tutors.add(tutor);
-          _markers.add(Marker(
+          newTutors.add(tutor);
+          newMarkers.add(Marker(
             position: markerPosition,
             icon: icon,
             onTap: (String markerId) {
-              final index = _markers.indexWhere((m) => 
+              final index = newMarkers.indexWhere((m) => 
                 m.position.latitude == markerPosition.latitude &&
                 m.position.longitude == markerPosition.longitude
               );
-              if (index != -1 && index < _tutors.length) {
-                _showBottomSheet(_tutors[index]);
+              if (index != -1 && index < newTutors.length) {
+                _showBottomSheet(newTutors[index]);
               }
             },
           ));
         }
       }
 
-      if (!_isDisposed) {
-        setState(() {});
+      if (mounted) {
+        setState(() {
+          _markers.addAll(newMarkers);
+          _tutors.addAll(newTutors);
+        });
       }
+
     } catch (e) {
       debugPrint('Error loading nearby tutors: $e');
-    }
-  }
-
-  void _onMapCreated(AMapController controller) {
-    _mapController = controller;
-    
-    if (_isInitialized && _currentLocation != null) {
-      _moveCameraToLocation(_currentLocation!);
-    }
-    
-    if (_isInitialized && _currentLocation != null) {
-      _loadMarkers();
     }
   }
 
@@ -361,6 +367,8 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
 
     final price = '${tutor.pricePerHour}元/小时';
+    
+    final bool isVerified = tutor.user.isVerified ?? false;
 
     return Container(
       decoration: BoxDecoration(
@@ -400,7 +408,7 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     ),
                     child: Center(
                       child: Text(
-                        tutor.user.name[0],
+                        tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
                         style: TextStyle(
                           fontSize: 28,
                           color: accentColor,
@@ -428,42 +436,80 @@ class _MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            if (tutor.user.isVerified)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF0F9FF),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.verified_rounded,
-                                      size: 12,
-                                      color: Color(0xFF0EA5E9),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      '已认证',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Color(0xFF0EA5E9),
-                                        fontWeight: FontWeight.w600,
+                            if (isVerified == true)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.verified, size: 11, color: Colors.blue.shade700),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        '已认证',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.blue.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            if (tutor.user.badge != null && tutor.user.badge!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFDF2F8),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    tutor.user.badge!,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Color(0xFFEC4899),
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        Text(
-                          tutor.subjects.map((s) => s.name).join('、'),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppTheme.textSecondary,
-                          ),
+                        Row(
+                          children: [
+                            if (tutor.user.gender != null && tutor.user.gender!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: Text(
+                                  (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? '♂' : '♀',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
+                                tutor.subjects.map((s) => s.name).join('、'),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppTheme.textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Row(

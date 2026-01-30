@@ -3,7 +3,7 @@ package com.hitutor.util;
 import com.hitutor.dto.*;
 import com.hitutor.entity.*;
 import com.hitutor.service.ReviewService;
-import com.hitutor.service.UserService;
+import com.hitutor.service.TutorCertificationService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -11,14 +11,14 @@ import java.util.Map;
 public class DtoConverter {
     
     private static ReviewService reviewService;
-    private static UserService userService;
+    private static TutorCertificationService tutorCertificationService;
     
     public static void setReviewService(ReviewService service) {
         reviewService = service;
     }
     
-    public static void setUserService(UserService service) {
-        userService = service;
+    public static void setTutorCertificationService(TutorCertificationService service) {
+        tutorCertificationService = service;
     }
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -38,14 +38,26 @@ public class DtoConverter {
         dto.setEmail(user.getEmail());
         dto.setGender(user.getGender());
         dto.setBirthDate(user.getBirthDate() != null ? user.getBirthDate().format(DATE_FORMATTER) : null);
-        dto.setEducation(user.getEducation());
-        dto.setSchool(user.getSchool());
-        dto.setMajor(user.getMajor());
         dto.setTeachingExperience(user.getTeachingExperience());
-        dto.setIsVerified(user.getIsVerified() != null && user.getIsVerified() == 1);
         dto.setRole(user.getRole());
+        dto.setStatus(user.getStatus());
         dto.setPoints(user.getPoints());
         dto.setCreatedAt(user.getCreateTime() != null ? user.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdatedAt(user.getUpdateTime() != null ? user.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        dto.setLastLoginTime(user.getLastLoginTime() != null ? user.getLastLoginTime().format(DATETIME_FORMATTER) : null);
+        dto.setLastLoginIp(user.getLastLoginIp());
+        
+        boolean isVerified = false;
+        if (tutorCertificationService != null) {
+            TutorCertification certification = tutorCertificationService.getCertificationByUserId(user.getId());
+            if (certification != null && "approved".equals(certification.getStatus())) {
+                isVerified = true;
+            }
+        }
+        dto.setIsVerified(isVerified);
+        
+        dto.setBadge(user.getBadge());
+        
         return dto;
     }
 
@@ -72,6 +84,7 @@ public class DtoConverter {
         dto.setContactPhone(complaint.getContactPhone());
         dto.setStatus(complaint.getStatus());
         dto.setCreatedAt(complaint.getCreatedAt() != null ? complaint.getCreatedAt().format(DATETIME_FORMATTER) : null);
+        dto.setUpdatedAt(complaint.getUpdatedAt() != null ? complaint.getUpdatedAt().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -86,7 +99,32 @@ public class DtoConverter {
         if (user != null) {
             dto.setUserName(user.getUsername());
             dto.setUserAvatar(user.getAvatar());
-            dto.setUserVerified(user.getIsVerified() != null && user.getIsVerified() == 1);
+            dto.setUserGender(user.getGender());
+            dto.setBadge(user.getBadge());
+            
+            String education = "";
+            String school = "";
+            String major = "";
+            boolean isVerified = false;
+            
+            if (tutorCertificationService != null) {
+                TutorCertification certification = tutorCertificationService.getCertificationByUserId(user.getId());
+                if (certification != null && "approved".equals(certification.getStatus())) {
+                    isVerified = true;
+                    education = certification.getEducation() != null ? certification.getEducation() : "";
+                    school = certification.getSchool() != null ? certification.getSchool() : "";
+                    major = certification.getMajor() != null ? certification.getMajor() : "";
+                }
+            }
+            dto.setUserVerified(isVerified);
+            dto.setEducation(education);
+            dto.setSchool(school);
+            dto.setMajor(major);
+        } else {
+            dto.setUserVerified(false);
+            dto.setEducation("");
+            dto.setSchool("");
+            dto.setMajor("");
         }
         dto.setSubjectId(profile.getSubjectId());
         dto.setSubjectName(profile.getSubjectName());
@@ -123,6 +161,17 @@ public class DtoConverter {
         if (user != null) {
             dto.setUserName(user.getUsername());
             dto.setUserAvatar(user.getAvatar());
+            dto.setUserGender(user.getGender());
+            
+            boolean isVerified = false;
+            if (tutorCertificationService != null) {
+                TutorCertification certification = tutorCertificationService.getCertificationByUserId(user.getId());
+                if (certification != null && "approved".equals(certification.getStatus())) {
+                    isVerified = true;
+                }
+            }
+            dto.setUserVerified(isVerified);
+            dto.setBadge(user.getBadge());
         }
         dto.setChildName(request.getChildName());
         dto.setChildGrade(request.getChildGrade());
@@ -137,6 +186,7 @@ public class DtoConverter {
         dto.setAvailableTime(request.getAvailableTime());
         dto.setStatus(request.getStatus());
         dto.setCreatedAt(request.getCreateTime() != null ? request.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdatedAt(request.getUpdateTime() != null ? request.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -152,13 +202,23 @@ public class DtoConverter {
             dto.setTutorName(tutor.getUsername());
             dto.setTutorAvatar(tutor.getAvatar());
             dto.setTutorPhone(tutor.getPhone());
-            dto.setTutorVerified(tutor.getIsVerified() != null && tutor.getIsVerified() == 1);
+            dto.setTutorGender(tutor.getGender());
+            
+            boolean isVerified = false;
+            if (tutorCertificationService != null) {
+                TutorCertification certification = tutorCertificationService.getCertificationByUserId(tutor.getId());
+                if (certification != null && "approved".equals(certification.getStatus())) {
+                    isVerified = true;
+                }
+            }
+            dto.setTutorVerified(isVerified);
         }
         dto.setStudentId(appointment.getStudentId());
         if (student != null) {
             dto.setStudentName(student.getUsername());
             dto.setStudentAvatar(student.getAvatar());
             dto.setStudentPhone(student.getPhone());
+            dto.setStudentGender(student.getGender());
         }
         dto.setSubjectId(appointment.getSubjectId());
         dto.setSubjectName(appointment.getSubjectName());
@@ -171,7 +231,8 @@ public class DtoConverter {
         dto.setNotes(appointment.getNotes());
         dto.setRequestId(appointment.getRequestId() != null ? appointment.getRequestId().toString() : null);
         dto.setRequestType(appointment.getRequestType());
-        dto.setCreatedAt(appointment.getCreateTime() != null ? appointment.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(appointment.getCreateTime() != null ? appointment.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdateTime(appointment.getUpdateTime() != null ? appointment.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -187,11 +248,12 @@ public class DtoConverter {
         if (reviewer != null) {
             dto.setReviewerName(reviewer.getUsername());
             dto.setReviewerAvatar(reviewer.getAvatar());
+            dto.setReviewerGender(reviewer.getGender());
         }
         dto.setReviewedId(review.getReviewedId());
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
-        dto.setCreatedAt(review.getCreateTime() != null ? review.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setCreateTime(review.getCreateTime() != null ? review.getCreateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 
@@ -209,12 +271,41 @@ public class DtoConverter {
         dto.setApplicantPhone(application.getApplicantPhone());
         if (applicant != null) {
             dto.setApplicantAvatar(applicant.getAvatar());
-            dto.setApplicantVerified(applicant.getIsVerified() != null && applicant.getIsVerified() == 1);
+            
+            boolean isVerified = false;
+            if (tutorCertificationService != null) {
+                TutorCertification certification = tutorCertificationService.getCertificationByUserId(applicant.getId());
+                if (certification != null && "approved".equals(certification.getStatus())) {
+                    isVerified = true;
+                }
+            }
+            dto.setApplicantVerified(isVerified);
         }
         dto.setMessage(application.getMessage());
         dto.setStatus(application.getStatus());
-        dto.setCreateTime(application.getCreateTime());
-        dto.setUpdateTime(application.getUpdateTime());
+        dto.setCreatedAt(application.getCreateTime() != null ? application.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdatedAt(application.getUpdateTime() != null ? application.getUpdateTime().format(DATETIME_FORMATTER) : null);
+        return dto;
+    }
+
+    public static TutorCertificationDTO toTutorCertificationDTO(TutorCertification certification, User user) {
+        if (certification == null) {
+            return null;
+        }
+        
+        TutorCertificationDTO dto = new TutorCertificationDTO();
+        dto.setId(certification.getId());
+        dto.setUserId(certification.getUserId());
+        dto.setUsername(user != null ? user.getUsername() : null);
+        dto.setRealName(certification.getRealName());
+        dto.setIdCard(certification.getIdCard());
+        dto.setEducation(certification.getEducation());
+        dto.setSchool(certification.getSchool());
+        dto.setMajor(certification.getMajor());
+        dto.setCertificateNumber(certification.getCertificateNumber());
+        dto.setStatus(certification.getStatus());
+        dto.setCreatedAt(certification.getCreateTime() != null ? certification.getCreateTime().format(DATETIME_FORMATTER) : null);
+        dto.setUpdatedAt(certification.getUpdateTime() != null ? certification.getUpdateTime().format(DATETIME_FORMATTER) : null);
         return dto;
     }
 }

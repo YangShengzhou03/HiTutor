@@ -210,6 +210,7 @@ class _PublishStudentRequestPageState extends State<PublishStudentRequestPage> {
   Widget _buildChildNameField() {
     return TextFormField(
       controller: _childNameController,
+      maxLength: 6,
       decoration: const InputDecoration(
         labelText: '孩子称呼',
         hintText: '请输入孩子称呼',
@@ -217,6 +218,9 @@ class _PublishStudentRequestPageState extends State<PublishStudentRequestPage> {
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return '请输入孩子称呼';
+        }
+        if (value.length > 6) {
+          return '孩子称呼最多6个字';
         }
         return null;
       },

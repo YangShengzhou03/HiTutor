@@ -23,4 +23,5 @@ public interface UserService extends IService<User> {
     List<User> searchStudents(String query, int page, int size);
     List<User> getUsersByIds(List<String> ids);
     List<String> getAllUserIds();
+    java.util.Map<String, Object> getUserStatistics(String userId);
 }

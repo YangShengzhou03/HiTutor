@@ -1,53 +1,20 @@
-package com.hitutor.entity;
+package com.hitutor.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Size;
-
-import java.time.LocalDateTime;
-
-@TableName("tutor_certifications")
-public class TutorCertification {
-    @TableId(type = IdType.AUTO)
+public class TutorCertificationDTO {
     private Long id;
-
-    @TableField("user_id")
     private String userId;
-
-    @TableField("real_name")
-    @Size(max = 6, message = "真实姓名最多6个字")
+    private String username;
     private String realName;
-
-    @TableField("id_card")
     private String idCard;
-
-    @TableField("education")
     private String education;
-
-    @TableField("school")
     private String school;
-
-    @TableField("major")
     private String major;
-
-    @TableField("certificate_number")
     private String certificateNumber;
-
-    @TableField("status")
     private String status;
+    private String createdAt;
+    private String updatedAt;
 
-    @TableField("create_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    @TableField("update_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
-
-    public TutorCertification() {
+    public TutorCertificationDTO() {
     }
 
     public Long getId() {
@@ -64,6 +31,14 @@ public class TutorCertification {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getRealName() {
@@ -122,19 +97,19 @@ public class TutorCertification {
         this.status = status;
     }
 
-    public LocalDateTime getCreateTime() {
-        return createTime;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

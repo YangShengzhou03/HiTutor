@@ -61,25 +61,37 @@ class _SubjectExplorePageState extends State<SubjectExplorePage> {
 
       List<dynamic> data = [];
 
-      if (tutorsResponse['success'] == true) {
+      if (tutorsResponse is List) {
+        for (final item in tutorsResponse) {
+          if (item is Map) {
+            data.add({...item, 'type': 'tutor_service', 'sourceType': 'tutor'});
+          }
+        }
+      } else if (tutorsResponse is Map && tutorsResponse['success'] == true) {
         final result = tutorsResponse['data'];
         final content = result is Map ? result['content'] ?? [] : result;
         if (content is List) {
           for (final item in content) {
             if (item is Map) {
-              data.add({...item, 'type': 'tutor'});
+              data.add({...item, 'type': 'tutor_service', 'sourceType': 'tutor'});
             }
           }
         }
       }
 
-      if (requestsResponse['success'] == true) {
+      if (requestsResponse is List) {
+        for (final item in requestsResponse) {
+          if (item is Map) {
+            data.add({...item, 'type': 'student_request', 'sourceType': 'student_request'});
+          }
+        }
+      } else if (requestsResponse is Map && requestsResponse['success'] == true) {
         final result = requestsResponse['data'];
         final content = result is Map ? result['content'] ?? [] : result;
         if (content is List) {
           for (final item in content) {
             if (item is Map) {
-              data.add({...item, 'type': 'student_request'});
+              data.add({...item, 'type': 'student_request', 'sourceType': 'student_request'});
             }
           }
         }
@@ -112,7 +124,7 @@ class _SubjectExplorePageState extends State<SubjectExplorePage> {
 
     if (_selectedType != 'all') {
       filtered = filtered.where((item) {
-        return item['type'] == _selectedType;
+        return item['sourceType'] == _selectedType;
       }).toList();
     }
 
@@ -563,17 +575,16 @@ class _SubjectExplorePageState extends State<SubjectExplorePage> {
   }
 
   Widget _buildItemCard(Map<String, dynamic> item) {
-    final isTutor = item['type'] == 'tutor';
+    final isTutor = item['sourceType'] == 'tutor';
     final price = isTutor 
         ? (item['hourlyRate']?.toString() ?? '0')
         : (item['hourlyRateMin']?.toString() ?? '0');
-    final rating = item['rating']?.toString() ?? '0';
-    final user = item['user'] as Map<String, dynamic>? ?? {};
-    final name = user['username']?.toString() ?? '';
-    final avatar = user['avatar']?.toString() ?? '';
     final description = item['description']?.toString() ?? item['requirements']?.toString() ?? '';
     final address = item['address']?.toString() ?? '';
     final tutor = Tutor.fromJson(item);
+    final rating = tutor.rating.toStringAsFixed(1);
+    final name = tutor.user.name;
+    final avatar = tutor.user.avatar;
 
     return GestureDetector(
       onTap: () {

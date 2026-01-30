@@ -1,13 +1,19 @@
 package com.hitutor.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StudentRequestDTO {
     private Long id;
     private String userId;
+    @Size(max = 6, message = "用户名最多6个字")
     private String userName;
     private String userAvatar;
+    private String userGender;
+    private Boolean userVerified;
+    private String badge;
+    @Size(max = 6, message = "孩子姓名最多6个字")
     private String childName;
     private String childGrade;
     private Long subjectId;
@@ -21,6 +27,7 @@ public class StudentRequestDTO {
     private String availableTime;
     private String status;
     private String createdAt;
+    private String updatedAt;
 
     public StudentRequestDTO() {
     }
@@ -55,6 +62,30 @@ public class StudentRequestDTO {
 
     public void setUserAvatar(String userAvatar) {
         this.userAvatar = userAvatar;
+    }
+
+    public String getUserGender() {
+        return userGender;
+    }
+
+    public void setUserGender(String userGender) {
+        this.userGender = userGender;
+    }
+
+    public Boolean getUserVerified() {
+        return userVerified;
+    }
+
+    public void setUserVerified(Boolean userVerified) {
+        this.userVerified = userVerified;
+    }
+
+    public String getBadge() {
+        return badge;
+    }
+
+    public void setBadge(String badge) {
+        this.badge = badge;
     }
 
     public String getChildName() {
@@ -159,5 +190,13 @@ public class StudentRequestDTO {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

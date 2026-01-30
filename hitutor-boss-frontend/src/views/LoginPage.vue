@@ -13,7 +13,7 @@
         <!-- Logo区域 -->
         <div class="logo-section">
           <div class="logo">
-            <span class="logo-text">管</span>
+            <span class="logo-text">帮</span>
           </div>
           <h1 class="app-title">好会帮</h1>
           <p class="subtitle">运营管理系统</p>
@@ -333,7 +333,7 @@ const showPrivacyPolicy = () => {
 
 const handleLogin = async () => {
   try {
-    const response = await store.login(loginForm);
+    const response = await store.adminLogin(loginForm);
     if (response.success) {
       ElMessage.success('登录成功');
       router.replace('/admin');
@@ -432,10 +432,10 @@ onMounted(() => {
 .card-inner {
   background: #ffffff;
   border-radius: 8px;
-  padding: 32px;
+  padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
-  gap: 24px;
+  gap: 20px;
 }
 
 .logo-section {

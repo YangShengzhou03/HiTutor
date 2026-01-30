@@ -15,11 +15,8 @@ class ProfileEditPage extends StatefulWidget {
 class _ProfileEditPageState extends State<ProfileEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
-  final _schoolController = TextEditingController();
-  final _majorController = TextEditingController();
   
   String? _gender;
-  String? _selectedEducation;
   DateTime? _birthDate;
   bool _isLoading = false;
 
@@ -39,8 +36,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _schoolController.dispose();
-    _majorController.dispose();
     super.dispose();
   }
 
@@ -50,10 +45,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     if (user == null) return;
 
     _usernameController.text = user.username ?? '';
-    _selectedEducation = user.education;
-    _schoolController.text = user.school ?? '';
-    _majorController.text = user.major ?? '';
-    _gender = user.gender;
+    _gender = user.gender ?? 'male';
     _birthDate = user.birthDate != null ? DateTime.tryParse(user.birthDate!) : null;
   }
 
@@ -80,9 +72,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         'birthDate': _birthDate != null 
             ? '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}'
             : null,
-        'education': _selectedEducation,
-        'school': _schoolController.text.trim(),
-        'major': _majorController.text.trim(),
       };
 
       await ApiService.updateProfile(userId.toString(), profileData);
@@ -90,7 +79,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       if (!mounted) return;
 
       
-      final updatedUser = await AuthService.getCurrentUser();
+      final updatedUser = await AuthService.getCurrentUserWithUserId(userId);
       await authProvider.updateUser(updatedUser);
 
       if (!mounted) return;
@@ -177,12 +166,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                   _buildGenderSelector(),
                   const SizedBox(height: 16),
                   _buildBirthDateField(),
-                  const SizedBox(height: 16),
-                  _buildEducationField(),
-                  const SizedBox(height: 16),
-                  _buildSchoolField(),
-                  const SizedBox(height: 16),
-                  _buildMajorField(),
                 ],
               ),
             ),
@@ -246,9 +229,13 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         labelText: '用户名',
         hintText: '请输入用户名',
       ),
+      maxLength: 6,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return '请输入用户名';
+        }
+        if (value.trim().length < 3) {
+          return '用户名长度必须在3-6个字之间';
         }
         return null;
       },
@@ -321,53 +308,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             color: _birthDate != null ? AppTheme.textPrimary : AppTheme.textTertiary,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEducationField() {
-    final educationOptions = ['初中及以下', '高中', '大专', '本科', '硕士', '博士及以上'];
-    return InputDecorator(
-      decoration: const InputDecoration(
-        labelText: '学历',
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
-      child: DropdownButton<String>(
-        value: _selectedEducation,
-        hint: const Text('请选择学历'),
-        isExpanded: true,
-        underline: Container(),
-        items: educationOptions.map((education) {
-          return DropdownMenuItem(
-            value: education,
-            child: Text(education),
-          );
-        }).toList(),
-        onChanged: (String? value) {
-          setState(() {
-            _selectedEducation = value;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildSchoolField() {
-    return TextFormField(
-      controller: _schoolController,
-      decoration: const InputDecoration(
-        labelText: '毕业院校',
-        hintText: '请输入毕业院校',
-      ),
-    );
-  }
-
-  Widget _buildMajorField() {
-    return TextFormField(
-      controller: _majorController,
-      decoration: const InputDecoration(
-        labelText: '专业',
-        hintText: '请输入专业',
       ),
     );
   }

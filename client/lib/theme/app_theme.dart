@@ -31,6 +31,9 @@ class AppTheme {
   
   static const Color accentColor = Color(0xFFFFD166);
   static const Color highlightColor = Color(0xFFEC4899);
+  
+  static const Color maleColor = Color(0xFF3B82F6);
+  static const Color femaleColor = Color(0xFFEC4899);
 
   static ThemeData get lightTheme {
     return ThemeData(

@@ -59,7 +59,7 @@
         </el-form-item>
 
         <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" show-word-limit />
+          <el-input v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="6" show-word-limit />
         </el-form-item>
 
         <el-form-item label="邮箱" prop="email">
@@ -118,7 +118,7 @@ const profileForm = reactive({
 const profileRules = {
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' },
-    { min: 2, max: 20, message: '昵称长度在 2 到 20 个字符', trigger: 'blur' }
+    { min: 2, max: 6, message: '昵称长度在 2 到 6 个字符', trigger: 'blur' }
   ],
   email: [
     { required: true, message: '请输入邮箱地址', trigger: 'blur' },
@@ -153,7 +153,7 @@ const loadUserInfo = async () => {
         nickname: userData.name || userData.username || '',
         email: userData.email || '',
         avatar: userData.avatar || '',
-        createTime: userData.createdAt || ''
+        createTime: userData.createTime || ''
       }
 
     } else {
@@ -307,7 +307,7 @@ onMounted(() => {
 }
 
 .profile-card :deep(.el-card__body) {
-  padding: 32px;
+  padding: 24px;
   background: white;
 }
 
@@ -318,7 +318,7 @@ onMounted(() => {
 .user-info-display {
   display: flex;
   align-items: flex-start;
-  gap: 32px;
+  gap: 24px;
   padding: 20px 0;
 }
 

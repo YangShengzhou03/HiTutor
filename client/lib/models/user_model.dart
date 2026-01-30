@@ -7,12 +7,10 @@ class User {
   final String email;
   final String? gender;
   final String? birthDate;
-  final String? education;
-  final String? school;
-  final String? major;
   final int? teachingExperience;
-  final bool isVerified;
   final String? role;
+  final String? badge;
+  final bool? isVerified;
   final DateTime createdAt;
   final double? latitude;
   final double? longitude;
@@ -27,12 +25,10 @@ class User {
     required this.email,
     this.gender,
     this.birthDate,
-    this.education,
-    this.school,
-    this.major,
     this.teachingExperience,
-    required this.isVerified,
     this.role,
+    this.badge,
+    this.isVerified,
     required this.createdAt,
     this.latitude,
     this.longitude,
@@ -46,26 +42,33 @@ class User {
   String get teachingExperienceText => teachingExperience != null ? '$teachingExperience年' : '';
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['userId']?.toString() ?? json['user_id']?.toString() ?? json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? json['userName']?.toString() ?? '',
+    final user = User(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
       username: json['username']?.toString(),
-      avatar: json['avatar']?.toString() ?? json['userAvatar']?.toString() ?? '',
+      avatar: json['avatar']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       gender: json['gender']?.toString(),
       birthDate: json['birthDate']?.toString(),
-      education: json['education']?.toString(),
-      school: json['school']?.toString(),
-      major: json['major']?.toString(),
       teachingExperience: json['teachingExperience'] is int ? json['teachingExperience'] : null,
-      isVerified: json['isVerified'] == true || json['isVerified'] == 1 || json['userVerified'] == true || json['userVerified'] == 1,
       role: json['role']?.toString(),
+      badge: json['badge']?.toString(),
+      isVerified: _parseBool(json['isVerified']),
       createdAt: _parseDateTime(json['createdAt']),
-      latitude: json['latitude'] is num ? json['latitude'].toDouble() : null,
-      longitude: json['longitude'] is num ? json['longitude'].toDouble() : null,
+      latitude: json['latitude'] is String ? double.tryParse(json['latitude']) : null,
+      longitude: json['longitude'] is String ? double.tryParse(json['longitude']) : null,
       points: json['points'] is int ? json['points'] : null,
     );
+    return user;
+  }
+
+  static bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) return value.toLowerCase() == 'true' || value == '1';
+    return false;
   }
 
   static DateTime _parseDateTime(dynamic value) {
@@ -106,14 +109,12 @@ class User {
       'avatar': avatar,
       'phone': phone,
       'email': email,
-      'education': education,
-      'school': school,
-      'major': major,
       'gender': gender,
       'birthDate': birthDate,
       'teachingExperience': teachingExperience,
-      'isVerified': isVerified,
       'role': role,
+      'badge': badge,
+      'isVerified': isVerified,
       'createdAt': createdAt.toIso8601String(),
       'points': points,
     };

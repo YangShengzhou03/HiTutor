@@ -1,19 +1,24 @@
 package com.hitutor.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AppointmentDTO {
     private Long id;
     private String tutorId;
+    @Size(max = 6, message = "家教姓名最多6个字")
     private String tutorName;
     private String tutorAvatar;
     private String tutorPhone;
+    private String tutorGender;
     private Boolean tutorVerified;
     private String studentId;
+    @Size(max = 6, message = "学生姓名最多6个字")
     private String studentName;
     private String studentAvatar;
     private String studentPhone;
+    private String studentGender;
     private Long subjectId;
     private String subjectName;
     private String appointmentTime;
@@ -25,7 +30,8 @@ public class AppointmentDTO {
     private String notes;
     private String requestId;
     private String requestType;
-    private String createdAt;
+    private String createTime;
+    private String updateTime;
 
     public AppointmentDTO() {
     }
@@ -70,6 +76,14 @@ public class AppointmentDTO {
         this.tutorPhone = tutorPhone;
     }
 
+    public String getTutorGender() {
+        return tutorGender;
+    }
+
+    public void setTutorGender(String tutorGender) {
+        this.tutorGender = tutorGender;
+    }
+
     public Boolean getTutorVerified() {
         return tutorVerified;
     }
@@ -108,6 +122,14 @@ public class AppointmentDTO {
 
     public void setStudentPhone(String studentPhone) {
         this.studentPhone = studentPhone;
+    }
+
+    public String getStudentGender() {
+        return studentGender;
+    }
+
+    public void setStudentGender(String studentGender) {
+        this.studentGender = studentGender;
     }
 
     public Long getSubjectId() {
@@ -198,11 +220,19 @@ public class AppointmentDTO {
         this.requestType = requestType;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }

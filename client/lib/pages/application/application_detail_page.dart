@@ -88,7 +88,7 @@ class _ApplicationDetailPageState extends State<ApplicationDetailPage> {
                     const SizedBox(height: 8),
                     _buildInfoRow('电话:', application['applicantPhone'] ?? ''),
                     const SizedBox(height: 8),
-                    _buildInfoRow('报名时间:', _formatDateTime(application['createTime'])),
+                    _buildInfoRow('报名时间:', _formatDateTime(application['createdAt'] ?? application['createTime'])),
                   ],
                 ),
               ),

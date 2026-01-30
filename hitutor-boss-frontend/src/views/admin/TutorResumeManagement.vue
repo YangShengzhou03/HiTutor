@@ -8,12 +8,12 @@
       </template>
 
       <el-table :data="resumeList" border style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="简历ID" width="180">
+        <el-table-column prop="id" label="简历ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="200">
+        <el-table-column prop="userId" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.userId" />
           </template>

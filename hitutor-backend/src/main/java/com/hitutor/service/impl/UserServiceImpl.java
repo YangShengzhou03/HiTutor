@@ -4,14 +4,42 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hitutor.entity.User;
+import com.hitutor.entity.TutorCertification;
+import com.hitutor.entity.Appointment;
+import com.hitutor.entity.Favorite;
+import com.hitutor.entity.PointRecord;
+import com.hitutor.entity.StudentRequest;
+import com.hitutor.entity.TutorProfile;
 import com.hitutor.mapper.UserMapper;
+import com.hitutor.mapper.AppointmentMapper;
+import com.hitutor.mapper.FavoriteMapper;
+import com.hitutor.mapper.PointRecordMapper;
+import com.hitutor.mapper.StudentRequestMapper;
+import com.hitutor.mapper.TutorProfileMapper;
 import com.hitutor.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+    
+    @Autowired
+    private AppointmentMapper appointmentMapper;
+    
+    @Autowired
+    private FavoriteMapper favoriteMapper;
+    
+    @Autowired
+    private PointRecordMapper pointRecordMapper;
+    
+    @Autowired
+    private StudentRequestMapper studentRequestMapper;
+    
+    @Autowired
+    private TutorProfileMapper tutorProfileMapper;
+    
     @Override
     public User getUserById(String id) {
         return baseMapper.selectById(id);
@@ -92,10 +120,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .eq("status", "active")
                 .and(wrapper -> wrapper
                     .like("username", query)
-                    .or()
-                    .like("education", query)
-                    .or()
-                    .like("major", query)
                 );
         
         Page<User> pageObj = new Page<>(page, size);
@@ -110,10 +134,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .eq("status", "active")
                 .and(wrapper -> wrapper
                     .like("username", query)
-                    .or()
-                    .like("education", query)
-                    .or()
-                    .like("major", query)
                 );
         
         Page<User> pageObj = new Page<>(page, size);
@@ -136,5 +156,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .select("id");
         List<User> users = baseMapper.selectList(queryWrapper);
         return users.stream().map(User::getId).toList();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getUserStatistics(String userId) {
+        java.util.Map<String, Object> statistics = new java.util.HashMap<>();
+        
+        // 计算订单数
+        int orderCount = appointmentMapper.selectCount(new QueryWrapper<Appointment>()
+                .eq("student_id", userId)
+                .or()
+                .eq("tutor_id", userId)
+        ).intValue();
+        statistics.put("orderCount", orderCount);
+        
+        // 计算发布数（需求 + 服务）
+        int requestCount = studentRequestMapper.selectCount(new QueryWrapper<StudentRequest>()
+                .eq("user_id", userId)
+        ).intValue();
+        
+        int serviceCount = tutorProfileMapper.selectCount(new QueryWrapper<TutorProfile>()
+                .eq("user_id", userId)
+        ).intValue();
+        
+        int publishingCount = requestCount + serviceCount;
+        statistics.put("publishingCount", publishingCount);
+        
+        // 计算收藏数
+        int favoriteCount = favoriteMapper.selectCount(new QueryWrapper<Favorite>()
+                .eq("user_id", userId)
+        ).intValue();
+        statistics.put("favoriteCount", favoriteCount);
+        
+        // 计算积分
+        java.util.List<PointRecord> pointRecords = pointRecordMapper.selectList(new QueryWrapper<PointRecord>()
+                .eq("user_id", userId)
+        );
+        int pointsCount = pointRecords.stream()
+                .mapToInt(PointRecord::getPoints)
+                .sum();
+        statistics.put("pointsCount", pointsCount);
+        
+        return statistics;
     }
 }

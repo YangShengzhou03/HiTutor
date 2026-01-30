@@ -362,7 +362,7 @@ class DiscoverPage extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      tutor.user.name[0],
+                      tutor.user.name.isNotEmpty ? tutor.user.name[0] : 'U',
                       style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -377,58 +377,76 @@ class DiscoverPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                         children: [
-                           Expanded(
-                             child: Text(
-                               tutor.user.name,
-                               style: const TextStyle(
-                                 fontSize: 14,
-                                 fontWeight: FontWeight.w700,
-                                 color: AppTheme.textPrimary,
-                               ),
-                               maxLines: 1,
-                               overflow: TextOverflow.ellipsis,
-                             ),
-                           ),
-                           const SizedBox(width: 2),
-                           if (tutor.user.isVerified)
-                             Container(
-                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                               decoration: BoxDecoration(
-                                 color: const Color(0xFFF0F9FF),
-                                 borderRadius: BorderRadius.circular(3),
-                               ),
-                               child: const Row(
-                                 mainAxisSize: MainAxisSize.min,
-                                 children: [
-                                   Icon(
-                                     Icons.verified_rounded,
-                                     size: 9,
-                                     color: Color(0xFF0EA5E9),
-                                   ),
-                                   SizedBox(width: 2),
-                                   Text(
-                                     '已认证',
-                                     style: TextStyle(
-                                       fontSize: 8,
-                                       color: Color(0xFF0EA5E9),
-                                       fontWeight: FontWeight.w600,
-                                     ),
-                                   ),
-                                 ],
-                               ),
-                             ),
-                         ],
-                       ),
+                        children: [
+                          Flexible(
+                            child: Text(
+                              tutor.user.name,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (tutor.user.isVerified == true)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Icon(
+                                Icons.verified,
+                                size: 11,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                          if (tutor.user.badge != null && tutor.user.badge!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFDF2F8),
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: Text(
+                                  tutor.user.badge!,
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    color: Color(0xFFEC4899),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          if (tutor.user.gender != null && tutor.user.gender!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              child: Text(
+                                (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? '♂' : '♀',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: (tutor.user.gender!.toLowerCase() == 'male' || tutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          Flexible(
+                            child: Text(
+                              subtitle,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppTheme.textSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

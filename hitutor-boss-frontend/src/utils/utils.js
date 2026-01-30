@@ -6,12 +6,21 @@ export function saveToken(token) {
   localStorage.setItem('token', token)
 }
 
+export function saveRefreshToken(refreshToken) {
+  localStorage.setItem('refreshToken', refreshToken)
+}
+
 export function removeToken() {
   localStorage.removeItem('token')
+  localStorage.removeItem('refreshToken')
 }
 
 export function getToken() {
   return localStorage.getItem('token')
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem('refreshToken')
 }
 
 export function parseJWT(token) {
@@ -35,13 +44,11 @@ export function parseJWT(token) {
     const payload = JSON.parse(jsonPayload);
 
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      removeToken();
       return {};
     }
 
     return payload;
   } catch (error) {
-    removeToken();
     return {};
   }
 }

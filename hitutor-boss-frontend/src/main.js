@@ -22,4 +22,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 app.config.globalProperties.$store = store;
 
-app.mount('#app');
+store.init().then(() => {
+  app.mount('#app');
+});

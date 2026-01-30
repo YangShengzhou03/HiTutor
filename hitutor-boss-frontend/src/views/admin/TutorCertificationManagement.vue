@@ -28,7 +28,7 @@
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="200">
+        <el-table-column prop="userId" label="用户ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.userId" />
           </template>
@@ -37,8 +37,8 @@
         <el-table-column prop="idCard" label="身份证号" width="180" />
         <el-table-column prop="education" label="学历" width="100" />
         <el-table-column prop="school" label="毕业院校" width="150" />
-        <el-table-column prop="major" label="专业" width="120" />
-        <el-table-column prop="certificateNumber" label="教师资格证号" width="150" />
+        <el-table-column prop="major" label="专业" width="180" />
+        <el-table-column prop="certificateNumber" label="教师资格证号" width="160" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
@@ -177,7 +177,11 @@ const formatDateTime = (dateTime) => {
 const fetchCertificationList = async () => {
   loading.value = true
   try {
-    const response = await api.tutorCertification.getAllCertifications()
+    const response = await api.tutorCertification.getAllCertifications({
+      page: pagination.page,
+      size: pagination.size,
+      status: searchForm.status
+    })
     if (response.success) {
       certificationList.value = response.data || []
       pagination.total = response.data?.length || 0

@@ -35,12 +35,12 @@
             <IdDisplay :id="row.id" />
           </template>
         </el-table-column>
-        <el-table-column prop="tutorId" label="家教老师ID" width="200">
+        <el-table-column prop="tutorId" label="家教老师ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.tutorId" />
           </template>
         </el-table-column>
-        <el-table-column prop="studentId" label="学生ID" width="200">
+        <el-table-column prop="studentId" label="学生ID" width="120">
           <template #default="{ row }">
             <IdDisplay :id="row.studentId" />
           </template>

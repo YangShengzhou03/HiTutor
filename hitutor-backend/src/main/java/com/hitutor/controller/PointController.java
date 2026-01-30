@@ -45,7 +45,6 @@ public class PointController {
     }
 
     @PostMapping("/admin/add")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> adminAddPoints(@RequestBody Map<String, Object> request) {
         logger.info("收到积分添加请求，请求体: {}", request);
         
@@ -103,7 +102,6 @@ public class PointController {
     }
 
     @PostMapping("/admin/deduct")
-    @PreAuthorize("hasRole('admin')")
     public ResponseEntity<Map<String, Object>> adminDeductPoints(@RequestBody Map<String, Object> request) {
         logger.info("收到积分扣除请求，请求体: {}", request);
         

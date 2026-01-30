@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken, removeToken } from './utils.js'
+import { getToken, removeToken, parseJWT } from './utils.js'
 import { ElMessage } from 'element-plus'
 import router from '@/route'
 import store from './store.js'
@@ -9,10 +9,24 @@ const Server = axios.create({
   timeout: 10000
 })
 
-Server.interceptors.request.use(config => {
+Server.interceptors.request.use(async config => {
   const token = getToken()
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    const decoded = parseJWT(token)
+    const isTokenExpiring = decoded && decoded.exp && decoded.exp * 1000 - Date.now() < 5 * 60 * 1000
+
+    if (isTokenExpiring) {
+      try {
+        const refreshSuccess = await store.refreshToken()
+        if (refreshSuccess) {
+          config.headers.Authorization = `Bearer ${getToken()}`
+        }
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+      }
+    } else {
+      config.headers.Authorization = `Bearer ${token}`
+    }
   }
   return config
 })
@@ -96,17 +110,22 @@ Server.interceptors.response.use(
 )
 
 function handleTokenExpiration() {
-  removeToken()
+  const token = getToken()
+  const decoded = parseJWT(token)
+  
+  if (!decoded || !decoded.exp || decoded.exp * 1000 < Date.now()) {
+    removeToken()
 
-  if (store && store.clearUser) {
-    store.clearUser()
-  }
+    if (store && store.clearUser) {
+      store.clearUser()
+    }
 
-  ElMessage.error('登录已过期，请重新登录')
+    ElMessage.error('登录已过期，请重新登录')
 
-  const currentPath = router.currentRoute.value.path
-  if (currentPath !== '/login' && !currentPath.includes('/login')) {
-    router.replace('/login')
+    const currentPath = router.currentRoute.value.path
+    if (currentPath !== '/login' && !currentPath.includes('/login')) {
+      router.replace('/login')
+    }
   }
 }
 

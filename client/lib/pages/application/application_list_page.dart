@@ -323,7 +323,7 @@ class _ApplicationListPageState extends State<ApplicationListPage> {
           _buildInfoRow(
             Icons.access_time_outlined,
             '报名时间',
-            _formatDateTime(app['createTime']),
+            _formatDateTime(app['createdAt'] ?? app['createTime']),
           ),
           const SizedBox(height: 16),
           if (status == 'pending')

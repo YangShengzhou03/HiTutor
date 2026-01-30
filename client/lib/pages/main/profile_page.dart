@@ -4,6 +4,7 @@ import '../../theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../routes.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,7 +36,23 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadStatistics();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadStatistics();
+      _refreshUserData();
+    });
+  }
+
+  Future<void> _refreshUserData() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      if (authProvider.user != null && authProvider.user!.id.isNotEmpty) {
+        final updatedUser = await AuthService.getCurrentUserWithUserId(authProvider.user!.id);
+        authProvider.updateUser(updatedUser);
+      }
+    } catch (e) {
+      debugPrint('Failed to refresh user data: $e');
+    }
   }
 
   Future<void> _loadStatistics() async {
@@ -48,53 +65,74 @@ class _ProfilePageState extends State<ProfilePage> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final userId = authProvider.user?.id;
 
-      if (userId != null) {
-        try {
-          final ordersResponse = await ApiService.getUserOrders(userId.toString());
-          if (ordersResponse['success'] == true) {
-            final orders = ordersResponse['data'] ?? [];
-            _orderCount = orders.length;
+      if (userId == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      try {
+        final ordersResponse = await ApiService.getUserOrders(userId.toString());
+        if (ordersResponse['success'] == true) {
+          final data = ordersResponse['data'];
+          if (data is List) {
+            _orderCount = data.length;
+          } else if (data is Map) {
+            _orderCount = (data['content'] as List?)?.length ?? (data['totalElements'] as int?) ?? 0;
           }
-        } catch (_) {
+        }
+      } catch (_) {
+      }
+
+      try {
+        _publishingCount = 0;
+        final requestsResponse = await ApiService.getUserRequestsWithUserId(userId);
+        if (requestsResponse['success'] == true) {
+          final data = requestsResponse['data'];
+          if (data is List) {
+            _publishingCount += data.length;
+          } else if (data is Map) {
+            _publishingCount += (data['content'] as List?)?.length ?? 0;
+          }
         }
 
-        try {
-          _publishingCount = 0;
-          final requestsResponse = await ApiService.getUserRequests();
-          if (requestsResponse['success'] == true) {
-            final requests = requestsResponse['data']?['content'] ?? [];
-            _publishingCount += (requests.length as num).toInt();
+        final servicesResponse = await ApiService.getUserServicesWithUserId(userId);
+        if (servicesResponse['success'] == true) {
+          final data = servicesResponse['data'];
+          if (data is List) {
+            _publishingCount += data.length;
+          } else if (data is Map) {
+            _publishingCount += (data['content'] as List?)?.length ?? 0;
           }
-
-          final servicesResponse = await ApiService.getUserServices();
-          if (servicesResponse['success'] == true) {
-            final services = servicesResponse['data']?['content'] ?? [];
-            _publishingCount += (services.length as num).toInt();
-          }
-        } catch (_) {
         }
+      } catch (_) {
+      }
 
-        try {
-          final favoritesResponse = await ApiService.getFavorites(userId);
-          if (favoritesResponse['success'] == true) {
-            final favorites = favoritesResponse['data'] ?? [];
-            _favoriteCount = favorites.length;
+      try {
+        final favoritesResponse = await ApiService.getFavorites(userId);
+        if (favoritesResponse['success'] == true) {
+          final data = favoritesResponse['data'];
+          if (data is List) {
+            _favoriteCount = data.length;
+          } else if (data is Map) {
+            _favoriteCount = (data['content'] as List?)?.length ?? (data['totalElements'] as int?) ?? 0;
           }
-        } catch (_) {
         }
+      } catch (_) {
+      }
 
-        try {
-          final pointsResponse = await ApiService.getTotalPoints(userId);
-          if (pointsResponse['success'] == true) {
-            final data = pointsResponse['data'];
-            if (data is Map && data.containsKey('totalPoints')) {
-              _pointsCount = data['totalPoints'] ?? 0;
-            } else {
-              _pointsCount = data ?? 0;
-            }
+      try {
+        final pointsResponse = await ApiService.getTotalPoints(userId);
+        if (pointsResponse['success'] == true) {
+          final data = pointsResponse['data'];
+          if (data is Map && data.containsKey('totalPoints')) {
+            _pointsCount = data['totalPoints'] ?? 0;
+          } else {
+            _pointsCount = data as int? ?? 0;
           }
-        } catch (_) {
         }
+      } catch (_) {
       }
     } catch (_) {
       setState(() {
@@ -256,7 +294,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final user = authProvider.user;
     
 
-    
     if (user == null) {
       return Container(
         padding: _padding20,
@@ -349,7 +386,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (user.isVerified) ...[
+
+                    if (user.isVerified == true) ...[
                       const SizedBox(width: 4),
                       Container(
                         padding: _paddingH8V2,
@@ -377,16 +415,50 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                       ),
+                    ]
+                    ,
+                    if (user.badge != null && user.badge!.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: _paddingH8V2,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDF2F8),
+                          borderRadius: _borderRadius4,
+                        ),
+                        child: Text(
+                          user.badge!,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFFEC4899),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  userLabel,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.textSecondary,
-                  ),
+                Row(
+                  children: [
+                    if (user.gender != null && user.gender!.isNotEmpty) ...[
+                      Text(
+                        user.gender == 'male' ? '♂' : '♀',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: user.gender == 'male' ? AppTheme.maleColor : AppTheme.femaleColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    Text(
+                      userLabel,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -32,7 +32,7 @@ class CustomerServicePage extends StatelessWidget {
               _buildContactCard(
                 Icons.phone_rounded,
                 '电话客服',
-                '19979043899',
+                '199-7904-3899',
                 '工作日 9:00-18:00',
               ),
               const SizedBox(height: 12),

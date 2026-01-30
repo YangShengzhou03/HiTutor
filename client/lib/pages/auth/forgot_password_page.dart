@@ -46,14 +46,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   void initState() {
     super.initState();
-    _phoneController.addListener(_updateFormState);
-    _verificationCodeController.addListener(_updateFormState);
-    _newPasswordController.addListener(_updateFormState);
-    _confirmPasswordController.addListener(_updateFormState);
-  }
-
-  void _updateFormState() {
-    setState(() {});
   }
 
   @override
