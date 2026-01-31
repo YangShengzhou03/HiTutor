@@ -77,6 +77,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                   targetGradeLevels: tutor.targetGradeLevels,
                   latitude: tutor.latitude,
                   longitude: tutor.longitude,
+                  availableTime: tutor.availableTime,
                 );
               }
             }
@@ -229,7 +230,7 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
           color: AppTheme.textPrimary,
         ),
         title: const Text(
-          '家教需求',
+          '家教服务',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -425,6 +426,16 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
+                        if (_currentTutor.user.gender != null && _currentTutor.user.gender!.isNotEmpty)
+                          Text(
+                            (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? '♂' : '♀',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        const SizedBox(width: 8),
                         const Icon(
                           Icons.star_rounded,
                           size: 16,
@@ -447,16 +458,6 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
                             color: AppTheme.textSecondary,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        if (_currentTutor.user.gender != null && _currentTutor.user.gender!.isNotEmpty)
-                          Text(
-                            (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? '♂' : '♀',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: (_currentTutor.user.gender!.toLowerCase() == 'male' || _currentTutor.user.gender == '男') ? AppTheme.maleColor : AppTheme.femaleColor,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
                       ],
                     ),
                   ],
@@ -544,6 +545,12 @@ class _TutorServiceDetailPageState extends State<TutorServiceDetailPage> {
             Icons.location_on_outlined,
             '授课区域',
             _currentTutor.address ?? '暂无信息',
+          ),
+          const SizedBox(height: 12),
+          _buildInfoRow(
+            Icons.access_time_outlined,
+            '授课时间',
+            _currentTutor.availableTime ?? '暂无信息',
           ),
           const SizedBox(height: 16),
           Container(

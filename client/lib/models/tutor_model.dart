@@ -21,6 +21,7 @@ class Tutor {
   final List<GradeLevel> targetGradeLevels;
   final String? latitude;
   final String? longitude;
+  final String? availableTime;
 
   Tutor({
     required this.id,
@@ -43,6 +44,7 @@ class Tutor {
     required this.targetGradeLevels,
     this.latitude,
     this.longitude,
+    this.availableTime,
   });
 
   factory Tutor.fromJson(Map<String, dynamic> json) {
@@ -108,6 +110,7 @@ class Tutor {
       targetGradeLevels: gradeLevels,
       latitude: json['latitude']?.toString(),
       longitude: json['longitude']?.toString(),
+      availableTime: json['availableTime']?.toString(),
     );
   }
 

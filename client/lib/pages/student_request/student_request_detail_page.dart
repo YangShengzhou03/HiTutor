@@ -433,6 +433,12 @@ class _StudentRequestDetailPageState extends State<StudentRequestDetailPage> {
             (widget.request.address != null && widget.request.address!.isNotEmpty) ? widget.request.address! : '暂无地址信息',
           ),
           const SizedBox(height: 16),
+          _buildInfoRow(
+            Icons.access_time_outlined,
+            '授课时间',
+            widget.request.availableTime ?? '暂无信息',
+          ),
+          const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
