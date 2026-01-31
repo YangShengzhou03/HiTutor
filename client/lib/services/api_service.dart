@@ -547,17 +547,18 @@ class ApiService {
   static Future<dynamic> getNotifications({
     int page = 0,
     int size = 20,
+    String? userId,
   }) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/notifications?page=$page&size=$size'),
+      Uri.parse('$baseUrl/notifications?page=$page&size=$size&userId=$userId'),
       headers: _getHeaders(needAuth: true),
     );
     return await _handleResponse(response, needAuth: true);
   }
 
-  static Future<dynamic> getUnreadNotificationCount() async {
+  static Future<dynamic> getUnreadNotificationCount({String? userId}) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/notifications/unread-count'),
+      Uri.parse('$baseUrl/notifications/unread-count?userId=$userId'),
       headers: _getHeaders(needAuth: true),
     );
     return await _handleResponse(response, needAuth: true);
@@ -571,9 +572,9 @@ class ApiService {
     return await _handleResponse(response, needAuth: true);
   }
 
-  static Future<dynamic> markAllNotificationsAsRead() async {
+  static Future<dynamic> markAllNotificationsAsRead({String? userId}) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/notifications/read-all'),
+      Uri.parse('$baseUrl/notifications/read-all?userId=$userId'),
       headers: _getHeaders(needAuth: true),
     );
     return await _handleResponse(response, needAuth: true);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
+import '../../providers/auth_provider.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -23,13 +25,26 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _loadNotifications() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.user?.id;
+    
+    if (userId == null) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = '请先登录';
+        });
+      }
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
     });
 
     try {
-      final response = await ApiService.getNotifications();
+      final response = await ApiService.getNotifications(userId: userId);
 
       if (!mounted) return;
 
@@ -64,7 +79,12 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Future<void> _loadUnreadCount() async {
     try {
-      final response = await ApiService.getUnreadNotificationCount();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.id;
+      
+      if (userId == null) return;
+      
+      final response = await ApiService.getUnreadNotificationCount(userId: userId);
       if (response is Map && response['success'] == true) {
         setState(() {
           _unreadCount = response['data'] ?? 0;
@@ -96,7 +116,12 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Future<void> _markAllAsRead() async {
     try {
-      await ApiService.markAllNotificationsAsRead();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.id;
+      
+      if (userId == null) return;
+      
+      await ApiService.markAllNotificationsAsRead(userId: userId);
       setState(() {
         for (var notification in _notifications) {
           notification['isRead'] = 1;

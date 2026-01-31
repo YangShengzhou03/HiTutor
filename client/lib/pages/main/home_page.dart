@@ -50,7 +50,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadUnreadNotificationCount() async {
     try {
-      final response = await ApiService.getUnreadNotificationCount();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.user?.id;
+      
+      if (userId == null) return;
+      
+      final response = await ApiService.getUnreadNotificationCount(userId: userId);
       if (response is Map && response['success'] == true) {
         setState(() {
           _unreadNotificationCount = response['data'] ?? 0;

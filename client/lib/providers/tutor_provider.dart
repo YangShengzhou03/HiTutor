@@ -52,39 +52,29 @@ class TutorProvider with ChangeNotifier {
       final requestsData = data['content'] as List? ?? [];
       
       final students = requestsData.map((item) {
-        final userVerified = _parseBool(item['userVerified']);
-        
+        final tutor = Tutor.fromJson(item);
         return Tutor(
-          id: item['id']?.toString() ?? '',
-          user: User(
-            id: item['userId']?.toString() ?? '',
-            username: item['userName'] ?? item['childName'] ?? '学生需求',
-            avatar: item['userAvatar'] ?? '',
-            phone: '',
-            email: '',
-            gender: _normalizeGender(item['userGender']),
-            badge: item['badge']?.toString(),
-            isVerified: userVerified,
-            teachingExperience: 0,
-            createTime: DateTime.now(),
-          ),
-          subjects: item['subjectName'] != null 
-              ? [Subject(id: item['subjectId'].toString(), name: item['subjectName'], icon: '')]
-              : [],
-          tags: [],
-          rating: 0.0,
-          reviewCount: 0,
-          pricePerHour: '${item['hourlyRateMin'] ?? 0}-${item['hourlyRateMax'] ?? 0}',
-          experience: '',
-          educationBackground: item['childGrade'] ?? '',
-          description: item['requirements'] ?? '',
-          certifications: [],
-          isAvailable: true,
-          createTime: DateTime.now(),
+          id: tutor.id,
+          user: tutor.user,
+          subjects: tutor.subjects,
+          tags: tutor.tags,
+          rating: tutor.rating,
+          reviewCount: tutor.reviewCount,
+          pricePerHour: tutor.pricePerHour,
+          experience: tutor.experience,
+          educationBackground: tutor.educationBackground,
+          school: tutor.school,
+          major: tutor.major,
+          description: tutor.description,
+          address: tutor.address,
+          certifications: tutor.certifications,
+          isAvailable: tutor.isAvailable,
+          createTime: tutor.createTime,
           type: 'student_request',
-          targetGradeLevels: [],
-          latitude: item['latitude']?.toString(),
-          longitude: item['longitude']?.toString(),
+          targetGradeLevels: tutor.targetGradeLevels,
+          latitude: tutor.latitude,
+          longitude: tutor.longitude,
+          availableTime: tutor.availableTime,
         );
       }).toList();
       
@@ -123,37 +113,29 @@ class TutorProvider with ChangeNotifier {
       final studentsData = response['data'] as List? ?? [];
       
       final students = studentsData.map((item) {
+        final tutor = Tutor.fromJson(item);
         return Tutor(
-          id: item['id']?.toString() ?? '',
-          user: User(
-            id: item['userId']?.toString() ?? '',
-            username: item['userName'] ?? item['childName'] ?? '学生需求',
-            avatar: item['userAvatar'] ?? '',
-            phone: '',
-            email: '',
-            gender: _normalizeGender(item['userGender']),
-            badge: item['badge']?.toString(),
-            isVerified: _parseBool(item['userVerified']),
-            teachingExperience: 0,
-            createTime: DateTime.now(),
-          ),
-          subjects: item['subjectName'] != null 
-              ? [Subject(id: item['subjectId'].toString(), name: item['subjectName'], icon: '')]
-              : [],
-          tags: [],
-          rating: 0.0,
-          reviewCount: 0,
-          pricePerHour: '${item['hourlyRateMin'] ?? 0}-${item['hourlyRateMax'] ?? 0}',
-          experience: '',
-          educationBackground: item['childGrade'] ?? '',
-          description: item['requirements'] ?? '',
-          certifications: [],
-          isAvailable: true,
-          createTime: DateTime.now(),
+          id: tutor.id,
+          user: tutor.user,
+          subjects: tutor.subjects,
+          tags: tutor.tags,
+          rating: tutor.rating,
+          reviewCount: tutor.reviewCount,
+          pricePerHour: tutor.pricePerHour,
+          experience: tutor.experience,
+          educationBackground: tutor.educationBackground,
+          school: tutor.school,
+          major: tutor.major,
+          description: tutor.description,
+          address: tutor.address,
+          certifications: tutor.certifications,
+          isAvailable: tutor.isAvailable,
+          createTime: tutor.createTime,
           type: 'student_request',
-          targetGradeLevels: [],
-          latitude: item['latitude']?.toString(),
-          longitude: item['longitude']?.toString(),
+          targetGradeLevels: tutor.targetGradeLevels,
+          latitude: tutor.latitude,
+          longitude: tutor.longitude,
+          availableTime: tutor.availableTime,
         );
       }).toList();
       
